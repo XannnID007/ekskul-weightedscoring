@@ -55,18 +55,18 @@
                         <div>
                             <h6 class="card-title mb-1">Status Pendaftaran</h6>
                             <h2 class="mb-0">
-                                @if (auth()->user()->pendaftarans()->disetujui()->exists())
+                                @if (auth()->user()->pendaftarans()->where('status', 'disetujui')->exists())
                                     <i class="bi bi-check-circle text-success"></i>
-                                @elseif(auth()->user()->pendaftarans()->pending()->exists())
+                                @elseif(auth()->user()->pendaftarans()->where('status', 'pending')->exists())
                                     <i class="bi bi-clock text-warning"></i>
                                 @else
                                     <i class="bi bi-x-circle text-danger"></i>
                                 @endif
                             </h2>
                             <small class="opacity-75">
-                                @if (auth()->user()->pendaftarans()->disetujui()->exists())
+                                @if (auth()->user()->pendaftarans()->where('status', 'disetujui')->exists())
                                     Sudah Terdaftar
-                                @elseif(auth()->user()->pendaftarans()->pending()->exists())
+                                @elseif(auth()->user()->pendaftarans()->where('status', 'pending')->exists())
                                     Menunggu Persetujuan
                                 @else
                                     Belum Mendaftar
@@ -88,8 +88,8 @@
                         <div>
                             <h6 class="card-title mb-1">Tingkat Kehadiran</h6>
                             <h2 class="mb-0">
-                                @if (auth()->user()->pendaftarans()->disetujui()->exists())
-                                    {{ auth()->user()->pendaftarans()->disetujui()->first()->persentase_kehadiran }}%
+                                @if (auth()->user()->pendaftarans()->where('status', 'disetujui')->exists())
+                                    {{ auth()->user()->pendaftarans()->where('status', 'disetujui')->first()->persentase_kehadiran ?? 0 }}%
                                 @else
                                     -
                                 @endif
@@ -162,7 +162,7 @@
                     <div class="card-body">
                         @if (isset($rekomendasis) && $rekomendasis->count() > 0)
                             <div class="row g-3">
-                                @foreach ($rekomendasis->take(3) as $rekomendasi)
+                                @foreach ($rekomendasis as $rekomendasi)
                                     <div class="col-md-4">
                                         <div class="card h-100 border-0"
                                             style="background: linear-gradient(135deg, rgba(108, 66, 193, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);">

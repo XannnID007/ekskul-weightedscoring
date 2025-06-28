@@ -53,6 +53,27 @@ Route::get('/', function () {
 // Authentication routes sudah di-handle oleh laravel/ui
 Auth::routes(['verify' => true]);
 
+Route::get('/redirect-by-role', function () {
+    if (!auth()->check()) {
+        return redirect()->route('login');
+    }
+
+    $user = auth()->user();
+
+    switch ($user->role) {
+        case 'admin':
+            return redirect()->route('admin.dashboard');
+        case 'pembina':
+            return redirect()->route('pembina.dashboard');
+        case 'siswa':
+            return redirect()->route('siswa.dashboard');
+        default:
+            auth()->logout();
+            return redirect()->route('login')
+                ->with('error', 'Role tidak valid. Silakan hubungi administrator.');
+    }
+})->name('redirect.by.role');
+
 // Routes yang memerlukan authentication
 Route::middleware(['auth', 'verified'])->group(function () {
 
@@ -163,22 +184,4 @@ Route::middleware(['auth'])->prefix('api')->name('api.')->group(function () {
         Route::get('/notifikasi', [SiswaDashboardController::class, 'getNotifikasi']);
         Route::post('/notifikasi/{id}/read', [SiswaDashboardController::class, 'markAsRead']);
     });
-});
-
-// Middleware untuk role checking
-Route::middleware('auth')->group(function () {
-    Route::get('/redirect-by-role', function () {
-        $user = auth()->user();
-        switch ($user->role) {
-            case 'admin':
-                return redirect()->route('admin.dashboard');
-            case 'pembina':
-                return redirect()->route('pembina.dashboard');
-            case 'siswa':
-                return redirect()->route('siswa.dashboard');
-            default:
-                auth()->logout();
-                return redirect()->route('login')->with('error', 'Role tidak valid');
-        }
-    })->name('redirect.by.role');
 });
