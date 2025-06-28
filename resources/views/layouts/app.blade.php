@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="id" data-bs-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Ekstrakurikuler App') - MA Modern Miftahussa'adah</title>
-    
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -16,7 +17,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
     <style>
         :root {
             --bs-primary: #6f42c1;
@@ -166,13 +167,15 @@
         }
 
         /* Forms */
-        .form-control, .form-select {
+        .form-control,
+        .form-select {
             background-color: var(--bs-gray-800);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #fff;
         }
 
-        .form-control:focus, .form-select:focus {
+        .form-control:focus,
+        .form-select:focus {
             background-color: var(--bs-gray-800);
             border-color: var(--bs-primary);
             box-shadow: 0 0 0 0.2rem rgba(108, 66, 193, 0.25);
@@ -193,11 +196,11 @@
             .sidebar {
                 transform: translateX(-100%);
             }
-            
+
             .sidebar.show {
                 transform: translateX(0);
             }
-            
+
             .main-content {
                 margin-left: 0;
             }
@@ -229,13 +232,21 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
-    
+
     @stack('styles')
 </head>
+
 <body>
     <!-- Sidebar -->
     <nav class="sidebar" id="sidebar">
@@ -243,76 +254,93 @@
             <h4><i class="bi bi-mortarboard-fill me-2"></i>EkstrakurikulerApp</h4>
             <small class="text-muted">MA Modern Miftahussa'adah</small>
         </div>
-        
+
         <div class="sidebar-menu">
-            @if(auth()->user()->role === 'admin')
-                <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+            @if (auth()->user()->role === 'admin')
+                <a href="{{ route('admin.dashboard') }}"
+                    class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <i class="bi bi-speedometer2"></i>
                     Dashboard
                 </a>
-                <a href="{{ route('admin.ekstrakurikuler.index') }}" class="nav-link {{ request()->routeIs('admin.ekstrakurikuler.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.ekstrakurikuler.index') }}"
+                    class="nav-link {{ request()->routeIs('admin.ekstrakurikuler.*') ? 'active' : '' }}">
                     <i class="bi bi-collection"></i>
                     Kelola Ekstrakurikuler
                 </a>
-                <a href="{{ route('admin.user.index', ['role' => 'siswa']) }}" class="nav-link {{ request()->routeIs('admin.user.*') && request()->get('role') === 'siswa' ? 'active' : '' }}">
+                <a href="{{ route('admin.user.index', ['role' => 'siswa']) }}"
+                    class="nav-link {{ request()->routeIs('admin.user.*') && request()->get('role') === 'siswa' ? 'active' : '' }}">
                     <i class="bi bi-people"></i>
                     Kelola Siswa
                 </a>
-                <a href="{{ route('admin.user.index', ['role' => 'pembina']) }}" class="nav-link {{ request()->routeIs('admin.user.*') && request()->get('role') === 'pembina' ? 'active' : '' }}">
+                <a href="{{ route('admin.user.index', ['role' => 'pembina']) }}"
+                    class="nav-link {{ request()->routeIs('admin.user.*') && request()->get('role') === 'pembina' ? 'active' : '' }}">
                     <i class="bi bi-person-badge"></i>
                     Kelola Pembina
                 </a>
-                <a href="{{ route('admin.laporan') }}" class="nav-link {{ request()->routeIs('admin.laporan') ? 'active' : '' }}">
+                <a href="{{ route('admin.laporan') }}"
+                    class="nav-link {{ request()->routeIs('admin.laporan') ? 'active' : '' }}">
                     <i class="bi bi-file-earmark-text"></i>
                     Laporan
                 </a>
             @elseif(auth()->user()->role === 'pembina')
-                <a href="{{ route('pembina.dashboard') }}" class="nav-link {{ request()->routeIs('pembina.dashboard') ? 'active' : '' }}">
+                <a href="{{ route('pembina.dashboard') }}"
+                    class="nav-link {{ request()->routeIs('pembina.dashboard') ? 'active' : '' }}">
                     <i class="bi bi-speedometer2"></i>
                     Dashboard
                 </a>
-                <a href="{{ route('pembina.pendaftaran.index') }}" class="nav-link {{ request()->routeIs('pembina.pendaftaran.*') ? 'active' : '' }}">
+                <a href="{{ route('pembina.pendaftaran.index') }}"
+                    class="nav-link {{ request()->routeIs('pembina.pendaftaran.*') ? 'active' : '' }}">
                     <i class="bi bi-person-plus"></i>
                     Kelola Pendaftaran
                 </a>
-                <a href="{{ route('pembina.absensi.index') }}" class="nav-link {{ request()->routeIs('pembina.absensi.*') ? 'active' : '' }}">
+                <a href="{{ route('pembina.absensi.index') }}"
+                    class="nav-link {{ request()->routeIs('pembina.absensi.*') ? 'active' : '' }}">
                     <i class="bi bi-calendar-check"></i>
                     Input Kehadiran
                 </a>
-                <a href="{{ route('pembina.pengumuman.index') }}" class="nav-link {{ request()->routeIs('pembina.pengumuman.*') ? 'active' : '' }}">
+                <a href="{{ route('pembina.pengumuman.index') }}"
+                    class="nav-link {{ request()->routeIs('pembina.pengumuman.*') ? 'active' : '' }}">
                     <i class="bi bi-megaphone"></i>
                     Pengumuman
                 </a>
-                <a href="{{ route('pembina.galeri.index') }}" class="nav-link {{ request()->routeIs('pembina.galeri.*') ? 'active' : '' }}">
+                <a href="{{ route('pembina.galeri.index') }}"
+                    class="nav-link {{ request()->routeIs('pembina.galeri.*') ? 'active' : '' }}">
                     <i class="bi bi-images"></i>
                     Galeri Kegiatan
                 </a>
             @else
-                <a href="{{ route('siswa.dashboard') }}" class="nav-link {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}">
+                <a href="{{ route('siswa.dashboard') }}"
+                    class="nav-link {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}">
                     <i class="bi bi-speedometer2"></i>
                     Dashboard
                 </a>
-                <a href="{{ route('siswa.profil') }}" class="nav-link {{ request()->routeIs('siswa.profil') ? 'active' : '' }}">
+                <a href="{{ route('siswa.profil') }}"
+                    class="nav-link {{ request()->routeIs('siswa.profil') ? 'active' : '' }}">
                     <i class="bi bi-person-circle"></i>
                     Lengkapi Profil
                 </a>
-                <a href="{{ route('siswa.rekomendasi') }}" class="nav-link {{ request()->routeIs('siswa.rekomendasi') ? 'active' : '' }}">
+                <a href="{{ route('siswa.rekomendasi') }}"
+                    class="nav-link {{ request()->routeIs('siswa.rekomendasi') ? 'active' : '' }}">
                     <i class="bi bi-stars"></i>
                     Rekomendasi
                 </a>
-                <a href="{{ route('siswa.ekstrakurikuler.index') }}" class="nav-link {{ request()->routeIs('siswa.ekstrakurikuler.*') ? 'active' : '' }}">
+                <a href="{{ route('siswa.ekstrakurikuler.index') }}"
+                    class="nav-link {{ request()->routeIs('siswa.ekstrakurikuler.*') ? 'active' : '' }}">
                     <i class="bi bi-collection"></i>
                     Ekstrakurikuler
                 </a>
-                <a href="{{ route('siswa.pendaftaran') }}" class="nav-link {{ request()->routeIs('siswa.pendaftaran') ? 'active' : '' }}">
+                <a href="{{ route('siswa.pendaftaran') }}"
+                    class="nav-link {{ request()->routeIs('siswa.pendaftaran') ? 'active' : '' }}">
                     <i class="bi bi-clipboard-check"></i>
                     Status Pendaftaran
                 </a>
-                <a href="{{ route('siswa.jadwal') }}" class="nav-link {{ request()->routeIs('siswa.jadwal') ? 'active' : '' }}">
+                <a href="{{ route('siswa.jadwal') }}"
+                    class="nav-link {{ request()->routeIs('siswa.jadwal') ? 'active' : '' }}">
                     <i class="bi bi-calendar3"></i>
                     Jadwal Kegiatan
                 </a>
-                <a href="{{ route('siswa.kehadiran') }}" class="nav-link {{ request()->routeIs('siswa.kehadiran') ? 'active' : '' }}">
+                <a href="{{ route('siswa.kehadiran') }}"
+                    class="nav-link {{ request()->routeIs('siswa.kehadiran') ? 'active' : '' }}">
                     <i class="bi bi-graph-up"></i>
                     Rekap Kehadiran
                 </a>
@@ -328,34 +356,43 @@
                 <button class="btn btn-outline-light d-lg-none" type="button" onclick="toggleSidebar()">
                     <i class="bi bi-list"></i>
                 </button>
-                
+
                 <div class="navbar-nav ms-auto">
                     <!-- Notifications -->
-                    @if(auth()->user()->role === 'siswa')
+                    @if (auth()->user()->role === 'siswa')
                         <div class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button"
+                                data-bs-toggle="dropdown">
                                 <i class="bi bi-bell"></i>
                                 <span class="badge bg-danger badge-pill">3</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><h6 class="dropdown-header">Notifikasi</h6></li>
+                                <li>
+                                    <h6 class="dropdown-header">Notifikasi</h6>
+                                </li>
                                 <li><a class="dropdown-item" href="#">Pendaftaran Anda disetujui</a></li>
                                 <li><a class="dropdown-item" href="#">Pengumuman baru dari Futsal</a></li>
                                 <li><a class="dropdown-item" href="#">Jadwal kegiatan berubah</a></li>
                             </ul>
                         </div>
                     @endif
-                    
+
                     <!-- User Dropdown -->
                     <div class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                            data-bs-toggle="dropdown">
                             <i class="bi bi-person-circle me-1"></i>
                             {{ auth()->user()->name }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><h6 class="dropdown-header">{{ ucfirst(auth()->user()->role) }}</h6></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="bi bi-gear me-2"></i>Pengaturan</a></li>
+                            <li>
+                                <h6 class="dropdown-header">{{ ucfirst(auth()->user()->role) }}</h6>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i
+                                        class="bi bi-gear me-2"></i>Pengaturan</a></li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
@@ -386,11 +423,11 @@
             </div>
 
             <!-- Breadcrumb -->
-            @if(isset($breadcrumbs))
+            @if (isset($breadcrumbs))
                 <nav aria-label="breadcrumb" class="mb-4">
                     <ol class="breadcrumb">
-                        @foreach($breadcrumbs as $breadcrumb)
-                            @if($loop->last)
+                        @foreach ($breadcrumbs as $breadcrumb)
+                            @if ($loop->last)
                                 <li class="breadcrumb-item active">{{ $breadcrumb['title'] }}</li>
                             @else
                                 <li class="breadcrumb-item">
@@ -403,25 +440,25 @@
             @endif
 
             <!-- Flash Messages -->
-            @if(session('success'))
+            @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
 
-            @if(session('error'))
+            @if (session('error'))
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <i class="bi bi-exclamation-circle me-2"></i>{{ session('error') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
 
-            @if($errors->any())
+            @if ($errors->any())
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <i class="bi bi-exclamation-triangle me-2"></i>
                     <ul class="mb-0">
-                        @foreach($errors->all() as $error)
+                        @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
@@ -458,7 +495,10 @@
                 },
                 responsive: true,
                 pageLength: 10,
-                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]],
+                lengthMenu: [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, "Semua"]
+                ],
                 dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rtip'
             });
         });
@@ -516,4 +556,5 @@
 
     @stack('scripts')
 </body>
+
 </html>

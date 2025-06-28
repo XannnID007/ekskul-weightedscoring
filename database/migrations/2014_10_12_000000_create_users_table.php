@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
             $table->enum('role', ['admin', 'pembina', 'siswa'])->default('siswa');
             $table->string('nis')->nullable();
             $table->string('telepon')->nullable();
@@ -23,7 +27,8 @@ return new class extends Migration
             $table->text('minat')->nullable(); // JSON array minat
             $table->text('prestasi')->nullable(); // prestasi
             $table->boolean('is_active')->default(true);
-            $table->timestamp('email_verified_at')->nullable();
+            $table->rememberToken();
+            $table->timestamps();
         });
     }
 
@@ -32,19 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn([
-                'role',
-                'nis',
-                'telepon',
-                'alamat',
-                'jenis_kelamin',
-                'tanggal_lahir',
-                'nilai_rata_rata',
-                'minat',
-                'prestasi',
-                'is_active'
-            ]);
-        });
+        Schema::dropIfExists('users');
     }
 };
