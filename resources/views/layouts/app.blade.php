@@ -20,7 +20,9 @@
 
     <style>
         :root {
-            --bs-primary: #6f42c1;
+            --bs-primary: #20b2aa;
+            --bs-primary-dark: #17a2b8;
+            --bs-primary-light: #4dd0e1;
             --bs-secondary: #6c757d;
             --bs-success: #20c997;
             --bs-info: #0dcaf0;
@@ -75,13 +77,13 @@
         }
 
         .sidebar-menu .nav-link:hover {
-            background-color: rgba(108, 66, 193, 0.1);
+            background-color: rgba(32, 178, 170, 0.1);
             color: var(--bs-primary);
             border-left-color: var(--bs-primary);
         }
 
         .sidebar-menu .nav-link.active {
-            background-color: rgba(108, 66, 193, 0.2);
+            background-color: rgba(32, 178, 170, 0.2);
             color: var(--bs-primary);
             border-left-color: var(--bs-primary);
         }
@@ -127,7 +129,7 @@
 
         /* Stats Cards */
         .stats-card {
-            background: linear-gradient(135deg, var(--bs-primary) 0%, #8b5cf6 100%);
+            background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-primary-dark) 100%);
             color: white;
             border: none;
         }
@@ -151,12 +153,12 @@
 
         /* Buttons */
         .btn-primary {
-            background: linear-gradient(135deg, var(--bs-primary) 0%, #8b5cf6 100%);
+            background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-primary-dark) 100%);
             border: none;
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, #8b5cf6 0%, var(--bs-primary) 100%);
+            background: linear-gradient(135deg, var(--bs-primary-dark) 0%, var(--bs-primary) 100%);
             transform: translateY(-1px);
         }
 
@@ -178,13 +180,13 @@
         .form-select:focus {
             background-color: var(--bs-gray-800);
             border-color: var(--bs-primary);
-            box-shadow: 0 0 0 0.2rem rgba(108, 66, 193, 0.25);
+            box-shadow: 0 0 0 0.2rem rgba(32, 178, 170, 0.25);
             color: #fff;
         }
 
         /* Page Header */
         .page-header {
-            background: linear-gradient(135deg, var(--bs-primary) 0%, #8b5cf6 100%);
+            background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-primary-dark) 100%);
             color: white;
             padding: 2rem;
             border-radius: 12px;
@@ -226,6 +228,22 @@
             padding: 0.5em 0.75em;
         }
 
+        /* Custom Badge Colors */
+        .badge.bg-female {
+            background-color: #ec4899 !important;
+            color: white !important;
+        }
+
+        .badge.bg-male {
+            background-color: var(--bs-primary) !important;
+            color: white !important;
+        }
+
+        .badge.bg-pink {
+            background-color: #ec4899 !important;
+            color: white !important;
+        }
+
         /* Animation */
         .fade-in {
             animation: fadeIn 0.5s ease-in;
@@ -242,236 +260,245 @@
                 transform: translateY(0);
             }
         }
+
+        /* Auth Layout Styles */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--bs-gray-900) 0%, var(--bs-gray-800) 100%);
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 400px;
+            background: var(--bs-gray-800);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
     </style>
 
     @stack('styles')
 </head>
 
 <body>
-    <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h4><i class="bi bi-mortarboard-fill me-2"></i>EkstrakurikulerApp</h4>
-            <small class="text-muted">MA Modern Miftahussa'adah</small>
-        </div>
+    @auth
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h4>MiftahXCool</h4>
+                <small class="text-muted">MA Modern Miftahussa'adah</small>
+            </div>
 
-        <div class="sidebar-menu">
-            @if (auth()->user()->role === 'admin')
-                <a href="{{ route('admin.dashboard') }}"
-                    class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                    <i class="bi bi-speedometer2"></i>
-                    Dashboard
-                </a>
-                <a href="{{ route('admin.ekstrakurikuler.index') }}"
-                    class="nav-link {{ request()->routeIs('admin.ekstrakurikuler.*') ? 'active' : '' }}">
-                    <i class="bi bi-collection"></i>
-                    Kelola Ekstrakurikuler
-                </a>
-                <a href="{{ route('admin.user.index', ['role' => 'siswa']) }}"
-                    class="nav-link {{ request()->routeIs('admin.user.*') && request()->get('role') === 'siswa' ? 'active' : '' }}">
-                    <i class="bi bi-people"></i>
-                    Kelola Siswa
-                </a>
-                <a href="{{ route('admin.user.index', ['role' => 'pembina']) }}"
-                    class="nav-link {{ request()->routeIs('admin.user.*') && request()->get('role') === 'pembina' ? 'active' : '' }}">
-                    <i class="bi bi-person-badge"></i>
-                    Kelola Pembina
-                </a>
-                <a href="{{ route('admin.laporan') }}"
-                    class="nav-link {{ request()->routeIs('admin.laporan') ? 'active' : '' }}">
-                    <i class="bi bi-file-earmark-text"></i>
-                    Laporan
-                </a>
-            @elseif(auth()->user()->role === 'pembina')
-                <a href="{{ route('pembina.dashboard') }}"
-                    class="nav-link {{ request()->routeIs('pembina.dashboard') ? 'active' : '' }}">
-                    <i class="bi bi-speedometer2"></i>
-                    Dashboard
-                </a>
-                <a href="{{ route('pembina.pendaftaran.index') }}"
-                    class="nav-link {{ request()->routeIs('pembina.pendaftaran.*') ? 'active' : '' }}">
-                    <i class="bi bi-person-plus"></i>
-                    Kelola Pendaftaran
-                </a>
-                <a href="{{ route('pembina.absensi.index') }}"
-                    class="nav-link {{ request()->routeIs('pembina.absensi.*') ? 'active' : '' }}">
-                    <i class="bi bi-calendar-check"></i>
-                    Input Kehadiran
-                </a>
-                <a href="{{ route('pembina.pengumuman.index') }}"
-                    class="nav-link {{ request()->routeIs('pembina.pengumuman.*') ? 'active' : '' }}">
-                    <i class="bi bi-megaphone"></i>
-                    Pengumuman
-                </a>
-                <a href="{{ route('pembina.galeri.index') }}"
-                    class="nav-link {{ request()->routeIs('pembina.galeri.*') ? 'active' : '' }}">
-                    <i class="bi bi-images"></i>
-                    Galeri Kegiatan
-                </a>
-            @else
-                <a href="{{ route('siswa.dashboard') }}"
-                    class="nav-link {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}">
-                    <i class="bi bi-speedometer2"></i>
-                    Dashboard
-                </a>
-                <a href="{{ route('siswa.profil') }}"
-                    class="nav-link {{ request()->routeIs('siswa.profil') ? 'active' : '' }}">
-                    <i class="bi bi-person-circle"></i>
-                    Lengkapi Profil
-                </a>
-                <a href="{{ route('siswa.rekomendasi') }}"
-                    class="nav-link {{ request()->routeIs('siswa.rekomendasi') ? 'active' : '' }}">
-                    <i class="bi bi-stars"></i>
-                    Rekomendasi
-                </a>
-                <a href="{{ route('siswa.ekstrakurikuler.index') }}"
-                    class="nav-link {{ request()->routeIs('siswa.ekstrakurikuler.*') ? 'active' : '' }}">
-                    <i class="bi bi-collection"></i>
-                    Ekstrakurikuler
-                </a>
-                <a href="{{ route('siswa.pendaftaran') }}"
-                    class="nav-link {{ request()->routeIs('siswa.pendaftaran') ? 'active' : '' }}">
-                    <i class="bi bi-clipboard-check"></i>
-                    Status Pendaftaran
-                </a>
-                <a href="{{ route('siswa.jadwal') }}"
-                    class="nav-link {{ request()->routeIs('siswa.jadwal') ? 'active' : '' }}">
-                    <i class="bi bi-calendar3"></i>
-                    Jadwal Kegiatan
-                </a>
-                <a href="{{ route('siswa.kehadiran') }}"
-                    class="nav-link {{ request()->routeIs('siswa.kehadiran') ? 'active' : '' }}">
-                    <i class="bi bi-graph-up"></i>
-                    Rekap Kehadiran
-                </a>
-            @endif
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Top Navbar -->
-        <nav class="navbar navbar-expand-lg top-navbar">
-            <div class="container-fluid">
-                <button class="btn btn-outline-light d-lg-none" type="button" onclick="toggleSidebar()">
-                    <i class="bi bi-list"></i>
-                </button>
-
-                <div class="navbar-nav ms-auto">
-                    <!-- Notifications -->
-                    @if (auth()->user()->role === 'siswa')
-                        <div class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button"
-                                data-bs-toggle="dropdown">
-                                <i class="bi bi-bell"></i>
-                                <span class="badge bg-danger badge-pill">3</span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li>
-                                    <h6 class="dropdown-header">Notifikasi</h6>
-                                </li>
-                                <li><a class="dropdown-item" href="#">Pendaftaran Anda disetujui</a></li>
-                                <li><a class="dropdown-item" href="#">Pengumuman baru dari Futsal</a></li>
-                                <li><a class="dropdown-item" href="#">Jadwal kegiatan berubah</a></li>
-                            </ul>
-                        </div>
-                    @endif
-
-                    <!-- User Dropdown -->
-                    <div class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                            data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle me-1"></i>
-                            {{ auth()->user()->name }}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <h6 class="dropdown-header">{{ ucfirst(auth()->user()->role) }}</h6>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i
-                                        class="bi bi-gear me-2"></i>Pengaturan</a></li>
-                            <li>
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item">
-                                        <i class="bi bi-box-arrow-right me-2"></i>Logout
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+            <div class="sidebar-menu">
+                @if (auth()->user()->role === 'admin')
+                    <a href="{{ route('admin.dashboard') }}"
+                        class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                        <i class="bi bi-speedometer2"></i>
+                        Dashboard
+                    </a>
+                    <a href="{{ route('admin.ekstrakurikuler.index') }}"
+                        class="nav-link {{ request()->routeIs('admin.ekstrakurikuler.*') ? 'active' : '' }}">
+                        <i class="bi bi-collection"></i>
+                        Kelola Ekstrakurikuler
+                    </a>
+                    <a href="{{ route('admin.user.index', ['role' => 'siswa']) }}"
+                        class="nav-link {{ request()->routeIs('admin.user.*') && request()->get('role') === 'siswa' ? 'active' : '' }}">
+                        <i class="bi bi-people"></i>
+                        Kelola Pengguna
+                    </a>
+                    <a href="{{ route('admin.laporan') }}"
+                        class="nav-link {{ request()->routeIs('admin.laporan') ? 'active' : '' }}">
+                        <i class="bi bi-file-earmark-text"></i>
+                        Laporan
+                    </a>
+                @elseif(auth()->user()->role === 'pembina')
+                    <a href="{{ route('pembina.dashboard') }}"
+                        class="nav-link {{ request()->routeIs('pembina.dashboard') ? 'active' : '' }}">
+                        <i class="bi bi-speedometer2"></i>
+                        Dashboard
+                    </a>
+                    <a href="{{ route('pembina.pendaftaran.index') }}"
+                        class="nav-link {{ request()->routeIs('pembina.pendaftaran.*') ? 'active' : '' }}">
+                        <i class="bi bi-person-plus"></i>
+                        Kelola Pendaftaran
+                    </a>
+                    <a href="{{ route('pembina.absensi.index') }}"
+                        class="nav-link {{ request()->routeIs('pembina.absensi.*') ? 'active' : '' }}">
+                        <i class="bi bi-calendar-check"></i>
+                        Input Kehadiran
+                    </a>
+                    <a href="{{ route('pembina.pengumuman.index') }}"
+                        class="nav-link {{ request()->routeIs('pembina.pengumuman.*') ? 'active' : '' }}">
+                        <i class="bi bi-megaphone"></i>
+                        Pengumuman
+                    </a>
+                    <a href="{{ route('pembina.galeri.index') }}"
+                        class="nav-link {{ request()->routeIs('pembina.galeri.*') ? 'active' : '' }}">
+                        <i class="bi bi-images"></i>
+                        Galeri Kegiatan
+                    </a>
+                @else
+                    <a href="{{ route('siswa.dashboard') }}"
+                        class="nav-link {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}">
+                        <i class="bi bi-speedometer2"></i>
+                        Dashboard
+                    </a>
+                    <a href="{{ route('siswa.profil') }}"
+                        class="nav-link {{ request()->routeIs('siswa.profil') ? 'active' : '' }}">
+                        <i class="bi bi-person-circle"></i>
+                        Lengkapi Profil
+                    </a>
+                    <a href="{{ route('siswa.rekomendasi') }}"
+                        class="nav-link {{ request()->routeIs('siswa.rekomendasi') ? 'active' : '' }}">
+                        <i class="bi bi-stars"></i>
+                        Rekomendasi
+                    </a>
+                    <a href="{{ route('siswa.ekstrakurikuler.index') }}"
+                        class="nav-link {{ request()->routeIs('siswa.ekstrakurikuler.*') ? 'active' : '' }}">
+                        <i class="bi bi-collection"></i>
+                        Ekstrakurikuler
+                    </a>
+                    <a href="{{ route('siswa.pendaftaran') }}"
+                        class="nav-link {{ request()->routeIs('siswa.pendaftaran') ? 'active' : '' }}">
+                        <i class="bi bi-clipboard-check"></i>
+                        Status Pendaftaran
+                    </a>
+                    <a href="{{ route('siswa.jadwal') }}"
+                        class="nav-link {{ request()->routeIs('siswa.jadwal') ? 'active' : '' }}">
+                        <i class="bi bi-calendar3"></i>
+                        Jadwal Kegiatan
+                    </a>
+                    <a href="{{ route('siswa.kehadiran') }}"
+                        class="nav-link {{ request()->routeIs('siswa.kehadiran') ? 'active' : '' }}">
+                        <i class="bi bi-graph-up"></i>
+                        Rekap Kehadiran
+                    </a>
+                @endif
             </div>
         </nav>
 
-        <!-- Content Wrapper -->
-        <div class="content-wrapper">
-            <!-- Page Header -->
-            <div class="page-header fade-in">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h2 class="mb-1">@yield('page-title', 'Dashboard')</h2>
-                        <p class="mb-0 opacity-75">@yield('page-description', 'Selamat datang di sistem manajemen ekstrakurikuler')</p>
-                    </div>
-                    <div>
-                        @yield('page-actions')
-                    </div>
-                </div>
-            </div>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Navbar -->
+            <nav class="navbar navbar-expand-lg top-navbar">
+                <div class="container-fluid">
+                    <button class="btn btn-outline-light d-lg-none" type="button" onclick="toggleSidebar()">
+                        <i class="bi bi-list"></i>
+                    </button>
 
-            <!-- Breadcrumb -->
-            @if (isset($breadcrumbs))
-                <nav aria-label="breadcrumb" class="mb-4">
-                    <ol class="breadcrumb">
-                        @foreach ($breadcrumbs as $breadcrumb)
-                            @if ($loop->last)
-                                <li class="breadcrumb-item active">{{ $breadcrumb['title'] }}</li>
-                            @else
-                                <li class="breadcrumb-item">
-                                    <a href="{{ $breadcrumb['url'] }}">{{ $breadcrumb['title'] }}</a>
+                    <div class="navbar-nav ms-auto">
+                        <!-- User Dropdown -->
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle me-1"></i>
+                                {{ auth()->user()->name }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <h6 class="dropdown-header">{{ ucfirst(auth()->user()->role) }}</h6>
                                 </li>
-                            @endif
-                        @endforeach
-                    </ol>
-                </nav>
-            @endif
-
-            <!-- Flash Messages -->
-            @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i
+                                            class="bi bi-gear me-2"></i>Pengaturan</a></li>
+                                <li>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item">
+                                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-            @endif
+            </nav>
 
-            @if (session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="bi bi-exclamation-circle me-2"></i>{{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <!-- Content Wrapper -->
+            <div class="content-wrapper">
+                <!-- Page Header -->
+                <div class="page-header fade-in">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="mb-1">@yield('page-title', 'Dashboard')</h2>
+                            <p class="mb-0 opacity-75">@yield('page-description', 'Selamat datang di sistem manajemen ekstrakurikuler')</p>
+                        </div>
+                        <div>
+                            @yield('page-actions')
+                        </div>
+                    </div>
                 </div>
-            @endif
 
-            @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="bi bi-exclamation-triangle me-2"></i>
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <!-- Breadcrumb -->
+                @if (isset($breadcrumbs))
+                    <nav aria-label="breadcrumb" class="mb-4">
+                        <ol class="breadcrumb">
+                            @foreach ($breadcrumbs as $breadcrumb)
+                                @if ($loop->last)
+                                    <li class="breadcrumb-item active">{{ $breadcrumb['title'] }}</li>
+                                @else
+                                    <li class="breadcrumb-item">
+                                        <a href="{{ $breadcrumb['url'] }}">{{ $breadcrumb['title'] }}</a>
+                                    </li>
+                                @endif
+                            @endforeach
+                        </ol>
+                    </nav>
+                @endif
+
+                <!-- Flash Messages -->
+                @if (session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                @if (session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-circle me-2"></i>{{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                <!-- Main Content -->
+                <div class="fade-in">
+                    @yield('content')
                 </div>
-            @endif
-
-            <!-- Main Content -->
-            <div class="fade-in">
-                @yield('content')
             </div>
         </div>
-    </div>
+    @else
+        <!-- Auth Layout -->
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <h4 class="text-primary"><i class="bi bi-mortarboard-fill me-2"></i>EkstrakurikulerApp</h4>
+                        <small class="text-muted">MA Modern Miftahussa'adah</small>
+                    </div>
+                    @yield('content')
+                </div>
+            </div>
+        </div>
+    @endauth
 
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>

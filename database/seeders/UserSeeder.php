@@ -11,50 +11,58 @@ class UserSeeder extends Seeder
     public function run()
     {
         // Admin
-        User::create([
-            'name' => 'Admin Miftah',
-            'email' => 'admin@miftah.com',
-            'password' => Hash::make('admin123'),
-            'role' => 'admin',
-            'email_verified_at' => now(),
-            'is_active' => true,
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@miftah.com'],
+            [
+                'name' => 'Admin Miftah',
+                'password' => Hash::make('admin123'),
+                'role' => 'admin',
+                'email_verified_at' => now(),
+                'is_active' => true,
+            ]
+        );
 
         // Pembina 1 - Olahraga
-        User::create([
-            'name' => 'Budi Santoso, S.Pd',
-            'email' => 'budisantoso@miftah.com',
-            'password' => Hash::make('pembina123'),
-            'role' => 'pembina',
-            'telepon' => '081234567890',
-            'jenis_kelamin' => 'L',
-            'email_verified_at' => now(),
-            'is_active' => true,
-        ]);
+        User::updateOrCreate(
+            ['email' => 'budisantoso@miftah.com'],
+            [
+                'name' => 'Budi Santoso, S.Pd',
+                'password' => Hash::make('pembina123'),
+                'role' => 'pembina',
+                'telepon' => '081234567890',
+                'jenis_kelamin' => 'L',
+                'email_verified_at' => now(),
+                'is_active' => true,
+            ]
+        );
 
         // Pembina 2 - Seni
-        User::create([
-            'name' => 'Siti Nurhaliza, S.Sn',
-            'email' => 'sitinurhaliza@miftah.com',
-            'password' => Hash::make('pembina123'),
-            'role' => 'pembina',
-            'telepon' => '081234567891',
-            'jenis_kelamin' => 'P',
-            'email_verified_at' => now(),
-            'is_active' => true,
-        ]);
+        User::updateOrCreate(
+            ['email' => 'sitinurhaliza@miftah.com'],
+            [
+                'name' => 'Siti Nurhaliza, S.Sn',
+                'password' => Hash::make('pembina123'),
+                'role' => 'pembina',
+                'telepon' => '081234567891',
+                'jenis_kelamin' => 'P',
+                'email_verified_at' => now(),
+                'is_active' => true,
+            ]
+        );
 
-        // Pembina 3 - Akademik
-        User::create([
-            'name' => 'Ahmad Dahlan, M.Pd',
-            'email' => 'ahmaddahlan@miftah.com',
-            'password' => Hash::make('pembina123'),
-            'role' => 'pembina',
-            'telepon' => '081234567892',
-            'jenis_kelamin' => 'L',
-            'email_verified_at' => now(),
-            'is_active' => true,
-        ]);
+        // Pembina 3 - Akademik & Teknologi
+        User::updateOrCreate(
+            ['email' => 'ahmadrifai@miftah.com'],
+            [
+                'name' => 'Ahmad Rifai, M.Pd',
+                'password' => Hash::make('pembina123'),
+                'role' => 'pembina',
+                'telepon' => '081234567892',
+                'jenis_kelamin' => 'L',
+                'email_verified_at' => now(),
+                'is_active' => true,
+            ]
+        );
 
         // Sample Siswa
         $siswas = [
@@ -82,7 +90,7 @@ class UserSeeder extends Seeder
                 'nis' => '2024003',
                 'jenis_kelamin' => 'L',
                 'nilai_rata_rata' => 82.0,
-                'minat' => json_encode(['olahraga', 'organisasi']),
+                'minat' => json_encode(['olahraga', 'kepemimpinan']),
                 'tanggal_lahir' => '2007-01-10',
             ],
             [
@@ -103,17 +111,70 @@ class UserSeeder extends Seeder
                 'minat' => json_encode(['teknologi', 'olahraga']),
                 'tanggal_lahir' => '2007-11-03',
             ],
+            [
+                'name' => 'Sari Dewi Lestari',
+                'email' => 'saridewi@student.com',
+                'nis' => '2024006',
+                'jenis_kelamin' => 'P',
+                'nilai_rata_rata' => 87.3,
+                'minat' => json_encode(['seni', 'budaya']),
+                'tanggal_lahir' => '2007-09-12',
+            ],
+            [
+                'name' => 'Rahman Hakim',
+                'email' => 'rahmanhakim@student.com',
+                'nis' => '2024007',
+                'jenis_kelamin' => 'L',
+                'nilai_rata_rata' => 84.7,
+                'minat' => json_encode(['akademik', 'bahasa']),
+                'tanggal_lahir' => '2007-06-25',
+            ],
+            [
+                'name' => 'Anisa Putri',
+                'email' => 'anisaputri@student.com',
+                'nis' => '2024008',
+                'jenis_kelamin' => 'P',
+                'nilai_rata_rata' => 91.2,
+                'minat' => json_encode(['akademik', 'kepemimpinan']),
+                'tanggal_lahir' => '2007-04-08',
+            ],
+            [
+                'name' => 'Bayu Kusuma',
+                'email' => 'bayukusuma@student.com',
+                'nis' => '2024009',
+                'jenis_kelamin' => 'L',
+                'nilai_rata_rata' => 78.9,
+                'minat' => json_encode(['olahraga', 'musik']),
+                'tanggal_lahir' => '2007-11-30',
+            ],
+            [
+                'name' => 'Dewi Sartika',
+                'email' => 'dewisartika@student.com',
+                'nis' => '2024010',
+                'jenis_kelamin' => 'P',
+                'nilai_rata_rata' => 86.5,
+                'minat' => json_encode(['seni', 'media']),
+                'tanggal_lahir' => '2007-02-14',
+            ],
         ];
 
         foreach ($siswas as $siswa) {
-            User::create(array_merge($siswa, [
-                'password' => Hash::make('siswa123'),
-                'role' => 'siswa',
-                'telepon' => '0812345678' . rand(10, 99),
-                'alamat' => 'Cimahi, Jawa Barat',
-                'email_verified_at' => now(),
-                'is_active' => true,
-            ]));
+            User::updateOrCreate(
+                ['email' => $siswa['email']],
+                array_merge($siswa, [
+                    'password' => Hash::make('siswa123'),
+                    'role' => 'siswa',
+                    'telepon' => '0812345678' . rand(10, 99),
+                    'alamat' => 'Cimahi, Jawa Barat',
+                    'email_verified_at' => now(),
+                    'is_active' => true,
+                ])
+            );
         }
+
+        $this->command->info('Users seeded successfully!');
+        $this->command->info('Admin: admin@miftah.com / admin123');
+        $this->command->info('Pembina: budisantoso@miftah.com / pembina123');
+        $this->command->info('Siswa: muhammadiqbal@student.com / siswa123');
     }
 }

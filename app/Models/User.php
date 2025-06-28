@@ -140,17 +140,58 @@ class User extends Authenticatable
     /**
      * Get minat as array
      */
+    /**
+     * Get minat as array
+     */
     public function getMinatArrayAttribute()
     {
+        // Jika minat tidak ada
         if (!$this->minat) {
             return [];
         }
 
-        if (is_string($this->minat)) {
-            return json_decode($this->minat, true) ?? [];
+        // Jika sudah array
+        if (is_array($this->minat)) {
+            return $this->minat;
         }
 
-        return is_array($this->minat) ? $this->minat : [];
+        // Jika string JSON
+        if (is_string($this->minat)) {
+            $decoded = json_decode($this->minat, true);
+
+            // Jika berhasil decode JSON
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $decoded;
+            }
+
+            // Jika bukan JSON, coba split by comma
+            if (strpos($this->minat, ',') !== false) {
+                return array_map('trim', explode(',', $this->minat));
+            }
+
+            // Single value
+            return [$this->minat];
+        }
+
+        return [];
+    }
+
+    /**
+     * Override getAttribute to handle minat field specifically
+     */
+    public function getAttribute($key)
+    {
+        $value = parent::getAttribute($key);
+
+        // Handle minat field specifically
+        if ($key === 'minat' && is_string($value)) {
+            $decoded = json_decode($value, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $decoded;
+            }
+        }
+
+        return $value;
     }
 
     /**

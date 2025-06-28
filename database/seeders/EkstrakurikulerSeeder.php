@@ -10,7 +10,20 @@ class EkstrakurikulerSeeder extends Seeder
 {
     public function run()
     {
+        // Ambil pembina yang ada atau buat jika tidak ada
         $pembinas = User::where('role', 'pembina')->get();
+
+        // Jika tidak ada pembina, buat beberapa pembina dulu
+        if ($pembinas->isEmpty()) {
+            $this->createPembinas();
+            $pembinas = User::where('role', 'pembina')->get();
+        }
+
+        // Pastikan ada minimal 3 pembina
+        if ($pembinas->count() < 3) {
+            $this->createAdditionalPembinas($pembinas->count());
+            $pembinas = User::where('role', 'pembina')->get();
+        }
 
         $ekstrakurikulers = [
             [
@@ -20,7 +33,7 @@ class EkstrakurikulerSeeder extends Seeder
                 'jadwal' => json_encode(['hari' => 'senin', 'waktu' => '15:30-17:00']),
                 'kategori' => json_encode(['olahraga', 'tim']),
                 'nilai_minimal' => 75.0,
-                'pembina_id' => $pembinas->where('name', 'Budi Santoso, S.Pd')->first()->id,
+                'pembina_id' => $pembinas->first()->id,
             ],
             [
                 'nama' => 'Basket',
@@ -29,7 +42,7 @@ class EkstrakurikulerSeeder extends Seeder
                 'jadwal' => json_encode(['hari' => 'rabu', 'waktu' => '15:30-17:00']),
                 'kategori' => json_encode(['olahraga', 'tim']),
                 'nilai_minimal' => 75.0,
-                'pembina_id' => $pembinas->where('name', 'Budi Santoso, S.Pd')->first()->id,
+                'pembina_id' => $pembinas->first()->id,
             ],
             [
                 'nama' => 'Paduan Suara',
@@ -38,7 +51,7 @@ class EkstrakurikulerSeeder extends Seeder
                 'jadwal' => json_encode(['hari' => 'selasa', 'waktu' => '15:00-16:30']),
                 'kategori' => json_encode(['seni', 'musik']),
                 'nilai_minimal' => 70.0,
-                'pembina_id' => $pembinas->where('name', 'Siti Nurhaliza, S.Sn')->first()->id,
+                'pembina_id' => $pembinas->count() >= 2 ? $pembinas->skip(1)->first()->id : $pembinas->first()->id,
             ],
             [
                 'nama' => 'Tari Tradisional',
@@ -47,7 +60,7 @@ class EkstrakurikulerSeeder extends Seeder
                 'jadwal' => json_encode(['hari' => 'kamis', 'waktu' => '15:00-16:30']),
                 'kategori' => json_encode(['seni', 'budaya']),
                 'nilai_minimal' => 70.0,
-                'pembina_id' => $pembinas->where('name', 'Siti Nurhaliza, S.Sn')->first()->id,
+                'pembina_id' => $pembinas->count() >= 2 ? $pembinas->skip(1)->first()->id : $pembinas->first()->id,
             ],
             [
                 'nama' => 'Robotika',
@@ -56,7 +69,7 @@ class EkstrakurikulerSeeder extends Seeder
                 'jadwal' => json_encode(['hari' => 'jumat', 'waktu' => '15:00-17:00']),
                 'kategori' => json_encode(['teknologi', 'akademik']),
                 'nilai_minimal' => 80.0,
-                'pembina_id' => $pembinas->where('name', 'Ahmad Rifai, M.Pd')->first()->id,
+                'pembina_id' => $pembinas->count() >= 3 ? $pembinas->skip(2)->first()->id : $pembinas->first()->id,
             ],
             [
                 'nama' => 'English Club',
@@ -65,7 +78,7 @@ class EkstrakurikulerSeeder extends Seeder
                 'jadwal' => json_encode(['hari' => 'selasa', 'waktu' => '15:30-17:00']),
                 'kategori' => json_encode(['akademik', 'bahasa']),
                 'nilai_minimal' => 78.0,
-                'pembina_id' => $pembinas->where('name', 'Ahmad Rifai, M.Pd')->first()->id,
+                'pembina_id' => $pembinas->count() >= 3 ? $pembinas->skip(2)->first()->id : $pembinas->first()->id,
             ],
             [
                 'nama' => 'Pramuka',
@@ -83,12 +96,89 @@ class EkstrakurikulerSeeder extends Seeder
                 'jadwal' => json_encode(['hari' => 'kamis', 'waktu' => '15:30-17:00']),
                 'kategori' => json_encode(['akademik', 'media']),
                 'nilai_minimal' => 75.0,
-                'pembina_id' => $pembinas->where('role', 'pembina')->skip(1)->first()->id,
+                'pembina_id' => $pembinas->count() >= 2 ? $pembinas->skip(1)->first()->id : $pembinas->first()->id,
             ],
         ];
 
         foreach ($ekstrakurikulers as $ekskul) {
             Ekstrakurikuler::create($ekskul);
+        }
+    }
+
+    /**
+     * Buat pembina jika belum ada
+     */
+    private function createPembinas()
+    {
+        $pembinas = [
+            [
+                'name' => 'Budi Santoso, S.Pd',
+                'email' => 'budisantoso@miftah.com',
+                'password' => bcrypt('pembina123'),
+                'role' => 'pembina',
+                'telepon' => '081234567890',
+                'jenis_kelamin' => 'L',
+                'email_verified_at' => now(),
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Siti Nurhaliza, S.Sn',
+                'email' => 'sitinurhaliza@miftah.com',
+                'password' => bcrypt('pembina123'),
+                'role' => 'pembina',
+                'telepon' => '081234567891',
+                'jenis_kelamin' => 'P',
+                'email_verified_at' => now(),
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Ahmad Rifai, M.Pd',
+                'email' => 'ahmadrifai@miftah.com',
+                'password' => bcrypt('pembina123'),
+                'role' => 'pembina',
+                'telepon' => '081234567892',
+                'jenis_kelamin' => 'L',
+                'email_verified_at' => now(),
+                'is_active' => true,
+            ],
+        ];
+
+        foreach ($pembinas as $pembina) {
+            User::create($pembina);
+        }
+    }
+
+    /**
+     * Buat pembina tambahan jika kurang
+     */
+    private function createAdditionalPembinas($existingCount)
+    {
+        $additionalPembinas = [
+            [
+                'name' => 'Dr. Fatimah Zahra, M.Ed',
+                'email' => 'fatimahzahra@miftah.com',
+                'password' => bcrypt('pembina123'),
+                'role' => 'pembina',
+                'telepon' => '081234567893',
+                'jenis_kelamin' => 'P',
+                'email_verified_at' => now(),
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Muhammad Yusuf, S.Kom',
+                'email' => 'muhammadyusuf@miftah.com',
+                'password' => bcrypt('pembina123'),
+                'role' => 'pembina',
+                'telepon' => '081234567894',
+                'jenis_kelamin' => 'L',
+                'email_verified_at' => now(),
+                'is_active' => true,
+            ],
+        ];
+
+        $needed = 3 - $existingCount;
+        for ($i = 0; $i < $needed && $i < count($additionalPembinas); $i++) {
+            User::create($additionalPembinas[$i]);
         }
     }
 }

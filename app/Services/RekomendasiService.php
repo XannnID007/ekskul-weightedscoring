@@ -58,9 +58,11 @@ class RekomendasiService
 
      private function hitungSkorMinat(User $siswa, Ekstrakurikuler $ekstrakurikuler)
      {
-          $minatSiswa = $siswa->minat_array ?? [];
-          $kategoriEkskul = $ekstrakurikuler->kategori ?? [];
+          // Ambil minat siswa dengan pengecekan yang aman
+          $minatSiswa = $this->getArrayFromJsonField($siswa->minat);
+          $kategoriEkskul = $this->getArrayFromJsonField($ekstrakurikuler->kategori);
 
+          // Jika salah satu data kosong, berikan skor netral
           if (empty($minatSiswa) || empty($kategoriEkskul)) {
                return 50; // Skor netral jika data tidak lengkap
           }
@@ -110,7 +112,7 @@ class RekomendasiService
           // Untuk saat ini, berikan skor berdasarkan preferensi umum
           // Bisa dikembangkan dengan input preferensi jadwal dari siswa
 
-          $jadwal = $ekstrakurikuler->jadwal ?? [];
+          $jadwal = $this->getArrayFromJsonField($ekstrakurikuler->jadwal);
           $hari = $jadwal['hari'] ?? '';
           $waktu = $jadwal['waktu'] ?? '';
 
@@ -149,9 +151,9 @@ class RekomendasiService
 
           // Alasan berdasarkan minat
           if ($skorMinat >= 80) {
-               $alasan[] = "Sangat sesuai dengan minat Anda";
+               $alasan[] = "sangat sesuai dengan minat Anda";
           } elseif ($skorMinat >= 60) {
-               $alasan[] = "Cukup sesuai dengan minat Anda";
+               $alasan[] = "cukup sesuai dengan minat Anda";
           }
 
           // Alasan berdasarkan akademik
@@ -169,7 +171,8 @@ class RekomendasiService
           }
 
           // Alasan tambahan berdasarkan karakteristik ekstrakurikuler
-          $kategori = $ekstrakurikuler->kategori ?? [];
+          $kategori = $this->getArrayFromJsonField($ekstrakurikuler->kategori);
+
           if (in_array('olahraga', $kategori)) {
                $alasan[] = "baik untuk kesehatan dan kebugaran";
           }
@@ -218,5 +221,40 @@ class RekomendasiService
                     return empty($siswa->$field);
                })
           ];
+     }
+
+     /**
+      * Helper method untuk mengkonversi JSON field ke array
+      * Handle berbagai kemungkinan format data
+      */
+     private function getArrayFromJsonField($field)
+     {
+          // Jika sudah array, return langsung
+          if (is_array($field)) {
+               return $field;
+          }
+
+          // Jika string, coba decode JSON
+          if (is_string($field)) {
+               $decoded = json_decode($field, true);
+
+               // Jika berhasil decode dan hasilnya array
+               if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                    return $decoded;
+               }
+
+               // Jika bukan JSON valid, coba split by comma (fallback)
+               if (strpos($field, ',') !== false) {
+                    return array_map('trim', explode(',', $field));
+               }
+
+               // Jika single value, wrap dalam array
+               if (!empty($field)) {
+                    return [$field];
+               }
+          }
+
+          // Default return empty array
+          return [];
      }
 }

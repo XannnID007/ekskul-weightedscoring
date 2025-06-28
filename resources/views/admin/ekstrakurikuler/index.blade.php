@@ -40,9 +40,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($ekstrakurikulers as $ekstrakurikuler)
+                        @forelse ($ekstrakurikulers as $ekstrakurikuler)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $loop->iteration + ($ekstrakurikulers->currentPage() - 1) * $ekstrakurikulers->perPage() }}
+                                </td>
                                 <td>
                                     @if ($ekstrakurikuler->gambar)
                                         <img src="{{ Storage::url($ekstrakurikuler->gambar) }}"
@@ -62,19 +63,65 @@
                                             class="text-muted">{{ Str::limit($ekstrakurikuler->deskripsi, 50) }}</small>
                                     </div>
                                 </td>
-                                <td>{{ $ekstrakurikuler->pembina->name }}</td>
                                 <td>
-                                    @foreach ($ekstrakurikuler->kategori as $kategori)
-                                        <span class="badge bg-secondary me-1">{{ ucfirst($kategori) }}</span>
-                                    @endforeach
+                                    @if ($ekstrakurikuler->pembina)
+                                        {{ $ekstrakurikuler->pembina->name }}
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @php
+                                        // Handle kategori dengan cara yang lebih aman
+                                        $kategori = [];
+
+                                        if ($ekstrakurikuler->kategori) {
+                                            if (is_array($ekstrakurikuler->kategori)) {
+                                                $kategori = $ekstrakurikuler->kategori;
+                                            } elseif (is_string($ekstrakurikuler->kategori)) {
+                                                $decoded = json_decode($ekstrakurikuler->kategori, true);
+                                                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                                                    $kategori = $decoded;
+                                                } else {
+                                                    // Fallback: split by comma
+                                                    $kategori = array_map(
+                                                        'trim',
+                                                        explode(',', $ekstrakurikuler->kategori),
+                                                    );
+                                                }
+                                            }
+                                        }
+
+                                        // Pastikan kategori adalah array dan tidak kosong
+                                        $kategori = is_array($kategori) ? array_filter($kategori) : [];
+                                    @endphp
+
+                                    @if (count($kategori) > 0)
+                                        @foreach ($kategori as $kat)
+                                            <span class="badge bg-secondary me-1">{{ ucfirst(trim($kat)) }}</span>
+                                        @endforeach
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <span
                                             class="me-2">{{ $ekstrakurikuler->peserta_saat_ini }}/{{ $ekstrakurikuler->kapasitas_maksimal }}</span>
                                         <div class="progress flex-grow-1" style="height: 8px; width: 50px;">
-                                            <div class="progress-bar {{ $ekstrakurikuler->masihBisaDaftar() ? 'bg-success' : 'bg-danger' }}"
-                                                style="width: {{ ($ekstrakurikuler->peserta_saat_ini / $ekstrakurikuler->kapasitas_maksimal) * 100 }}%">
+                                            @php
+                                                $percentage =
+                                                    $ekstrakurikuler->kapasitas_maksimal > 0
+                                                        ? ($ekstrakurikuler->peserta_saat_ini /
+                                                                $ekstrakurikuler->kapasitas_maksimal) *
+                                                            100
+                                                        : 0;
+                                                $progressClass = $ekstrakurikuler->masihBisaDaftar()
+                                                    ? 'bg-success'
+                                                    : 'bg-danger';
+                                            @endphp
+                                            <div class="progress-bar {{ $progressClass }}"
+                                                style="width: {{ $percentage }}%">
                                             </div>
                                         </div>
                                     </div>
@@ -93,10 +140,14 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="badge bg-info">{{ $ekstrakurikuler->pendaftarans->count() }} total</span>
-                                    <br><small
-                                        class="text-success">{{ $ekstrakurikuler->pendaftarans->where('status', 'disetujui')->count() }}
-                                        disetujui</small>
+                                    @php
+                                        $totalPendaftaran = $ekstrakurikuler->pendaftarans->count();
+                                        $disetujui = $ekstrakurikuler->pendaftarans
+                                            ->where('status', 'disetujui')
+                                            ->count();
+                                    @endphp
+                                    <span class="badge bg-info">{{ $totalPendaftaran }} total</span>
+                                    <br><small class="text-success">{{ $disetujui }} disetujui</small>
                                 </td>
                                 <td>
                                     <div class="dropdown">
@@ -130,10 +181,27 @@
                                     </div>
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="9" class="text-center py-4">
+                                    <i class="bi bi-collection text-muted" style="font-size: 3rem;"></i>
+                                    <p class="text-muted mt-2">Belum ada ekstrakurikuler yang terdaftar</p>
+                                    <a href="{{ route('admin.ekstrakurikuler.create') }}" class="btn btn-primary">
+                                        <i class="bi bi-plus-circle me-1"></i>Tambah Ekstrakurikuler Pertama
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
+
+            <!-- Pagination -->
+            @if ($ekstrakurikulers->hasPages())
+                <div class="d-flex justify-content-center mt-4">
+                    {{ $ekstrakurikulers->withQueryString()->links() }}
+                </div>
+            @endif
         </div>
     </div>
 
@@ -163,15 +231,21 @@
                                 <option value="seni">Seni</option>
                                 <option value="akademik">Akademik</option>
                                 <option value="teknologi">Teknologi</option>
+                                <option value="bahasa">Bahasa</option>
+                                <option value="kepemimpinan">Kepemimpinan</option>
+                                <option value="budaya">Budaya</option>
+                                <option value="media">Media</option>
                             </select>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Pembina</label>
                             <select class="form-select" name="pembina">
                                 <option value="">Semua Pembina</option>
-                                @foreach ($ekstrakurikulers->pluck('pembina')->unique('id') as $pembina)
-                                    <option value="{{ $pembina->id }}">{{ $pembina->name }}</option>
-                                @endforeach
+                                @if ($ekstrakurikulers->count() > 0)
+                                    @foreach ($ekstrakurikulers->pluck('pembina')->whereNotNull()->unique('id') as $pembina)
+                                        <option value="{{ $pembina->id }}">{{ $pembina->name }}</option>
+                                    @endforeach
+                                @endif
                             </select>
                         </div>
                     </form>
@@ -188,7 +262,7 @@
 @push('scripts')
     <script>
         function toggleStatus(id, isActive) {
-            fetch(`/api/admin/ekstrakurikuler/${id}/toggle-status`, {
+            fetch(`/admin/ekstrakurikuler/${id}/toggle-status`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -209,26 +283,79 @@
                         badge.className = `badge bg-${isActive ? 'success' : 'secondary'}`;
                     } else {
                         showError('Gagal mengubah status');
+                        // Reset checkbox
+                        document.querySelector(`input[onchange*="${id}"]`).checked = !isActive;
                     }
                 })
                 .catch(error => {
                     showError('Terjadi kesalahan');
                     console.error('Error:', error);
+                    // Reset checkbox
+                    document.querySelector(`input[onchange*="${id}"]`).checked = !isActive;
                 });
         }
 
         function confirmDelete(url) {
             Swal.fire({
-                    title: 'Hapus Ekstrakurikuler?',
-                    text: 'Data yang dihapus tidak dapat dikembalikan!',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#dc3545',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Ya, Hapus!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Create form and submit
-                            const form = document.createElement('form');
-                            form.method = 'POST';
+                title: 'Hapus Ekstrakurikuler?',
+                text: 'Data yang dihapus tidak dapat dikembalikan!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Create form and submit
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = url;
+
+                    const csrfToken = document.createElement('input');
+                    csrfToken.type = 'hidden';
+                    csrfToken.name = '_token';
+                    csrfToken.value = $('meta[name="csrf-token"]').attr('content');
+
+                    const methodField = document.createElement('input');
+                    methodField.type = 'hidden';
+                    methodField.name = '_method';
+                    methodField.value = 'DELETE';
+
+                    form.appendChild(csrfToken);
+                    form.appendChild(methodField);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+
+        function applyFilter() {
+            // Get filter values and apply to current URL
+            const form = document.getElementById('filterForm');
+            const formData = new FormData(form);
+            const params = new URLSearchParams(window.location.search);
+
+            // Clear existing filter params
+            params.delete('status');
+            params.delete('kategori');
+            params.delete('pembina');
+
+            // Add new filter params
+            for (let [key, value] of formData.entries()) {
+                if (value) {
+                    params.set(key, value);
+                }
+            }
+
+            // Redirect with new filters
+            window.location.href = window.location.pathname + '?' + params.toString();
+        }
+
+        function exportData() {
+            const params = new URLSearchParams(window.location.search);
+            params.set('export', '1');
+            window.location.href = window.location.pathname + '?' + params.toString();
+        }
+    </script>
+@endpush

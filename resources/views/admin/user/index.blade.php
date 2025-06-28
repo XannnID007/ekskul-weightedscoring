@@ -63,7 +63,7 @@
                             @if ($role == 'siswa')
                                 <th width="10%">NIS</th>
                                 <th width="10%">Jenis Kelamin</th>
-                                <th width="10%">Nilai Rata-rata</th>
+                                <th width="10%">Nilai AVG</th>
                             @endif
                             <th width="10%">Status</th>
                             <th width="10%">Aksi</th>
@@ -91,9 +91,12 @@
                                     <td>{{ $user->nis ?? '-' }}</td>
                                     <td>
                                         @if ($user->jenis_kelamin)
-                                            <span class="badge bg-{{ $user->jenis_kelamin == 'L' ? 'info' : 'pink' }}">
-                                                {{ $user->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}
-                                            </span>
+                                            @if ($user->jenis_kelamin == 'L')
+                                                <span class="badge bg-info">Laki-laki</span>
+                                            @else
+                                                <span class="badge text-white"
+                                                    style="background-color: #e91e63;">Perempuan</span>
+                                            @endif
                                         @else
                                             -
                                         @endif

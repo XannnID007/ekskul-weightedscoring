@@ -6,47 +6,6 @@
 
 @section('content')
     <div class="row g-4">
-        <!-- Welcome Card -->
-        <div class="col-12">
-            <div class="card border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                <div class="card-body text-white p-4">
-                    <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <h3 class="mb-2">Selamat Datang, {{ auth()->user()->name }}! 👋</h3>
-                            <p class="mb-3 opacity-90">
-                                @if (!auth()->user()->sudahTerdaftarEkstrakurikuler())
-                                    Yuk, temukan ekstrakurikuler yang cocok dengan minat dan bakatmu!
-                                    Sistem kami akan memberikan rekomendasi terbaik untukmu.
-                                @else
-                                    Semangat mengikuti kegiatan ekstrakurikuler! Jangan lupa cek jadwal dan kehadiranmu.
-                                @endif
-                            </p>
-                            <div class="d-flex gap-2">
-                                @if (!auth()->user()->sudahTerdaftarEkstrakurikuler())
-                                    <a href="{{ route('siswa.rekomendasi') }}" class="btn btn-light">
-                                        <i class="bi bi-stars me-1"></i>Lihat Rekomendasi
-                                    </a>
-                                    <a href="{{ route('siswa.ekstrakurikuler.index') }}" class="btn btn-outline-light">
-                                        <i class="bi bi-collection me-1"></i>Jelajahi Semua
-                                    </a>
-                                @else
-                                    <a href="{{ route('siswa.jadwal') }}" class="btn btn-light">
-                                        <i class="bi bi-calendar3 me-1"></i>Lihat Jadwal
-                                    </a>
-                                    <a href="{{ route('siswa.kehadiran') }}" class="btn btn-outline-light">
-                                        <i class="bi bi-graph-up me-1"></i>Rekap Kehadiran
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
-                        <div class="col-md-4 text-center">
-                            <i class="bi bi-mortarboard-fill" style="font-size: 6rem; opacity: 0.3;"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Status Cards -->
         <div class="col-md-6 col-xl-3">
             <div class="card stats-card">
@@ -146,7 +105,7 @@
 
         <!-- Rekomendasi Section -->
         @if (!auth()->user()->sudahTerdaftarEkstrakurikuler())
-            <div class="col-xl-8">
+            <div class="col-xl-12">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <div>
@@ -212,7 +171,7 @@
             </div>
         @else
             <!-- Ekstrakurikuler yang Diikuti -->
-            <div class="col-xl-8">
+            <div class="col-xl-12">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-0">
@@ -271,92 +230,6 @@
                 </div>
             </div>
         @endif
-
-        <!-- Quick Actions -->
-        <div class="col-xl-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Aksi Cepat</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        @if (!auth()->user()->sudahTerdaftarEkstrakurikuler())
-                            <a href="{{ route('siswa.profil') }}" class="btn btn-outline-primary">
-                                <i class="bi bi-person-gear me-2"></i>Lengkapi Profil
-                            </a>
-                            <a href="{{ route('siswa.rekomendasi') }}" class="btn btn-primary">
-                                <i class="bi bi-stars me-2"></i>Lihat Rekomendasi
-                            </a>
-                            <a href="{{ route('siswa.ekstrakurikuler.index') }}" class="btn btn-outline-secondary">
-                                <i class="bi bi-collection me-2"></i>Jelajahi Ekstrakurikuler
-                            </a>
-                        @else
-                            <a href="{{ route('siswa.jadwal') }}" class="btn btn-primary">
-                                <i class="bi bi-calendar3 me-2"></i>Jadwal Kegiatan
-                            </a>
-                            <a href="{{ route('siswa.kehadiran') }}" class="btn btn-outline-primary">
-                                <i class="bi bi-graph-up me-2"></i>Rekap Kehadiran
-                            </a>
-                            <a href="{{ route('siswa.pendaftaran') }}" class="btn btn-outline-secondary">
-                                <i class="bi bi-clipboard-check me-2"></i>Status Pendaftaran
-                            </a>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pengumuman Terbaru -->
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-megaphone text-warning me-2"></i>Pengumuman Terbaru
-                    </h5>
-                    <a href="#" class="btn btn-outline-primary btn-sm">Lihat Semua</a>
-                </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="card border-0 bg-light">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-start">
-                                        <div class="bg-warning rounded-circle p-2 me-3">
-                                            <i class="bi bi-megaphone text-white"></i>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <h6 class="card-title mb-1">Latihan Futsal Dipindah</h6>
-                                            <p class="card-text small text-muted mb-2">
-                                                Latihan futsal hari Senin dipindah ke hari Selasa karena ada acara sekolah.
-                                            </p>
-                                            <small class="text-muted">2 jam lalu</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card border-0 bg-light">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-start">
-                                        <div class="bg-info rounded-circle p-2 me-3">
-                                            <i class="bi bi-info-circle text-white"></i>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <h6 class="card-title mb-1">Pendaftaran Terbuka</h6>
-                                            <p class="card-text small text-muted mb-2">
-                                                Pendaftaran ekstrakurikuler Robotika gelombang 2 dibuka hingga akhir bulan.
-                                            </p>
-                                            <small class="text-muted">1 hari lalu</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 @endsection
 
