@@ -126,7 +126,12 @@
                                     name="hari" required>
                                     <option value="">Pilih Hari</option>
                                     @php
-                                        $currentHari = old('hari', $ekstrakurikuler->jadwal['hari'] ?? '');
+                                        $currentHari = old(
+                                            'hari',
+                                            isset($ekstrakurikuler->jadwal['hari'])
+                                                ? $ekstrakurikuler->jadwal['hari']
+                                                : '',
+                                        );
                                     @endphp
                                     <option value="senin" {{ $currentHari == 'senin' ? 'selected' : '' }}>Senin</option>
                                     <option value="selasa" {{ $currentHari == 'selasa' ? 'selected' : '' }}>Selasa</option>
@@ -145,7 +150,7 @@
                                 <label for="waktu" class="form-label">Waktu *</label>
                                 <input type="text" class="form-control @error('waktu') is-invalid @enderror"
                                     id="waktu" name="waktu"
-                                    value="{{ old('waktu', $ekstrakurikuler->jadwal['waktu'] ?? '') }}"
+                                    value="{{ old('waktu', isset($ekstrakurikuler->jadwal['waktu']) ? $ekstrakurikuler->jadwal['waktu'] : '') }}"
                                     placeholder="Contoh: 15:30 - 17:00" required>
                                 @error('waktu')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -161,13 +166,38 @@
                         <div class="mb-4">
                             <div class="form-text mb-3">Pilih minimal 1 kategori yang sesuai</div>
                             <div class="row g-2">
+                                @php
+                                    // Handle kategori dengan safe parsing
+                                    $selectedKategori = old('kategori', []);
+
+                                    if (empty($selectedKategori) && $ekstrakurikuler->kategori) {
+                                        if (is_array($ekstrakurikuler->kategori)) {
+                                            $selectedKategori = $ekstrakurikuler->kategori;
+                                        } elseif (is_string($ekstrakurikuler->kategori)) {
+                                            $decoded = json_decode($ekstrakurikuler->kategori, true);
+                                            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                                                $selectedKategori = $decoded;
+                                            } else {
+                                                // Fallback: split by comma
+                                                $selectedKategori = array_map(
+                                                    'trim',
+                                                    explode(',', $ekstrakurikuler->kategori),
+                                                );
+                                            }
+                                        }
+                                    }
+
+                                    // Pastikan selectedKategori adalah array
+                                    $selectedKategori = is_array($selectedKategori) ? $selectedKategori : [];
+                                @endphp
+
                                 @foreach ($kategori_options as $key => $label)
                                     <div class="col-md-4 col-sm-6">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox"
                                                 id="kategori_{{ $key }}" name="kategori[]"
                                                 value="{{ $key }}"
-                                                {{ in_array($key, old('kategori', $ekstrakurikuler->kategori ?? [])) ? 'checked' : '' }}>
+                                                {{ in_array($key, $selectedKategori) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="kategori_{{ $key }}">
                                                 {{ $label }}
                                             </label>

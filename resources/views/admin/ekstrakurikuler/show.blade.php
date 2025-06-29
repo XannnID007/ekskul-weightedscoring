@@ -38,11 +38,14 @@
                             <div>
                                 <h3 class="mb-1">{{ $ekstrakurikuler->nama }}</h3>
                                 <div class="mb-2">
-                                    @foreach ($ekstrakurikuler->kategori as $kategori)
-                                        <span class="badge bg-light text-dark me-1">{{ ucfirst($kategori) }}</span>
-                                    @endforeach
+                                    @if ($ekstrakurikuler->kategori && is_array($ekstrakurikuler->kategori))
+                                        @foreach ($ekstrakurikuler->kategori as $kategori)
+                                            <span class="badge bg-light text-dark me-1">{{ ucfirst($kategori) }}</span>
+                                        @endforeach
+                                    @endif
                                 </div>
-                                <p class="mb-0 opacity-75">Pembina: {{ $ekstrakurikuler->pembina->name }}</p>
+                                <p class="mb-0 opacity-75">Pembina:
+                                    {{ $ekstrakurikuler->pembina->name ?? 'Belum ditentukan' }}</p>
                             </div>
                             <div class="text-end">
                                 <span
@@ -193,7 +196,7 @@
             </div>
 
             <!-- Galeri -->
-            @if ($ekstrakurikuler->galeris->count() > 0)
+            @if (isset($ekstrakurikuler->galeris) && $ekstrakurikuler->galeris->count() > 0)
                 <div class="card mb-4">
                     <div class="card-header">
                         <h5 class="mb-0">
@@ -229,7 +232,7 @@
             @endif
 
             <!-- Pengumuman -->
-            @if ($ekstrakurikuler->pengumumans->count() > 0)
+            @if (isset($ekstrakurikuler->pengumumans) && $ekstrakurikuler->pengumumans->count() > 0)
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0">
@@ -275,8 +278,8 @@
                                 <i class="bi bi-person text-white"></i>
                             </div>
                             <div>
-                                <strong>{{ $ekstrakurikuler->pembina->name }}</strong>
-                                @if ($ekstrakurikuler->pembina->telepon)
+                                <strong>{{ $ekstrakurikuler->pembina->name ?? 'Belum ditentukan' }}</strong>
+                                @if ($ekstrakurikuler->pembina && $ekstrakurikuler->pembina->telepon)
                                     <br><small class="text-muted">{{ $ekstrakurikuler->pembina->telepon }}</small>
                                 @endif
                             </div>
@@ -384,7 +387,7 @@
         }
 
         function toggleStatus(id, isActive) {
-            fetch(`/api/admin/ekstrakurikuler/${id}/toggle-status`, {
+            fetch(`/admin/ekstrakurikuler/${id}/toggle-status`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

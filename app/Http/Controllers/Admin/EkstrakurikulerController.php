@@ -7,7 +7,7 @@ use App\Models\Ekstrakurikuler;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Nette\Utils\Image;
+use Illuminate\Support\Facades\Schema;
 
 class EkstrakurikulerController extends Controller
 {
@@ -58,15 +58,8 @@ class EkstrakurikulerController extends Controller
             $image = $request->file('gambar');
             $filename = time() . '_' . $image->getClientOriginalName();
 
-            // Resize dan simpan gambar
-            $img = Image::make($image->getRealPath());
-            $img->resize(800, 600, function ($constraint) {
-                $constraint->aspectRatio();
-                $constraint->upsize();
-            });
-
-            $path = 'ekstrakurikuler/' . $filename;
-            Storage::disk('public')->put($path, $img->encode());
+            // Simpan file tanpa resize - langsung store
+            $path = $image->storeAs('ekstrakurikuler', $filename, 'public');
             $data['gambar'] = $path;
         }
 
@@ -78,7 +71,27 @@ class EkstrakurikulerController extends Controller
 
     public function show(Ekstrakurikuler $ekstrakurikuler)
     {
-        $ekstrakurikuler->load(['pembina', 'pendaftarans.user', 'pengumumans', 'galeris']);
+        // Load relasi wajib
+        $ekstrakurikuler->load(['pembina', 'pendaftarans.user']);
+
+        // Load relasi optional dengan pengecehan
+        $relationships = [];
+
+        // Cek jika tabel pengumumans ada
+        if (Schema::hasTable('pengumumans')) {
+            $relationships[] = 'pengumumans';
+        }
+
+        // Cek jika tabel galeris ada
+        if (Schema::hasTable('galeris')) {
+            $relationships[] = 'galeris';
+        }
+
+        // Load relasi yang tersedia
+        if (!empty($relationships)) {
+            $ekstrakurikuler->load($relationships);
+        }
+
         return view('admin.ekstrakurikuler.show', compact('ekstrakurikuler'));
     }
 
@@ -119,8 +132,9 @@ class EkstrakurikulerController extends Controller
             'waktu' => $request->waktu
         ];
 
+        // Handle file upload if new file provided
         if ($request->hasFile('gambar')) {
-            // Hapus gambar lama
+            // Delete old file
             if ($ekstrakurikuler->gambar) {
                 Storage::disk('public')->delete($ekstrakurikuler->gambar);
             }
@@ -128,14 +142,8 @@ class EkstrakurikulerController extends Controller
             $image = $request->file('gambar');
             $filename = time() . '_' . $image->getClientOriginalName();
 
-            $img = Image::make($image->getRealPath());
-            $img->resize(800, 600, function ($constraint) {
-                $constraint->aspectRatio();
-                $constraint->upsize();
-            });
-
-            $path = 'ekstrakurikuler/' . $filename;
-            Storage::disk('public')->put($path, $img->encode());
+            // Simpan file tanpa resize - langsung store
+            $path = $image->storeAs('ekstrakurikuler', $filename, 'public');
             $data['gambar'] = $path;
         }
 
@@ -155,5 +163,21 @@ class EkstrakurikulerController extends Controller
 
         return redirect()->route('admin.ekstrakurikuler.index')
             ->with('success', 'Ekstrakurikuler berhasil dihapus!');
+    }
+
+    /**
+     * Toggle status aktif/nonaktif ekstrakurikuler
+     */
+    public function toggleStatus(Request $request, Ekstrakurikuler $ekstrakurikuler)
+    {
+        $ekstrakurikuler->update([
+            'is_active' => $request->boolean('is_active')
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status berhasil diubah',
+            'is_active' => $ekstrakurikuler->is_active
+        ]);
     }
 }

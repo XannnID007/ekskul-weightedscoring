@@ -88,6 +88,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Ekstrakurikuler Management
         Route::resource('ekstrakurikuler', AdminEkstrakurikulerController::class);
+        Route::post('/ekstrakurikuler/{ekstrakurikuler}/toggle-status', [AdminEkstrakurikulerController::class, 'toggleStatus'])->name('ekstrakurikuler.toggle-status');
 
         // User Management
         Route::get('/user', [AdminUserController::class, 'index'])->name('user.index');
