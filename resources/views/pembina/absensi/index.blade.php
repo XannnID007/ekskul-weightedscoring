@@ -4,17 +4,6 @@
 @section('page-title', 'Input Kehadiran Digital')
 @section('page-description', 'Kelola kehadiran siswa pada ekstrakurikuler yang Anda bina')
 
-@section('page-actions')
-    <div class="d-flex gap-2">
-        <a href="{{ route('pembina.absensi.history') }}" class="btn btn-outline-light">
-            <i class="bi bi-clock-history me-1"></i>Riwayat Absensi
-        </a>
-        <a href="{{ route('pembina.absensi.report') }}" class="btn btn-light">
-            <i class="bi bi-graph-up me-1"></i>Laporan
-        </a>
-    </div>
-@endsection
-
 @section('content')
     <!-- Date Selector -->
     <div class="row g-4 mb-4">
@@ -349,115 +338,80 @@
                 }
             });
 
-            fetch('{{ route('pembina.absensi.bulkStore') }}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        tanggal: tanggal,
-                        absensi: attendanceData
+            function saveIndividualAttendance(pendaftaranId) {
+                const status = $(`.attendance-status[data-pendaftaran-id="${pendaftaranId}"]`).val();
+                const catatan = $(`input[name="attendance[${pendaftaranId}][catatan]"]`).val();
+                const tanggal = $('#hiddenTanggal').val();
+
+                if (!status) {
+                    showError('Pilih status kehadiran terlebih dahulu');
+                    return;
+                }
+
+                // Show loading
+                const btn = $(`.btn[onclick="saveIndividualAttendance(${pendaftaranId})"]`);
+                const originalText = btn.html();
+                btn.html('<i class="bi bi-hourglass-split"></i>').prop('disabled', true);
+
+                fetch('{{ route('pembina.absensi.store') }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            pendaftaran_id: pendaftaranId,
+                            tanggal: tanggal,
+                            status: status,
+                            catatan: catatan
+                        })
                     })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: `${attendanceData.length} data kehadiran berhasil disimpan!`,
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                        updateStats();
-                    } else {
-                        throw new Error(data.message || 'Terjadi kesalahan');
-                    }
-                })
-                .catch(error => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal!',
-                        text: error.message || 'Terjadi kesalahan saat menyimpan data'
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            btn.html('<i class="bi bi-check text-success"></i>');
+                            setTimeout(() => {
+                                btn.html(originalText).prop('disabled', false);
+                            }, 2000);
+                            updateStats();
+                        } else {
+                            throw new Error(data.message || 'Terjadi kesalahan');
+                        }
+                    })
+                    .catch(error => {
+                        btn.html(originalText).prop('disabled', false);
+                        showError(error.message || 'Terjadi kesalahan saat menyimpan data');
                     });
-                });
-        }
-
-        function saveIndividualAttendance(pendaftaranId) {
-            const status = $(`.attendance-status[data-pendaftaran-id="${pendaftaranId}"]`).val();
-            const catatan = $(`input[name="attendance[${pendaftaranId}][catatan]"]`).val();
-            const tanggal = $('#hiddenTanggal').val();
-
-            if (!status) {
-                showError('Pilih status kehadiran terlebih dahulu');
-                return;
             }
 
-            // Show loading
-            const btn = $(`.btn[onclick="saveIndividualAttendance(${pendaftaranId})"]`);
-            const originalText = btn.html();
-            btn.html('<i class="bi bi-hourglass-split"></i>').prop('disabled', true);
+            function updateStats() {
+                const totalSiswa = $('.attendance-status').length;
+                const totalHadir = $('.attendance-status[value="hadir"]').length;
+                const totalIzin = $('.attendance-status').filter(function() {
+                    return $(this).val() === 'izin' || $(this).val() === 'terlambat';
+                }).length;
+                const totalAlpa = $('.attendance-status[value="alpa"]').length;
 
-            fetch('{{ route('pembina.absensi.store') }}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        pendaftaran_id: pendaftaranId,
-                        tanggal: tanggal,
-                        status: status,
-                        catatan: catatan
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        btn.html('<i class="bi bi-check text-success"></i>');
-                        setTimeout(() => {
-                            btn.html(originalText).prop('disabled', false);
-                        }, 2000);
-                        updateStats();
-                    } else {
-                        throw new Error(data.message || 'Terjadi kesalahan');
-                    }
-                })
-                .catch(error => {
-                    btn.html(originalText).prop('disabled', false);
-                    showError(error.message || 'Terjadi kesalahan saat menyimpan data');
-                });
-        }
-
-        function updateStats() {
-            const totalSiswa = $('.attendance-status').length;
-            const totalHadir = $('.attendance-status[value="hadir"]').length;
-            const totalIzin = $('.attendance-status').filter(function() {
-                return $(this).val() === 'izin' || $(this).val() === 'terlambat';
-            }).length;
-            const totalAlpa = $('.attendance-status[value="alpa"]').length;
-
-            $('#totalSiswa').text(totalSiswa);
-            $('#totalHadir').text(totalHadir);
-            $('#totalIzin').text(totalIzin);
-            $('#totalAlpa').text(totalAlpa);
-        }
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            // Ctrl + S to save all
-            if (e.ctrlKey && e.key === 's') {
-                e.preventDefault();
-                saveAllAttendance();
+                $('#totalSiswa').text(totalSiswa);
+                $('#totalHadir').text(totalHadir);
+                $('#totalIzin').text(totalIzin);
+                $('#totalAlpa').text(totalAlpa);
             }
 
-            // Ctrl + A to mark all present
-            if (e.ctrlKey && e.key === 'a') {
-                e.preventDefault();
-                markAllPresent();
-            }
-        });
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Ctrl + S to save all
+                if (e.ctrlKey && e.key === 's') {
+                    e.preventDefault();
+                    saveAllAttendance();
+                }
+
+                // Ctrl + A to mark all present
+                if (e.ctrlKey && e.key === 'a') {
+                    e.preventDefault();
+                    markAllPresent();
+                }
+            });
     </script>
 @endpush
 

@@ -714,76 +714,43 @@
                 }
             });
 
-            fetch('{{ route('pembina.galeri.bulkUpload') }}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                    },
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: `${files.length} file berhasil diupload!`,
-                            timer: 2000,
-                            showConfirmButton: false
-                        }).then(() => {
-                            $('#bulkUploadModal').modal('hide');
-                            location.reload();
-                        });
-                    } else {
-                        throw new Error(data.message || 'Terjadi kesalahan');
-                    }
-                })
-                .catch(error => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal!',
-                        text: error.message || 'Terjadi kesalahan saat mengupload file'
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Esc to close modals
+                if (e.key === 'Escape') {
+                    $('#mediaViewerModal, #bulkUploadModal').modal('hide');
+                }
+
+                // Ctrl + A to select all (prevent default browser behavior)
+                if (e.ctrlKey && e.key === 'a') {
+                    e.preventDefault();
+                    $('#selectAllFiles').prop('checked', true).trigger('change');
+                }
+
+                // Delete key to delete selected
+                if (e.key === 'Delete') {
+                    e.preventDefault();
+                    deleteSelected();
+                }
+            });
+
+            // Lazy loading for images
+            if ('IntersectionObserver' in window) {
+                const imageObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            img.src = img.dataset.src;
+                            img.classList.remove('lazy');
+                            imageObserver.unobserve(img);
+                        }
                     });
                 });
-        }
 
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            // Esc to close modals
-            if (e.key === 'Escape') {
-                $('#mediaViewerModal, #bulkUploadModal').modal('hide');
-            }
-
-            // Ctrl + A to select all (prevent default browser behavior)
-            if (e.ctrlKey && e.key === 'a') {
-                e.preventDefault();
-                $('#selectAllFiles').prop('checked', true).trigger('change');
-            }
-
-            // Delete key to delete selected
-            if (e.key === 'Delete') {
-                e.preventDefault();
-                deleteSelected();
-            }
-        });
-
-        // Lazy loading for images
-        if ('IntersectionObserver' in window) {
-            const imageObserver = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const img = entry.target;
-                        img.src = img.dataset.src;
-                        img.classList.remove('lazy');
-                        imageObserver.unobserve(img);
-                    }
+                document.querySelectorAll('img[data-src]').forEach(img => {
+                    imageObserver.observe(img);
                 });
-            });
-
-            document.querySelectorAll('img[data-src]').forEach(img => {
-                imageObserver.observe(img);
-            });
-        }
+            }
     </script>
 @endpush
 
