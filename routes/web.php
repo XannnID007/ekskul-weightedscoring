@@ -6,17 +6,18 @@ use Illuminate\Support\Facades\Route;
 
 // Admin Controllers
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Siswa\JadwalController as SiswaJadwalController;
-use App\Http\Controllers\Siswa\ProfilController as SiswaProfilController;
 
 // Pembina Controllers
+use App\Http\Controllers\Siswa\ProfilController as SiswaProfilController;
 use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
 use App\Http\Controllers\Pembina\GaleriController as PembinaGaleriController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Siswa\DashboardController as SiswaDashboardController;
 
 // Siswa Controllers
+use App\Http\Controllers\Siswa\DashboardController as SiswaDashboardController;
 use App\Http\Controllers\Pembina\DashboardController as PembinaDashboardController;
 use App\Http\Controllers\Siswa\PendaftaranController as SiswaPendaftaranController;
 use App\Http\Controllers\Siswa\RekomendasiController as SiswaRekomendasiController;
@@ -49,7 +50,7 @@ Route::get('/', function () {
 });
 
 // Authentication routes sudah di-handle oleh laravel/ui
-Auth::routes(['verify' => true]);
+Auth::routes(['register' => true, 'verify' => true]);
 
 Route::get('/redirect-by-role', function () {
     if (!auth()->check()) {
@@ -71,6 +72,10 @@ Route::get('/redirect-by-role', function () {
                 ->with('error', 'Role tidak valid. Silakan hubungi administrator.');
     }
 })->name('redirect.by.role');
+
+Route::middleware(['throttle:5,1'])->group(function () {
+    Route::post('/register', [RegisterController::class, 'register'])->name('register');
+});
 
 // Routes yang memerlukan authentication
 Route::middleware(['auth', 'verified'])->group(function () {

@@ -19,6 +19,8 @@ class DashboardController extends Controller
             'total_pendaftaran' => Pendaftaran::count(),
             'pendaftaran_pending' => Pendaftaran::pending()->count(),
             'pendaftaran_disetujui' => Pendaftaran::disetujui()->count(),
+            'siswa_baru_hari_ini' => User::siswa()->whereDate('created_at', today())->count(),
+            'profil_belum_lengkap' => User::siswa()->whereNull('minat')->count(),
         ];
 
         // Data untuk chart ekstrakurikuler paling diminati

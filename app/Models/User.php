@@ -400,4 +400,30 @@ class User extends Authenticatable
 
         return $this->telepon;
     }
+
+    public function needsProfileCompletion()
+    {
+        return $this->role === 'siswa' && (
+            empty($this->minat) ||
+            empty($this->nilai_rata_rata) ||
+            empty($this->tanggal_lahir) ||
+            empty($this->jenis_kelamin)
+        );
+    }
+
+    public function getProfileCompletionPercentage()
+    {
+        if ($this->role !== 'siswa') return 100;
+
+        $fields = ['minat', 'nilai_rata_rata', 'tanggal_lahir', 'jenis_kelamin'];
+        $completed = 0;
+
+        foreach ($fields as $field) {
+            if (!empty($this->$field)) {
+                $completed++;
+            }
+        }
+
+        return round(($completed / count($fields)) * 100);
+    }
 }

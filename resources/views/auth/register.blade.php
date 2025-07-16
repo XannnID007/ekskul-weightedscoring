@@ -1,11 +1,11 @@
 @extends('layouts.auth')
 
-@section('title', 'Daftar')
+@section('title', 'Daftar Akun Siswa')
 
 @section('content')
     <h4 class="text-center mb-4">
         <i class="bi bi-person-plus me-2 text-primary"></i>
-        Daftar Akun Baru
+        Daftar Akun Siswa
     </h4>
 
     <form method="POST" action="{{ route('register') }}">
@@ -21,9 +21,22 @@
                 value="{{ old('name') }}" required autocomplete="name" autofocus placeholder="Masukkan nama lengkap Anda">
 
             @error('name')
-                <div class="invalid-feedback">
-                    {{ $message }}
-                </div>
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <!-- NIS Field -->
+        <div class="mb-3">
+            <label for="nis" class="form-label">
+                <i class="bi bi-card-text me-1"></i>
+                NIS (Nomor Induk Siswa)
+            </label>
+            <input id="nis" type="text" class="form-control @error('nis') is-invalid @enderror" name="nis"
+                value="{{ old('nis') }}" required placeholder="Contoh: 2024001">
+            <div class="form-text">Sesuai dengan NIS di kartu siswa Anda</div>
+
+            @error('nis')
+                <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
 
@@ -34,12 +47,10 @@
                 Email
             </label>
             <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email"
-                value="{{ old('email') }}" required autocomplete="email" placeholder="Masukkan alamat email">
+                value="{{ old('email') }}" required autocomplete="email" placeholder="nama@gmail.com">
 
             @error('email')
-                <div class="invalid-feedback">
-                    {{ $message }}
-                </div>
+                <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
 
@@ -58,22 +69,20 @@
             </div>
 
             @error('password')
-                <div class="invalid-feedback">
-                    {{ $message }}
-                </div>
+                <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
 
         <!-- Confirm Password Field -->
         <div class="mb-3">
-            <label for="password-confirm" class="form-label">
+            <label for="password_confirmation" class="form-label">
                 <i class="bi bi-lock-fill me-1"></i>
                 Konfirmasi Password
             </label>
             <div class="input-group">
-                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required
+                <input id="password_confirmation" type="password" class="form-control" name="password_confirmation" required
                     autocomplete="new-password" placeholder="Ulangi password yang sama">
-                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password-confirm')">
+                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password_confirmation')">
                     <i class="bi bi-eye"></i>
                 </button>
             </div>
@@ -84,8 +93,7 @@
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="terms" required>
                 <label class="form-check-label" for="terms">
-                    Saya setuju dengan
-                    <a href="#" class="text-decoration-none">Syarat dan Ketentuan</a>
+                    Saya setuju dengan Syarat dan Ketentuan penggunaan sistem
                 </label>
             </div>
         </div>
@@ -111,7 +119,7 @@
         <div class="text-center mt-4">
             <small class="text-muted">
                 <i class="bi bi-info-circle me-1"></i>
-                Pendaftaran hanya untuk siswa. Admin dan pembina didaftarkan oleh sistem.
+                Sistem ekstrakurikuler MA Modern Miftahussa'adah
             </small>
         </div>
     </form>
@@ -119,27 +127,40 @@
 
 @push('scripts')
     <script>
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = field.nextElementSibling.querySelector('i');
+
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.className = 'bi bi-eye-slash';
+            } else {
+                field.type = 'password';
+                icon.className = 'bi bi-eye';
+            }
+        }
+
         // Password strength indicator
         document.getElementById('password').addEventListener('input', function() {
             const password = this.value;
-            const strength = document.getElementById('password-strength');
+            let strengthDiv = document.getElementById('password-strength');
 
-            if (!strength) {
-                const strengthDiv = document.createElement('div');
+            if (!strengthDiv) {
+                strengthDiv = document.createElement('div');
                 strengthDiv.id = 'password-strength';
                 strengthDiv.className = 'mt-1';
                 this.parentNode.parentNode.appendChild(strengthDiv);
             }
 
             let score = 0;
-            let feedback = '';
-            let color = '';
-
             if (password.length >= 8) score++;
             if (/[a-z]/.test(password)) score++;
             if (/[A-Z]/.test(password)) score++;
             if (/[0-9]/.test(password)) score++;
             if (/[^A-Za-z0-9]/.test(password)) score++;
+
+            let feedback = '';
+            let color = '';
 
             switch (score) {
                 case 0:
@@ -160,15 +181,14 @@
             }
 
             if (password.length === 0) {
-                document.getElementById('password-strength').innerHTML = '';
+                strengthDiv.innerHTML = '';
             } else {
-                document.getElementById('password-strength').innerHTML =
-                    `<small class="text-${color}">Kekuatan password: ${feedback}</small>`;
+                strengthDiv.innerHTML = `<small class="text-${color}">Kekuatan password: ${feedback}</small>`;
             }
         });
 
         // Confirm password validation
-        document.getElementById('password-confirm').addEventListener('input', function() {
+        document.getElementById('password_confirmation').addEventListener('input', function() {
             const password = document.getElementById('password').value;
             const confirmPassword = this.value;
 

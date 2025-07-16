@@ -10,8 +10,9 @@
             <i class="bi bi-person-plus me-1"></i>Tambah {{ ucfirst($role) }}
         </a>
         @if ($role == 'siswa')
-            <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#importModal">
-                <i class="bi bi-upload me-1"></i>Import Excel
+            <!-- Optional: Keep manual add option -->
+            <button class="btn btn-outline-light" onclick="showStudentStats()">
+                <i class="bi bi-graph-up me-1"></i>Lihat Statistik
             </button>
         @endif
     </div>
