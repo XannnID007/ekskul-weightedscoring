@@ -325,11 +325,6 @@
                         <i class="bi bi-person-plus"></i>
                         Kelola Pendaftaran
                     </a>
-                    <a href="{{ route('pembina.absensi.index') }}"
-                        class="nav-link {{ request()->routeIs('pembina.absensi.*') ? 'active' : '' }}">
-                        <i class="bi bi-calendar-check"></i>
-                        Input Kehadiran
-                    </a>
                     <a href="{{ route('pembina.pengumuman.index') }}"
                         class="nav-link {{ request()->routeIs('pembina.pengumuman.*') ? 'active' : '' }}">
                         <i class="bi bi-megaphone"></i>
@@ -370,11 +365,6 @@
                         class="nav-link {{ request()->routeIs('siswa.jadwal') ? 'active' : '' }}">
                         <i class="bi bi-calendar3"></i>
                         Jadwal Kegiatan
-                    </a>
-                    <a href="{{ route('siswa.kehadiran') }}"
-                        class="nav-link {{ request()->routeIs('siswa.kehadiran') ? 'active' : '' }}">
-                        <i class="bi bi-graph-up"></i>
-                        Rekap Kehadiran
                     </a>
                 @endif
             </div>

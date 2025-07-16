@@ -134,10 +134,6 @@
                                                             class="btn btn-primary btn-sm">
                                                             <i class="bi bi-person-plus me-1"></i>Pendaftaran
                                                         </a>
-                                                        <a href="{{ route('pembina.absensi.index') }}?ekstrakurikuler={{ $ekstrakurikuler->id }}"
-                                                            class="btn btn-outline-primary btn-sm">
-                                                            <i class="bi bi-calendar-check me-1"></i>Absensi
-                                                        </a>
                                                     </div>
                                                 </div>
                                             </div>
