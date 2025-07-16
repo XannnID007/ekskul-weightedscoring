@@ -122,33 +122,48 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // Siswa Routes
+    // Siswa Routes
     Route::middleware(['role:siswa'])->prefix('siswa')->name('siswa.')->group(function () {
         Route::get('/dashboard', [SiswaDashboardController::class, 'index'])->name('dashboard');
 
-        // Profil Management
+        // Profil Management - selalu bisa diakses
         Route::get('/profil', [SiswaProfilController::class, 'index'])->name('profil');
         Route::put('/profil', [SiswaProfilController::class, 'update'])->name('profil.update');
 
-        // Rekomendasi
-        Route::get('/rekomendasi', [SiswaRekomendasiController::class, 'index'])->name('rekomendasi');
-        Route::post('/rekomendasi/regenerate', [SiswaRekomendasiController::class, 'regenerate'])->name('rekomendasi.regenerate');
-        Route::get('/rekomendasi/{rekomendasi}', [SiswaRekomendasiController::class, 'detail'])->name('rekomendasi.detail');
+        // Routes untuk siswa yang BELUM terdaftar ekstrakurikuler
+        Route::middleware(['ensure.student.not.registered'])->group(function () {
+            // Rekomendasi
+            Route::get('/rekomendasi', [SiswaRekomendasiController::class, 'index'])->name('rekomendasi');
+            Route::post('/rekomendasi/regenerate', [SiswaRekomendasiController::class, 'regenerate'])->name('rekomendasi.regenerate');
+            Route::get('/rekomendasi/{rekomendasi}', [SiswaRekomendasiController::class, 'detail'])->name('rekomendasi.detail');
 
-        // Ekstrakurikuler
+            // Daftar ekstrakurikuler
+            Route::post('/ekstrakurikuler/{ekstrakurikuler}/daftar', [SiswaEkstrakurikulerController::class, 'daftar'])->name('ekstrakurikuler.daftar');
+        });
+
+        // Ekstrakurikuler - bisa diakses semua siswa
         Route::get('/ekstrakurikuler', [SiswaEkstrakurikulerController::class, 'index'])->name('ekstrakurikuler.index');
         Route::get('/ekstrakurikuler/{ekstrakurikuler}', [SiswaEkstrakurikulerController::class, 'show'])->name('ekstrakurikuler.show');
-        Route::post('/ekstrakurikuler/{ekstrakurikuler}/daftar', [SiswaEkstrakurikulerController::class, 'daftar'])->name('ekstrakurikuler.daftar');
 
-        // Pendaftaran Status
+        // Pendaftaran Status - selalu bisa diakses
         Route::get('/pendaftaran', [SiswaPendaftaranController::class, 'index'])->name('pendaftaran');
         Route::delete('/pendaftaran/{pendaftaran}', [SiswaPendaftaranController::class, 'cancel'])->name('pendaftaran.cancel');
 
-        // Jadwal
-        Route::get('/jadwal', [SiswaJadwalController::class, 'index'])->name('jadwal');
-        Route::get('/jadwal/calendar', [SiswaJadwalController::class, 'calendar'])->name('jadwal.calendar');
+        // Routes untuk siswa yang SUDAH terdaftar ekstrakurikuler
+        Route::middleware(['ensure.student.registered'])->group(function () {
+            Route::get('/jadwal', [SiswaJadwalController::class, 'index'])->name('jadwal');
+            Route::get('/jadwal/calendar', [SiswaJadwalController::class, 'calendar'])->name('jadwal.calendar');
+            Route::get('/jadwal/export', [SiswaJadwalController::class, 'exportCalendar'])->name('jadwal.export');
+
+            Route::get('/galeri', [\App\Http\Controllers\Siswa\GaleriController::class, 'index'])->name('galeri.index');
+            Route::get('/galeri/{galeri}', [\App\Http\Controllers\Siswa\GaleriController::class, 'show'])->name('galeri.show');
+
+            // Pengumuman - BARU  
+            Route::get('/pengumuman', [\App\Http\Controllers\Siswa\PengumumanController::class, 'index'])->name('pengumuman.index');
+            Route::get('/pengumuman/{pengumuman}', [\App\Http\Controllers\Siswa\PengumumanController::class, 'show'])->name('pengumuman.show');
+        });
     });
 });
-
 // API Routes untuk AJAX calls
 Route::middleware(['auth'])->prefix('api')->name('api.')->group(function () {
 

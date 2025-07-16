@@ -129,8 +129,10 @@ class User extends Authenticatable
         return $this->role === 'siswa';
     }
 
+    // ========== EKSTRAKURIKULER STATUS METHODS ==========
+
     /**
-     * Check if user sudah terdaftar ekstrakurikuler
+     * Check if user sudah terdaftar ekstrakurikuler yang disetujui
      */
     public function sudahTerdaftarEkstrakurikuler()
     {
@@ -138,60 +140,52 @@ class User extends Authenticatable
     }
 
     /**
-     * Get minat as array
+     * Check apakah user punya pendaftaran pending
      */
-    /**
-     * Get minat as array
-     */
-    public function getMinatArrayAttribute()
+    public function hasPendingPendaftaran()
     {
-        // Jika minat tidak ada
-        if (!$this->minat) {
-            return [];
-        }
-
-        // Jika sudah array
-        if (is_array($this->minat)) {
-            return $this->minat;
-        }
-
-        // Jika string JSON
-        if (is_string($this->minat)) {
-            $decoded = json_decode($this->minat, true);
-
-            // Jika berhasil decode JSON
-            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                return $decoded;
-            }
-
-            // Jika bukan JSON, coba split by comma
-            if (strpos($this->minat, ',') !== false) {
-                return array_map('trim', explode(',', $this->minat));
-            }
-
-            // Single value
-            return [$this->minat];
-        }
-
-        return [];
+        return $this->pendaftarans()->where('status', 'pending')->exists();
     }
 
     /**
-     * Override getAttribute to handle minat field specifically
+     * Get jumlah pendaftaran pending
      */
-    public function getAttribute($key)
+    public function getPendingPendaftaranCount()
     {
-        $value = parent::getAttribute($key);
+        return $this->pendaftarans()->where('status', 'pending')->count();
+    }
 
-        // Handle minat field specifically
-        if ($key === 'minat' && is_string($value)) {
-            $decoded = json_decode($value, true);
-            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                return $decoded;
-            }
+    /**
+     * Check apakah bisa mendaftar ekstrakurikuler baru
+     * (belum terdaftar dan tidak ada pending)
+     */
+    public function bisaMendaftarEkstrakurikuler()
+    {
+        return !$this->sudahTerdaftarEkstrakurikuler() && !$this->hasPendingPendaftaran();
+    }
+
+    /**
+     * Get status pendaftaran ekstrakurikuler
+     * Return: 'none', 'pending', 'approved', 'rejected'
+     */
+    public function getStatusPendaftaranEkstrakurikuler()
+    {
+        $pendaftaran = $this->pendaftarans()->latest()->first();
+
+        if (!$pendaftaran) {
+            return 'none'; // Belum pernah daftar
         }
 
-        return $value;
+        switch ($pendaftaran->status) {
+            case 'disetujui':
+                return 'approved';
+            case 'pending':
+                return 'pending';
+            case 'ditolak':
+                return 'rejected';
+            default:
+                return 'none';
+        }
     }
 
     /**
@@ -199,9 +193,115 @@ class User extends Authenticatable
      */
     public function getEkstrakurikulerDiikutiAttribute()
     {
-        return $this->ekstrakurikulers()
-            ->wherePivot('status', 'disetujui')
-            ->first();
+        return $this->pendaftarans()
+            ->where('status', 'disetujui')
+            ->with('ekstrakurikuler')
+            ->first()?->ekstrakurikuler;
+    }
+
+    /**
+     * Get pendaftaran yang disetujui
+     */
+    public function getPendaftaranDisetujui()
+    {
+        return $this->pendaftarans()->where('status', 'disetujui')->first();
+    }
+
+    // ========== MINAT & PROFIL METHODS ==========
+
+    /**
+     * Get minat as array
+     */
+    public function getMinatArrayAttribute()
+    {
+        $minat = $this->attributes['minat'] ?? null;
+
+        // Jika minat kosong atau null
+        if (empty($minat)) {
+            return [];
+        }
+
+        // Jika sudah array, return langsung
+        if (is_array($minat)) {
+            return $minat;
+        }
+
+        // Jika string, coba decode JSON
+        if (is_string($minat)) {
+            // Coba decode sebagai JSON
+            $decoded = json_decode($minat, true);
+
+            // Jika berhasil decode dan hasilnya array
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $decoded;
+            }
+
+            // Jika bukan JSON valid, coba split by comma (fallback)
+            if (strpos($minat, ',') !== false) {
+                return array_filter(array_map('trim', explode(',', $minat)));
+            }
+
+            // Jika single value string, wrap dalam array
+            if (strlen(trim($minat)) > 0) {
+                return [trim($minat)];
+            }
+        }
+
+        // Default return empty array
+        return [];
+    }
+
+    /**
+     * Override getAttribute untuk handle minat field khusus
+     */
+    public function getAttribute($key)
+    {
+        $value = parent::getAttribute($key);
+
+        // Handle minat field specifically
+        if ($key === 'minat') {
+            // Jika value adalah string, coba convert ke array
+            if (is_string($value)) {
+                $decoded = json_decode($value, true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                    return $decoded;
+                }
+            }
+
+            // Jika bukan string atau gagal decode, return as is
+            return $value;
+        }
+
+        return $value;
+    }
+
+    /**
+     * Safe method untuk mendapatkan minat sebagai array
+     */
+    public function getMinatSafe()
+    {
+        $minat = $this->minat;
+
+        if (is_array($minat)) {
+            return $minat;
+        }
+
+        if (is_string($minat)) {
+            $decoded = json_decode($minat, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $decoded;
+            }
+
+            // Fallback untuk comma separated
+            if (strpos($minat, ',') !== false) {
+                return array_filter(array_map('trim', explode(',', $minat)));
+            }
+
+            // Single value
+            return [$minat];
+        }
+
+        return [];
     }
 
     /**
@@ -225,14 +325,6 @@ class User extends Authenticatable
             ->first();
 
         return $rekomendasi ? $rekomendasi->total_skor : 0;
-    }
-
-    /**
-     * Get pendaftaran yang disetujui
-     */
-    public function getPendaftaranDisetujui()
-    {
-        return $this->pendaftarans()->where('status', 'disetujui')->first();
     }
 
     /**

@@ -94,6 +94,42 @@
             text-align: center;
         }
 
+        .sidebar-section-header {
+            margin-top: 1rem;
+        }
+
+        .sidebar-section-header:first-child {
+            margin-top: 0;
+        }
+
+        .nav-link .badge {
+            font-size: 0.65rem;
+            padding: 0.25em 0.5em;
+        }
+
+        .sidebar-menu .nav-link:hover .badge {
+            transform: scale(1.1);
+            transition: transform 0.2s ease;
+        }
+
+        @keyframes pulse-badge {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .badge.bg-warning {
+            animation: pulse-badge 2s infinite;
+        }
+
         /* Main Content */
         .main-content {
             margin-left: 280px;
@@ -341,30 +377,151 @@
                         <i class="bi bi-speedometer2"></i>
                         Dashboard
                     </a>
+
                     <a href="{{ route('siswa.profil') }}"
                         class="nav-link {{ request()->routeIs('siswa.profil') ? 'active' : '' }}">
                         <i class="bi bi-person-circle"></i>
                         Lengkapi Profil
+                        @if (class_exists('App\Services\RekomendasiService'))
+                            @php
+                                try {
+                                    $profilCheck = app('App\Services\RekomendasiService')->cekKelengkapanProfil(
+                                        auth()->user(),
+                                    );
+                                    $showBadge = $profilCheck['persentase'] < 100;
+                                    $percentage = $profilCheck['persentase'];
+                                } catch (Exception $e) {
+                                    $showBadge = false;
+                                    $percentage = 0;
+                                }
+                            @endphp
+                            @if ($showBadge)
+                                <span class="badge bg-warning ms-2">{{ $percentage }}%</span>
+                            @endif
+                        @endif
                     </a>
-                    <a href="{{ route('siswa.rekomendasi') }}"
-                        class="nav-link {{ request()->routeIs('siswa.rekomendasi') ? 'active' : '' }}">
-                        <i class="bi bi-stars"></i>
-                        Rekomendasi
-                    </a>
-                    <a href="{{ route('siswa.ekstrakurikuler.index') }}"
-                        class="nav-link {{ request()->routeIs('siswa.ekstrakurikuler.*') ? 'active' : '' }}">
-                        <i class="bi bi-collection"></i>
-                        Ekstrakurikuler
-                    </a>
+
+                    @if (!auth()->user()->sudahTerdaftarEkstrakurikuler())
+                        {{-- Menu untuk siswa yang BELUM terdaftar --}}
+                        <div class="sidebar-section-header">
+                            <small class="text-muted px-3 py-2 d-block">CARI EKSTRAKURIKULER</small>
+                        </div>
+
+                        <a href="{{ route('siswa.rekomendasi') }}"
+                            class="nav-link {{ request()->routeIs('siswa.rekomendasi*') ? 'active' : '' }}">
+                            <i class="bi bi-stars"></i>
+                            Rekomendasi
+                            <span class="badge bg-primary ms-2">AI</span>
+                        </a>
+
+                        <a href="{{ route('siswa.ekstrakurikuler.index') }}"
+                            class="nav-link {{ request()->routeIs('siswa.ekstrakurikuler.*') ? 'active' : '' }}">
+                            <i class="bi bi-collection"></i>
+                            Jelajahi Semua
+                        </a>
+                    @else
+                        {{-- Menu untuk siswa yang SUDAH terdaftar --}}
+                        @php
+                            $pendaftaran = auth()
+                                ->user()
+                                ->pendaftarans()
+                                ->where('status', 'disetujui')
+                                ->with('ekstrakurikuler')
+                                ->first();
+                            $ekstrakurikuler = $pendaftaran ? $pendaftaran->ekstrakurikuler : null;
+                        @endphp
+
+                        <div class="sidebar-section-header">
+                            <small class="text-muted px-3 py-2 d-block">KEGIATAN SAYA</small>
+                        </div>
+
+                        @if ($ekstrakurikuler)
+                            {{-- Info Ekstrakurikuler yang diikuti --}}
+                            <div class="nav-item px-3 py-2 mb-2">
+                                <div class="bg-primary bg-opacity-10 rounded p-2">
+                                    <div class="d-flex align-items-center">
+                                        @if ($ekstrakurikuler->gambar)
+                                            <img src="{{ Storage::url($ekstrakurikuler->gambar) }}"
+                                                alt="{{ $ekstrakurikuler->nama }}" class="rounded me-2" width="32"
+                                                height="32" style="object-fit: cover;">
+                                        @else
+                                            <div class="bg-primary rounded d-flex align-items-center justify-content-center me-2"
+                                                style="width: 32px; height: 32px;">
+                                                <i class="bi bi-collection text-white small"></i>
+                                            </div>
+                                        @endif
+                                        <div class="flex-grow-1">
+                                            <div class="fw-bold small text-primary">{{ $ekstrakurikuler->nama }}</div>
+                                            <div class="text-muted" style="font-size: 0.75rem;">
+                                                {{ $ekstrakurikuler->pembina->name ?? 'Pembina' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
+                        <a href="{{ route('siswa.jadwal') }}"
+                            class="nav-link {{ request()->routeIs('siswa.jadwal*') ? 'active' : '' }}">
+                            <i class="bi bi-calendar3"></i>
+                            Jadwal Kegiatan
+                        </a>
+
+                        {{-- MENU BARU: Galeri --}}
+                        <a href="{{ route('siswa.galeri.index') }}"
+                            class="nav-link {{ request()->routeIs('siswa.galeri*') ? 'active' : '' }}">
+                            <i class="bi bi-images"></i>
+                            Galeri Kegiatan
+                            @php
+                                $totalGaleri = $ekstrakurikuler ? $ekstrakurikuler->galeris()->count() : 0;
+                            @endphp
+                            @if ($totalGaleri > 0)
+                                <span class="badge bg-info ms-2">{{ $totalGaleri }}</span>
+                            @endif
+                        </a>
+
+                        {{-- MENU BARU: Pengumuman --}}
+                        <a href="{{ route('siswa.pengumuman.index') }}"
+                            class="nav-link {{ request()->routeIs('siswa.pengumuman*') ? 'active' : '' }}">
+                            <i class="bi bi-megaphone"></i>
+                            Pengumuman
+                            @php
+                                $pengumumanBaru = $ekstrakurikuler
+                                    ? $ekstrakurikuler
+                                        ->pengumumans()
+                                        ->where('created_at', '>=', now()->subDays(7))
+                                        ->count()
+                                    : 0;
+                            @endphp
+                            @if ($pengumumanBaru > 0)
+                                <span class="badge bg-warning ms-2">{{ $pengumumanBaru }}</span>
+                            @endif
+                        </a>
+
+                        {{-- Divider --}}
+                        <hr class="sidebar-divider">
+
+                        <div class="sidebar-section-header">
+                            <small class="text-muted px-3 py-2 d-block">LAINNYA</small>
+                        </div>
+
+                        <a href="{{ route('siswa.ekstrakurikuler.index') }}"
+                            class="nav-link {{ request()->routeIs('siswa.ekstrakurikuler.*') ? 'active' : '' }}">
+                            <i class="bi bi-eye"></i>
+                            Lihat Ekstrakurikuler Lain
+                        </a>
+                    @endif
+
                     <a href="{{ route('siswa.pendaftaran') }}"
                         class="nav-link {{ request()->routeIs('siswa.pendaftaran') ? 'active' : '' }}">
                         <i class="bi bi-clipboard-check"></i>
                         Status Pendaftaran
-                    </a>
-                    <a href="{{ route('siswa.jadwal') }}"
-                        class="nav-link {{ request()->routeIs('siswa.jadwal') ? 'active' : '' }}">
-                        <i class="bi bi-calendar3"></i>
-                        Jadwal Kegiatan
+                        @php
+                            $pendingCount = auth()->user()->pendaftarans()->where('status', 'pending')->count();
+                        @endphp
+                        @if ($pendingCount > 0)
+                            <span class="badge bg-warning ms-2">{{ $pendingCount }}</span>
+                        @endif
                     </a>
                 @endif
             </div>

@@ -280,7 +280,34 @@
                 </div>
                 <div class="card-body">
                     @php
-                        $minatSiswa = $pendaftaran->user->minat_array ?? [];
+                        // Pastikan $minatSiswa adalah array
+                        $minatSiswa = $pendaftaran->user->minat ?? [];
+                        if (is_string($minatSiswa)) {
+                            $minatSiswa = json_decode($minatSiswa, true) ?? [];
+                        }
+                        if (!is_array($minatSiswa)) {
+                            $minatSiswa = [];
+                        }
+
+                        // Pastikan $kategoriEkskul adalah array
+                        $kategoriEkskul = $pendaftaran->ekstrakurikuler->kategori ?? [];
+                        if (is_string($kategoriEkskul)) {
+                            $kategoriEkskul = json_decode($kategoriEkskul, true) ?? [];
+                        }
+                        if (!is_array($kategoriEkskul)) {
+                            $kategoriEkskul = [];
+                        }
+
+                        $kecocokan = [];
+                        if (is_array($minatSiswa) && is_array($kategoriEkskul)) {
+                            $kecocokan = array_intersect($minatSiswa, $kategoriEkskul);
+                        }
+
+                        // TAMBAHAN: Hitung tingkat kecocokan
+                        $tingkatKecocokan = 0;
+                        if (count($kategoriEkskul) > 0) {
+                            $tingkatKecocokan = count($kecocokan) / count($kategoriEkskul);
+                        }
                     @endphp
                     @if (!empty($minatSiswa))
                         <div class="d-flex flex-wrap gap-2">
@@ -290,14 +317,31 @@
                         </div>
 
                         <!-- Analisis Kesesuaian -->
-                        @php
-                            $kategoriEkskul = $pendaftaran->ekstrakurikuler->kategori ?? [];
-                            $kecocokan = array_intersect($minatSiswa, $kategoriEkskul);
-                            $tingkatKecocokan =
-                                count($kategoriEkskul) > 0 ? count($kecocokan) / count($kategoriEkskul) : 0;
-                        @endphp
+                        @if (!empty($minatSiswa))
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach ($minatSiswa as $minat)
+                                    <span class="badge bg-primary fs-6 px-3 py-2">{{ ucfirst($minat) }}</span>
+                                @endforeach
+                            </div>
+                        @endif
 
-                        <div class="mt-3 p-3 bg-light rounded">
+                        @if (!empty($kecocokan))
+                            <div class="mt-2">
+                                <small class="text-success">
+                                    <i class="bi bi-check-circle me-1"></i>
+                                    Minat yang cocok: {{ implode(', ', $kecocokan) }}
+                                </small>
+                            </div>
+                        @else
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Tidak ada minat yang langsung cocok dengan kategori ekstrakurikuler
+                                </small>
+                            </div>
+                        @endif
+
+                        <div class="mt-3 p-3 bg-light-300 rounded">
                             <h6 class="text-success mb-2">
                                 <i class="bi bi-puzzle me-1"></i>Analisis Kesesuaian
                             </h6>

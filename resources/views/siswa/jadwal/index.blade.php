@@ -47,15 +47,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3 text-center">
-                                <div class="bg-white bg-opacity-20 rounded-3 p-3">
-                                    <i class="bi bi-calendar-event" style="font-size: 2rem;"></i>
-                                    <div class="mt-2">
-                                        <strong class="d-block">Hari Ini</strong>
-                                        <small>{{ now()->locale('id')->isoFormat('dddd, D MMMM Y') }}</small>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -141,79 +132,6 @@
                                 <p class="text-muted mt-2 mb-0">Tidak ada kegiatan mendatang</p>
                             </div>
                         @endforelse
-                    </div>
-                </div>
-
-                <!-- Quick Stats -->
-                <div class="card">
-                    <div class="card-header">
-                        <h6 class="mb-0">
-                            <i class="bi bi-graph-up me-2"></i>Statistik Kehadiran
-                        </h6>
-                    </div>
-                    <div class="card-body">
-                        @php
-                            $attendanceStats = [
-                                'total_kegiatan' => 12,
-                                'hadir' => 10,
-                                'izin' => 1,
-                                'alpa' => 1,
-                            ];
-                            $percentage =
-                                $attendanceStats['total_kegiatan'] > 0
-                                    ? round(($attendanceStats['hadir'] / $attendanceStats['total_kegiatan']) * 100)
-                                    : 0;
-                        @endphp
-
-                        <div class="text-center mb-3">
-                            <div class="position-relative d-inline-block">
-                                <svg width="120" height="120" class="circular-progress">
-                                    <circle cx="60" cy="60" r="50" stroke="rgba(255,255,255,0.1)"
-                                        stroke-width="8" fill="none" />
-                                    <circle cx="60" cy="60" r="50" stroke="#28a745" stroke-width="8"
-                                        fill="none" stroke-dasharray="{{ 2 * 3.14159 * 50 }}"
-                                        stroke-dashoffset="{{ 2 * 3.14159 * 50 * (1 - $percentage / 100) }}"
-                                        transform="rotate(-90 60 60)" class="progress-ring" />
-                                </svg>
-                                <div class="position-absolute top-50 start-50 translate-middle text-center">
-                                    <h4 class="mb-0 text-success">{{ $percentage }}%</h4>
-                                    <small class="text-muted">Kehadiran</small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row g-2 text-center mb-3">
-                            <div class="col-3">
-                                <div class="bg-primary rounded p-2">
-                                    <strong class="text-white d-block">{{ $attendanceStats['total_kegiatan'] }}</strong>
-                                    <small class="text-white">Total</small>
-                                </div>
-                            </div>
-                            <div class="col-3">
-                                <div class="bg-success rounded p-2">
-                                    <strong class="text-white d-block">{{ $attendanceStats['hadir'] }}</strong>
-                                    <small class="text-white">Hadir</small>
-                                </div>
-                            </div>
-                            <div class="col-3">
-                                <div class="bg-warning rounded p-2">
-                                    <strong class="text-white d-block">{{ $attendanceStats['izin'] }}</strong>
-                                    <small class="text-white">Izin</small>
-                                </div>
-                            </div>
-                            <div class="col-3">
-                                <div class="bg-danger rounded p-2">
-                                    <strong class="text-white d-block">{{ $attendanceStats['alpa'] }}</strong>
-                                    <small class="text-white">Alpa</small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="d-grid">
-                            <a href="{{ route('siswa.kehadiran') }}" class="btn btn-outline-primary btn-sm">
-                                <i class="bi bi-bar-chart me-1"></i>Lihat Detail Kehadiran
-                            </a>
-                        </div>
                     </div>
                 </div>
             </div>

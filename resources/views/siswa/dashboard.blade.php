@@ -186,9 +186,6 @@
                                     <a href="{{ route('siswa.jadwal') }}" class="btn btn-primary btn-sm me-2">
                                         <i class="bi bi-calendar3 me-1"></i>Lihat Jadwal
                                     </a>
-                                    <a href="{{ route('siswa.kehadiran') }}" class="btn btn-outline-primary btn-sm">
-                                        <i class="bi bi-graph-up me-1"></i>Rekap Kehadiran
-                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -238,80 +235,6 @@
                                 <p class="text-muted mt-2 mb-0">Tidak ada jadwal mendatang</p>
                             </div>
                         @endforelse
-                    </div>
-                </div>
-
-                <!-- Ringkasan Kehadiran -->
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0">
-                            <i class="bi bi-bar-chart text-success me-2"></i>Ringkasan Kehadiran
-                        </h6>
-                        <a href="{{ route('siswa.kehadiran') }}" class="btn btn-outline-success btn-sm">
-                            Detail
-                        </a>
-                    </div>
-                    <div class="card-body">
-                        <!-- Progress Circle -->
-                        <div class="text-center mb-3">
-                            <div class="position-relative d-inline-block">
-                                <svg width="100" height="100" class="circular-progress">
-                                    <circle cx="50" cy="50" r="40" stroke="rgba(255,255,255,0.1)"
-                                        stroke-width="8" fill="none" />
-                                    <circle cx="50" cy="50" r="40" stroke="#28a745" stroke-width="8"
-                                        fill="none" stroke-dasharray="{{ 2 * 3.14159 * 40 }}"
-                                        stroke-dashoffset="{{ 2 * 3.14159 * 40 * (1 - $attendancePercentage / 100) }}"
-                                        transform="rotate(-90 50 50)" class="progress-ring" />
-                                </svg>
-                                <div class="position-absolute top-50 start-50 translate-middle text-center">
-                                    <h6 class="mb-0 text-success">{{ $attendancePercentage }}%</h6>
-                                    <small class="text-muted">Hadir</small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Stats Grid -->
-                        <div class="row g-2 text-center">
-                            <div class="col-3">
-                                <div class="bg-primary rounded p-2">
-                                    <strong class="text-white d-block">{{ $attendanceStats['total_kegiatan'] }}</strong>
-                                    <small class="text-white">Total</small>
-                                </div>
-                            </div>
-                            <div class="col-3">
-                                <div class="bg-success rounded p-2">
-                                    <strong class="text-white d-block">{{ $attendanceStats['hadir'] }}</strong>
-                                    <small class="text-white">Hadir</small>
-                                </div>
-                            </div>
-                            <div class="col-3">
-                                <div class="bg-warning rounded p-2">
-                                    <strong class="text-white d-block">{{ $attendanceStats['izin'] }}</strong>
-                                    <small class="text-white">Izin</small>
-                                </div>
-                            </div>
-                            <div class="col-3">
-                                <div class="bg-danger rounded p-2">
-                                    <strong class="text-white d-block">{{ $attendanceStats['alpa'] }}</strong>
-                                    <small class="text-white">Alpa</small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Achievement Badge -->
-                        @if ($attendancePercentage >= 80)
-                            <div class="alert alert-success mt-3 py-2">
-                                <i class="bi bi-trophy me-2"></i>
-                                <small><strong>Target Tercapai!</strong><br>Anda memenuhi syarat sertifikat
-                                    keaktifan.</small>
-                            </div>
-                        @else
-                            <div class="alert alert-warning mt-3 py-2">
-                                <i class="bi bi-target me-2"></i>
-                                <small><strong>Tingkatkan Kehadiran!</strong><br>Target: 80% untuk sertifikat
-                                    keaktifan.</small>
-                            </div>
-                        @endif
                     </div>
                 </div>
             </div>
@@ -489,14 +412,6 @@
                     window.location.href = '{{ route('siswa.jadwal') }}';
                 @endif
             }
-
-            // Ctrl + K for Kehadiran
-            if (e.ctrlKey && e.key === 'k') {
-                e.preventDefault();
-                @if ($ekstrakurikuler)
-                    window.location.href = '{{ route('siswa.kehadiran') }}';
-                @endif
-            }
         });
 
         // Show tooltips for keyboard shortcuts
@@ -506,12 +421,6 @@
                 const jadwalBtn = document.querySelector('a[href="{{ route('siswa.jadwal') }}"]');
                 if (jadwalBtn) {
                     jadwalBtn.setAttribute('title', 'Shortcut: Ctrl + J');
-                }
-
-                // Add tooltip to kehadiran button
-                const kehadiranBtn = document.querySelector('a[href="{{ route('siswa.kehadiran') }}"]');
-                if (kehadiranBtn) {
-                    kehadiranBtn.setAttribute('title', 'Shortcut: Ctrl + K');
                 }
             @endif
         });

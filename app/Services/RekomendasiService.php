@@ -58,7 +58,7 @@ class RekomendasiService
 
      private function hitungSkorMinat(User $siswa, Ekstrakurikuler $ekstrakurikuler)
      {
-          // Ambil minat siswa dengan pengecekan yang aman
+          // Ambil minat siswa dengan safety check
           $minatSiswa = $this->getArrayFromJsonField($siswa->minat);
           $kategoriEkskul = $this->getArrayFromJsonField($ekstrakurikuler->kategori);
 
@@ -67,9 +67,30 @@ class RekomendasiService
                return 50; // Skor netral jika data tidak lengkap
           }
 
-          // Hitung kecocokan minat
-          $kecocokan = array_intersect($minatSiswa, $kategoriEkskul);
-          $persentaseKecocokan = count($kecocokan) / count($kategoriEkskul);
+          // Double check: pastikan keduanya adalah array
+          if (!is_array($minatSiswa)) {
+               $minatSiswa = [];
+          }
+
+          if (!is_array($kategoriEkskul)) {
+               $kategoriEkskul = [];
+          }
+
+          // Hitung kecocokan minat dengan safety check
+          $kecocokan = [];
+          if (!empty($minatSiswa) && !empty($kategoriEkskul)) {
+               $kecocokan = array_intersect($minatSiswa, $kategoriEkskul);
+          }
+
+          $jumlahKecocokan = count($kecocokan);
+          $jumlahKategori = count($kategoriEkskul);
+
+          // Avoid division by zero
+          if ($jumlahKategori === 0) {
+               return 50;
+          }
+
+          $persentaseKecocokan = $jumlahKecocokan / $jumlahKategori;
 
           // Konversi ke skor 0-100
           $skor = $persentaseKecocokan * 100;
@@ -229,30 +250,64 @@ class RekomendasiService
       */
      private function getArrayFromJsonField($field)
      {
+          // Jika null atau empty
+          if (empty($field)) {
+               return [];
+          }
+
           // Jika sudah array, return langsung
           if (is_array($field)) {
-               return $field;
+               return array_filter($field); // Remove empty values
           }
 
           // Jika string, coba decode JSON
           if (is_string($field)) {
+               // Trim whitespace
+               $field = trim($field);
+
+               // Jika empty setelah trim
+               if (empty($field)) {
+                    return [];
+               }
+
                $decoded = json_decode($field, true);
 
                // Jika berhasil decode dan hasilnya array
                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                    return $decoded;
+                    return array_filter($decoded); // Remove empty values
                }
 
                // Jika bukan JSON valid, coba split by comma (fallback)
                if (strpos($field, ',') !== false) {
-                    return array_map('trim', explode(',', $field));
+                    $items = array_map('trim', explode(',', $field));
+                    return array_filter($items); // Remove empty values
                }
 
                // Jika single value, wrap dalam array
-               if (!empty($field)) {
-                    return [$field];
-               }
+               return [$field];
           }
+
+          // Default return empty array
+          return [];
+     }
+
+     /**
+      * Debug method untuk troubleshooting
+      */
+     public function debugMinatData(User $siswa, Ekstrakurikuler $ekstrakurikuler)
+     {
+          $minatSiswa = $siswa->minat;
+          $kategoriEkskul = $ekstrakurikuler->kategori;
+
+          return [
+               'minat_siswa_raw' => $minatSiswa,
+               'minat_siswa_type' => gettype($minatSiswa),
+               'minat_siswa_processed' => $this->getArrayFromJsonField($minatSiswa),
+               'kategori_ekskul_raw' => $kategoriEkskul,
+               'kategori_ekskul_type' => gettype($kategoriEkskul),
+               'kategori_ekskul_processed' => $this->getArrayFromJsonField($kategoriEkskul),
+          ];
+
 
           // Default return empty array
           return [];
