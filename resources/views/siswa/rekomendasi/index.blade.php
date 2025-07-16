@@ -137,9 +137,21 @@
 
                             <!-- Categories -->
                             <div class="mb-3">
-                                @foreach ($rekomendasi->ekstrakurikuler->kategori as $kategori)
-                                    <span class="badge bg-secondary me-1">{{ ucfirst($kategori) }}</span>
-                                @endforeach
+                                @if ($rekomendasi->ekstrakurikuler->kategori && is_array($rekomendasi->ekstrakurikuler->kategori))
+                                    @foreach ($rekomendasi->ekstrakurikuler->kategori as $kategori)
+                                        <span class="badge bg-secondary me-1">{{ ucfirst($kategori) }}</span>
+                                    @endforeach
+                                @elseif($rekomendasi->ekstrakurikuler->kategori && is_string($rekomendasi->ekstrakurikuler->kategori))
+                                    @php
+                                        $kategoriArray = json_decode($rekomendasi->ekstrakurikuler->kategori, true);
+                                        if (!$kategoriArray) {
+                                            $kategoriArray = [$rekomendasi->ekstrakurikuler->kategori];
+                                        }
+                                    @endphp
+                                    @foreach ($kategoriArray as $kategori)
+                                        <span class="badge bg-secondary me-1">{{ ucfirst($kategori) }}</span>
+                                    @endforeach
+                                @endif
                             </div>
 
                             <!-- Score Breakdown -->

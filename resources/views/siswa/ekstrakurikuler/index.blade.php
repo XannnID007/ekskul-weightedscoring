@@ -118,9 +118,21 @@
 
                             <!-- Categories -->
                             <div class="mb-2">
-                                @foreach ($ekstrakurikuler->kategori as $kategori)
-                                    <span class="badge bg-secondary me-1">{{ ucfirst($kategori) }}</span>
-                                @endforeach
+                                @if ($ekstrakurikuler->kategori && is_array($ekstrakurikuler->kategori))
+                                    @foreach ($ekstrakurikuler->kategori as $kategori)
+                                        <span class="badge bg-secondary me-1">{{ ucfirst($kategori) }}</span>
+                                    @endforeach
+                                @elseif($ekstrakurikuler->kategori && is_string($ekstrakurikuler->kategori))
+                                    @php
+                                        $kategoriArray = json_decode($ekstrakurikuler->kategori, true);
+                                        if (!$kategoriArray) {
+                                            $kategoriArray = [$ekstrakurikuler->kategori];
+                                        }
+                                    @endphp
+                                    @foreach ($kategoriArray as $kategori)
+                                        <span class="badge bg-secondary me-1">{{ ucfirst($kategori) }}</span>
+                                    @endforeach
+                                @endif
                             </div>
 
                             <!-- Description -->
@@ -177,7 +189,7 @@
                                     <button class="btn btn-secondary" disabled>
                                         <i class="bi bi-x-circle me-1"></i>Kuota Penuh
                                     </button>
-                                @elseif(auth()->user()->nilai_rata_rata < $ekstrakurikuler->nilai_minimal)
+                                @elseif(auth()->user()->nilai_rata_rata && auth()->user()->nilai_rata_rata < $ekstrakurikuler->nilai_minimal)
                                     <button class="btn btn-secondary" disabled>
                                         <i class="bi bi-exclamation-circle me-1"></i>Nilai Tidak Memenuhi
                                     </button>

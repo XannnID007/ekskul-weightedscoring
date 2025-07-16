@@ -33,11 +33,21 @@
                             <div>
                                 <h3 class="mb-1">{{ $ekstrakurikuler->nama }}</h3>
                                 <div class="mb-2">
-                                    @foreach ($ekstrakurikuler->kategori as $kategori)
-                                        <span class="badge bg-light text-dark me-1">{{ ucfirst($kategori) }}</span>
-                                    @endforeach
+                                    @if (is_array($ekstrakurikuler->kategori))
+                                        @foreach ($ekstrakurikuler->kategori as $kategori)
+                                            <span class="badge bg-light text-dark me-1">{{ ucfirst($kategori) }}</span>
+                                        @endforeach
+                                    @elseif($ekstrakurikuler->kategori)
+                                        @php
+                                            $kategoriArray = json_decode($ekstrakurikuler->kategori, true) ?: [];
+                                        @endphp
+                                        @foreach ($kategoriArray as $kategori)
+                                            <span class="badge bg-light text-dark me-1">{{ ucfirst($kategori) }}</span>
+                                        @endforeach
+                                    @endif
                                 </div>
-                                <p class="mb-0 opacity-75">{{ $ekstrakurikuler->pembina->name }}</p>
+                                <p class="mb-0 opacity-75">
+                                    {{ $ekstrakurikuler->pembina->name ?? 'Pembina belum ditentukan' }}</p>
                             </div>
                             <div class="text-end">
                                 @if ($ekstrakurikuler->masihBisaDaftar())
@@ -64,7 +74,7 @@
             </div>
 
             <!-- Gallery -->
-            @if ($ekstrakurikuler->galeris->count() > 0)
+            @if ($ekstrakurikuler->galeris && $ekstrakurikuler->galeris->count() > 0)
                 <div class="card mb-4">
                     <div class="card-header">
                         <h5 class="mb-0">
@@ -107,7 +117,7 @@
             @endif
 
             <!-- Announcements -->
-            @if ($ekstrakurikuler->pengumumans->count() > 0)
+            @if ($ekstrakurikuler->pengumumans && $ekstrakurikuler->pengumumans->count() > 0)
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0">
@@ -153,7 +163,7 @@
                                     <i class="bi bi-people text-white"></i>
                                 </div>
                                 <div>
-                                    <strong class="d-block">{{ $ekstrakurikuler->peserta_saat_ini }}</strong>
+                                    <strong class="d-block">{{ $ekstrakurikuler->peserta_saat_ini ?? 0 }}</strong>
                                     <small class="text-muted">Peserta</small>
                                 </div>
                             </div>
@@ -164,7 +174,7 @@
                                     <i class="bi bi-trophy text-white"></i>
                                 </div>
                                 <div>
-                                    <strong class="d-block">{{ $ekstrakurikuler->nilai_minimal }}</strong>
+                                    <strong class="d-block">{{ $ekstrakurikuler->nilai_minimal ?? 0 }}</strong>
                                     <small class="text-muted">Min. Nilai</small>
                                 </div>
                             </div>
@@ -180,8 +190,8 @@
                                 <i class="bi bi-person text-white"></i>
                             </div>
                             <div>
-                                <strong>{{ $ekstrakurikuler->pembina->name }}</strong>
-                                @if ($ekstrakurikuler->pembina->telepon)
+                                <strong>{{ $ekstrakurikuler->pembina->name ?? 'Belum ditentukan' }}</strong>
+                                @if ($ekstrakurikuler->pembina && $ekstrakurikuler->pembina->telepon)
                                     <br><small class="text-muted">{{ $ekstrakurikuler->pembina->telepon }}</small>
                                 @endif
                             </div>
@@ -194,19 +204,24 @@
                             <div class="bg-info rounded-circle p-2 me-2">
                                 <i class="bi bi-calendar text-white"></i>
                             </div>
-                            <strong>{{ $ekstrakurikuler->jadwal_string }}</strong>
+                            <strong>{{ $ekstrakurikuler->jadwal_string ?? 'Belum ditentukan' }}</strong>
                         </div>
                     </div>
 
                     <div>
                         <label class="form-label small text-muted">KAPASITAS</label>
                         <div class="d-flex justify-content-between mb-1">
-                            <span>{{ $ekstrakurikuler->peserta_saat_ini }}/{{ $ekstrakurikuler->kapasitas_maksimal }}</span>
-                            <span>{{ round(($ekstrakurikuler->peserta_saat_ini / $ekstrakurikuler->kapasitas_maksimal) * 100) }}%</span>
+                            <span>{{ $ekstrakurikuler->peserta_saat_ini ?? 0 }}/{{ $ekstrakurikuler->kapasitas_maksimal ?? 0 }}</span>
+                            @php
+                                $capacity = $ekstrakurikuler->kapasitas_maksimal ?? 1;
+                                $current = $ekstrakurikuler->peserta_saat_ini ?? 0;
+                                $percentage = $capacity > 0 ? round(($current / $capacity) * 100) : 0;
+                            @endphp
+                            <span>{{ $percentage }}%</span>
                         </div>
                         <div class="progress">
                             <div class="progress-bar {{ $ekstrakurikuler->masihBisaDaftar() ? 'bg-success' : 'bg-danger' }}"
-                                style="width: {{ ($ekstrakurikuler->peserta_saat_ini / $ekstrakurikuler->kapasitas_maksimal) * 100 }}%">
+                                style="width: {{ $percentage }}%">
                             </div>
                         </div>
                     </div>
@@ -240,11 +255,11 @@
                             <i class="bi bi-x-circle me-2"></i>
                             Kuota ekstrakurikuler ini sudah penuh atau tidak aktif.
                         </div>
-                    @elseif(auth()->user()->nilai_rata_rata < $ekstrakurikuler->nilai_minimal)
+                    @elseif((auth()->user()->nilai_rata_rata ?? 0) < ($ekstrakurikuler->nilai_minimal ?? 0))
                         <div class="alert alert-warning">
                             <i class="bi bi-exclamation-circle me-2"></i>
-                            Nilai rata-rata Anda ({{ auth()->user()->nilai_rata_rata }}) belum memenuhi syarat minimal
-                            ({{ $ekstrakurikuler->nilai_minimal }}).
+                            Nilai rata-rata Anda ({{ auth()->user()->nilai_rata_rata ?? 0 }}) belum memenuhi syarat minimal
+                            ({{ $ekstrakurikuler->nilai_minimal ?? 0 }}).
                         </div>
                     @else
                         <form action="{{ route('siswa.ekstrakurikuler.daftar', $ekstrakurikuler) }}" method="POST">

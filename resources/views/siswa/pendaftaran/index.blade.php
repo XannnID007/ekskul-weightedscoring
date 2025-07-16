@@ -6,7 +6,7 @@
 
 @section('content')
     <div class="row justify-content-center">
-        <div class="col-xl-8">
+        <div class="col-xl-12">
             @if (auth()->user()->pendaftarans->count() > 0)
                 @foreach (auth()->user()->pendaftarans as $pendaftaran)
                     <div class="card mb-4">

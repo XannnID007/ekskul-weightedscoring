@@ -123,10 +123,10 @@
                         </div>
                         <div class="btn-group" role="group">
                             <button class="btn btn-outline-secondary" onclick="sortGallery('newest')">
-                                <i class="bi bi-sort-down me-1"></i>Terbaru
+                                Terbaru
                             </button>
                             <button class="btn btn-outline-secondary" onclick="sortGallery('oldest')">
-                                <i class="bi bi-sort-up me-1"></i>Terlama
+                                Terlama
                             </button>
                         </div>
                     </div>

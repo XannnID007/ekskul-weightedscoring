@@ -54,9 +54,12 @@
                                 <span class="badge bg-success fs-6 px-3 py-2">
                                     <i class="bi bi-check-circle me-1"></i>Disetujui
                                 </span>
-                                <p class="text-muted mt-2 mb-0">
-                                    <small>Disetujui pada: {{ $pendaftaran->disetujui_pada->format('d M Y H:i') }}</small>
-                                </p>
+                                @if ($pendaftaran->disetujui_pada)
+                                    <p class="text-muted mt-2 mb-0">
+                                        <small>Disetujui pada:
+                                            {{ $pendaftaran->disetujui_pada->format('d M Y H:i') }}</small>
+                                    </p>
+                                @endif
                             @else
                                 <span class="badge bg-danger fs-6 px-3 py-2">
                                     <i class="bi bi-x-circle me-1"></i>Ditolak
@@ -276,17 +279,19 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    @if ($pendaftaran->user->minat && count($pendaftaran->user->minat) > 0)
+                    @php
+                        $minatSiswa = $pendaftaran->user->minat_array ?? [];
+                    @endphp
+                    @if (!empty($minatSiswa))
                         <div class="d-flex flex-wrap gap-2">
-                            @foreach ($pendaftaran->user->minat as $minat)
-                                <span class="badge bg-primary fs-6 px-3 py-2">{{ $minat }}</span>
+                            @foreach ($minatSiswa as $minat)
+                                <span class="badge bg-primary fs-6 px-3 py-2">{{ ucfirst($minat) }}</span>
                             @endforeach
                         </div>
 
                         <!-- Analisis Kesesuaian -->
                         @php
                             $kategoriEkskul = $pendaftaran->ekstrakurikuler->kategori ?? [];
-                            $minatSiswa = $pendaftaran->user->minat ?? [];
                             $kecocokan = array_intersect($minatSiswa, $kategoriEkskul);
                             $tingkatKecocokan =
                                 count($kategoriEkskul) > 0 ? count($kecocokan) / count($kategoriEkskul) : 0;
@@ -359,9 +364,11 @@
                     <div class="mb-0">
                         <label class="text-muted small">Kategori</label>
                         <div class="d-flex flex-wrap gap-1">
-                            @foreach ($pendaftaran->ekstrakurikuler->kategori as $kategori)
-                                <span class="badge bg-secondary">{{ $kategori }}</span>
-                            @endforeach
+                            @if (is_array($pendaftaran->ekstrakurikuler->kategori))
+                                @foreach ($pendaftaran->ekstrakurikuler->kategori as $kategori)
+                                    <span class="badge bg-secondary">{{ ucfirst($kategori) }}</span>
+                                @endforeach
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -392,8 +399,10 @@
                                     <div class="timeline-marker bg-success"></div>
                                     <div class="timeline-content">
                                         <h6 class="mb-1">Pendaftaran Disetujui</h6>
-                                        <p class="text-muted mb-1">{{ $pendaftaran->disetujui_pada->format('d M Y H:i') }}
-                                        </p>
+                                        @if ($pendaftaran->disetujui_pada)
+                                            <p class="text-muted mb-1">
+                                                {{ $pendaftaran->disetujui_pada->format('d M Y H:i') }}</p>
+                                        @endif
                                         @if ($pendaftaran->penyetuju)
                                             <small class="text-muted">Oleh: {{ $pendaftaran->penyetuju->name }}</small>
                                         @endif
