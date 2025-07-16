@@ -14,11 +14,9 @@ use App\Http\Controllers\Siswa\ProfilController as SiswaProfilController;
 use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
 use App\Http\Controllers\Pembina\GaleriController as PembinaGaleriController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Pembina\AbsensiController as PembinaAbsensiController;
 use App\Http\Controllers\Siswa\DashboardController as SiswaDashboardController;
 
 // Siswa Controllers
-use App\Http\Controllers\Siswa\KehadiranController as SiswaKehadiranController;
 use App\Http\Controllers\Pembina\DashboardController as PembinaDashboardController;
 use App\Http\Controllers\Siswa\PendaftaranController as SiswaPendaftaranController;
 use App\Http\Controllers\Siswa\RekomendasiController as SiswaRekomendasiController;
@@ -115,14 +113,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/pendaftaran/{pendaftaran}/approve', [PembinaPendaftaranController::class, 'approve'])->name('pendaftaran.approve');
         Route::post('/pendaftaran/{pendaftaran}/reject', [PembinaPendaftaranController::class, 'reject'])->name('pendaftaran.reject');
 
-        // Absensi Management
-        Route::get('/absensi', [PembinaAbsensiController::class, 'index'])->name('absensi.index');
-        Route::get('/absensi/create', [PembinaAbsensiController::class, 'create'])->name('absensi.create');
-        Route::post('/absensi', [PembinaAbsensiController::class, 'store'])->name('absensi.store');
-        Route::get('/absensi/{date}/edit', [PembinaAbsensiController::class, 'edit'])->name('absensi.edit');
-        Route::put('/absensi/{date}', [PembinaAbsensiController::class, 'update'])->name('absensi.update');
-        Route::get('/absensi/rekap', [PembinaAbsensiController::class, 'rekap'])->name('absensi.rekap');
-
         // Pengumuman Management
         Route::resource('pengumuman', PembinaPengumumanController::class);
 
@@ -156,10 +146,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Jadwal
         Route::get('/jadwal', [SiswaJadwalController::class, 'index'])->name('jadwal');
         Route::get('/jadwal/calendar', [SiswaJadwalController::class, 'calendar'])->name('jadwal.calendar');
-
-        // Kehadiran
-        Route::get('/kehadiran', [SiswaKehadiranController::class, 'index'])->name('kehadiran');
-        Route::get('/kehadiran/export', [SiswaKehadiranController::class, 'export'])->name('kehadiran.export');
     });
 });
 
@@ -171,12 +157,6 @@ Route::middleware(['auth'])->prefix('api')->name('api.')->group(function () {
         Route::get('/stats/ekstrakurikuler-populer', [AdminDashboardController::class, 'ekstrakurikulerPopuler']);
         Route::get('/stats/pendaftaran-bulanan', [AdminDashboardController::class, 'pendaftaranBulanan']);
         Route::post('/ekstrakurikuler/{ekstrakurikuler}/toggle-status', [AdminEkstrakurikulerController::class, 'toggleStatus']);
-    });
-
-    // Pembina API
-    Route::middleware(['role:pembina'])->prefix('pembina')->name('pembina.')->group(function () {
-        Route::get('/siswa/{ekstrakurikuler}', [PembinaAbsensiController::class, 'getSiswa']);
-        Route::post('/absensi/bulk-update', [PembinaAbsensiController::class, 'bulkUpdate']);
     });
 
     // Siswa API

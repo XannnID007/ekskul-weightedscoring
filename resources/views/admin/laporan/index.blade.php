@@ -91,7 +91,7 @@
 
     <div class="row g-4">
         <!-- Chart Pendaftaran per Bulan -->
-        <div class="col-xl-8">
+        <div class="col-xl-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Tren Pendaftaran</h5>
@@ -104,58 +104,6 @@
                 </div>
                 <div class="card-body">
                     <canvas id="chartPendaftaran" height="300"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Top Ekstrakurikuler -->
-        <div class="col-xl-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Ekstrakurikuler Terpopuler</h5>
-                </div>
-                <div class="card-body">
-                    @php
-                        $topEkstrakurikuler = \App\Models\Ekstrakurikuler::withCount([
-                            'pendaftarans as total_pendaftar',
-                        ])
-                            ->orderBy('total_pendaftar', 'desc')
-                            ->limit(5)
-                            ->get();
-                    @endphp
-
-                    @forelse($topEkstrakurikuler as $ekskul)
-                        <div
-                            class="d-flex justify-content-between align-items-center {{ !$loop->last ? 'border-bottom pb-3 mb-3' : '' }}">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-primary rounded-circle p-2 me-3">
-                                    <small class="text-white fw-bold">{{ $loop->iteration }}</small>
-                                </div>
-                                <div>
-                                    <h6 class="mb-0">{{ $ekskul->nama }}</h6>
-                                    <small class="text-muted">{{ $ekskul->pembina->name ?? '-' }}</small>
-                                </div>
-                            </div>
-                            <span class="badge bg-primary">{{ $ekskul->total_pendaftar }}</span>
-                        </div>
-                    @empty
-                        <div class="text-center py-4">
-                            <i class="bi bi-collection text-muted" style="font-size: 2rem;"></i>
-                            <p class="text-muted mt-2">Belum ada data</p>
-                        </div>
-                    @endforelse
-                </div>
-            </div>
-        </div>
-
-        <!-- Status Pendaftaran -->
-        <div class="col-xl-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Status Pendaftaran</h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="chartStatus" height="250"></canvas>
                 </div>
             </div>
         </div>
@@ -183,149 +131,6 @@
                         <button class="btn btn-outline-danger" onclick="generateReport('rekomendasi')">
                             <i class="bi bi-stars me-2"></i>Analisis Rekomendasi
                         </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Statistik Detail -->
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Statistik Detail</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row g-4">
-                        <!-- Distribusi Gender -->
-                        <div class="col-md-4">
-                            <h6 class="text-primary mb-3">Distribusi Gender Siswa</h6>
-                            @php
-                                $totalSiswa = \App\Models\User::siswa()->count();
-                                $lakiLaki = \App\Models\User::siswa()->where('jenis_kelamin', 'L')->count();
-                                $perempuan = \App\Models\User::siswa()->where('jenis_kelamin', 'P')->count();
-                                $belumIsi = $totalSiswa - $lakiLaki - $perempuan;
-                            @endphp
-
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between">
-                                    <span>Laki-laki</span>
-                                    <span>{{ $lakiLaki }}
-                                        ({{ $totalSiswa > 0 ? round(($lakiLaki / $totalSiswa) * 100) : 0 }}%)</span>
-                                </div>
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-info"
-                                        style="width: {{ $totalSiswa > 0 ? ($lakiLaki / $totalSiswa) * 100 : 0 }}%"></div>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between">
-                                    <span>Perempuan</span>
-                                    <span>{{ $perempuan }}
-                                        ({{ $totalSiswa > 0 ? round(($perempuan / $totalSiswa) * 100) : 0 }}%)</span>
-                                </div>
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-pink"
-                                        style="width: {{ $totalSiswa > 0 ? ($perempuan / $totalSiswa) * 100 : 0 }}%"></div>
-                                </div>
-                            </div>
-
-                            @if ($belumIsi > 0)
-                                <div>
-                                    <div class="d-flex justify-content-between">
-                                        <span>Belum diisi</span>
-                                        <span>{{ $belumIsi }}
-                                            ({{ $totalSiswa > 0 ? round(($belumIsi / $totalSiswa) * 100) : 0 }}%)</span>
-                                    </div>
-                                    <div class="progress" style="height: 8px;">
-                                        <div class="progress-bar bg-secondary"
-                                            style="width: {{ $totalSiswa > 0 ? ($belumIsi / $totalSiswa) * 100 : 0 }}%"></div>
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-
-                        <!-- Distribusi Nilai -->
-                        <div class="col-md-4">
-                            <h6 class="text-primary mb-3">Distribusi Nilai Siswa</h6>
-                            @php
-                                $siswaWithNilai = \App\Models\User::siswa()->whereNotNull('nilai_rata_rata')->count();
-                                $nilaiTinggi = \App\Models\User::siswa()->where('nilai_rata_rata', '>=', 80)->count();
-                                $nilaiBaik = \App\Models\User::siswa()
-                                    ->whereBetween('nilai_rata_rata', [70, 79.9])
-                                    ->count();
-                                $nilaiCukup = \App\Models\User::siswa()->where('nilai_rata_rata', '<', 70)->count();
-                            @endphp
-
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between">
-                                    <span>≥ 80 (Baik Sekali)</span>
-                                    <span>{{ $nilaiTinggi }}</span>
-                                </div>
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-success"
-                                        style="width: {{ $siswaWithNilai > 0 ? ($nilaiTinggi / $siswaWithNilai) * 100 : 0 }}%">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between">
-                                    <span>70-79 (Baik)</span>
-                                    <span>{{ $nilaiBaik }}</span>
-                                </div>
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-warning"
-                                        style="width: {{ $siswaWithNilai > 0 ? ($nilaiBaik / $siswaWithNilai) * 100 : 0 }}%">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="d-flex justify-content-between">
-                                    <span>
-                                        < 70 (Cukup)</span>
-                                            <span>{{ $nilaiCukup }}</span>
-                                </div>
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-danger"
-                                        style="width: {{ $siswaWithNilai > 0 ? ($nilaiCukup / $siswaWithNilai) * 100 : 0 }}%">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Kategori Ekstrakurikuler -->
-                        <div class="col-md-4">
-                            <h6 class="text-primary mb-3">Kategori Ekstrakurikuler</h6>
-                            @php
-                                $kategoriStats = [];
-                                $ekstrakurikulers = \App\Models\Ekstrakurikuler::all();
-                                foreach ($ekstrakurikulers as $ekskul) {
-                                    if ($ekskul->kategori && is_array($ekskul->kategori)) {
-                                        foreach ($ekskul->kategori as $kat) {
-                                            $kategoriStats[$kat] = ($kategoriStats[$kat] ?? 0) + 1;
-                                        }
-                                    }
-                                }
-                                arsort($kategoriStats);
-                                $totalKategori = array_sum($kategoriStats);
-                            @endphp
-
-                            @foreach (array_slice($kategoriStats, 0, 5, true) as $kategori => $count)
-                                <div class="mb-2">
-                                    <div class="d-flex justify-content-between">
-                                        <span>{{ ucfirst($kategori) }}</span>
-                                        <span>{{ $count }}</span>
-                                    </div>
-                                    <div class="progress" style="height: 6px;">
-                                        <div class="progress-bar bg-primary"
-                                            style="width: {{ $totalKategori > 0 ? ($count / $totalKategori) * 100 : 0 }}%">
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
                     </div>
                 </div>
             </div>
@@ -533,7 +338,8 @@
                         'Sep', 'Okt', 'Nov', 'Des'
                     ];
                     chartPendaftaran.data.datasets[0].data = [12, 19, 15, 25, 22, 18, 30, 28, 35, 32, 40,
-                        38];
+                        38
+                    ];
                 } else {
                     // Update chart for 6 months period
                     chartPendaftaran.data.labels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'];

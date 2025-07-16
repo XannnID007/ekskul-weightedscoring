@@ -20,23 +20,46 @@
             --bs-gray-800: #343a40;
         }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
         body {
             background: linear-gradient(135deg, var(--bs-gray-900) 0%, var(--bs-gray-800) 100%);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+        }
+
+        .auth-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
 
         .auth-card {
             width: 100%;
-            max-width: 360px;
+            max-width: 380px;
             background: linear-gradient(135deg, var(--bs-gray-800) 0%, #212529 100%);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 10;
         }
 
         .auth-header {
@@ -52,8 +75,21 @@
             font-size: 1.4rem;
         }
 
+        .auth-header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+
         .auth-body {
             padding: 1.5rem;
+        }
+
+        .form-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
         }
 
         .form-control {
@@ -62,17 +98,35 @@
             color: #fff;
             border-radius: 8px;
             padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
         }
 
         .form-control:focus {
             background-color: rgba(255, 255, 255, 0.08);
             border-color: var(--bs-primary);
-            box-shadow: 0 0 0 0.2rem rgba(108, 66, 193, 0.25);
+            box-shadow: 0 0 0 0.2rem rgba(32, 178, 170, 0.25);
             color: #fff;
         }
 
         .form-control::placeholder {
             color: rgba(255, 255, 255, 0.5);
+        }
+
+        .input-group-text {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .btn-outline-secondary {
+            border-color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: var(--bs-primary);
+            color: var(--bs-primary);
         }
 
         .btn-primary {
@@ -100,37 +154,31 @@
             border-color: var(--bs-primary);
         }
 
+        .form-check-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
         .school-info {
             background: rgba(32, 178, 170, 0.1);
             border: 1px solid rgba(32, 178, 170, 0.3);
-            border-radius: 8px;
+            border-radius: 0 0 16px 16px;
             padding: 0.75rem;
-            margin-top: 1rem;
             text-align: center;
+            font-size: 0.85rem;
         }
 
-        .demo-accounts {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
+        .school-info small {
+            color: rgba(255, 255, 255, 0.7);
         }
 
-        .demo-accounts .demo-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        .text-decoration-none {
+            color: var(--bs-primary);
+            transition: color 0.3s ease;
         }
 
-        .demo-accounts .demo-item:last-child {
-            border-bottom: none;
-        }
-
-        .demo-accounts .badge {
-            font-size: 0.7rem;
-            padding: 0.3rem 0.6rem;
+        .text-decoration-none:hover {
+            color: var(--bs-primary-dark);
         }
 
         .fade-in {
@@ -156,7 +204,7 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: -1;
+            z-index: 1;
         }
 
         .floating-shape {
@@ -204,8 +252,11 @@
         }
 
         @media (max-width: 576px) {
+            .auth-container {
+                padding: 15px;
+            }
+
             .auth-card {
-                margin: 1rem;
                 max-width: none;
             }
 
@@ -216,6 +267,13 @@
 
             .auth-header h3 {
                 font-size: 1.2rem;
+            }
+        }
+
+        @media (max-height: 600px) {
+            .auth-container {
+                align-items: flex-start;
+                padding-top: 20px;
             }
         }
     </style>
@@ -230,31 +288,28 @@
     </div>
 
     <!-- Auth Container -->
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-12">
-                <div class="auth-card fade-in">
-                    <!-- Auth Header -->
-                    <div class="auth-header">
-                        <h3>
-                            MiftahXCool
-                        </h3>
-                        <p class="text-muted mb-0">MA Modern Miftahussa'adah</p>
-                    </div>
+    <div class="auth-container">
+        <div class="auth-card fade-in">
+            <!-- Auth Header -->
+            <div class="auth-header">
+                <h3>
+                    <i class="bi bi-mortarboard-fill me-2"></i>
+                    MiftahXCool
+                </h3>
+                <p>MA Modern Miftahussa'adah</p>
+            </div>
 
-                    <!-- Auth Body -->
-                    <div class="auth-body">
-                        @yield('content')
-                    </div>
+            <!-- Auth Body -->
+            <div class="auth-body">
+                @yield('content')
+            </div>
 
-                    <!-- School Info -->
-                    <div class="school-info">
-                        <small class="text-muted">
-                            <i class="bi bi-info-circle me-1"></i>
-                            Sistem Manajemen Ekstrakurikuler Modern
-                        </small>
-                    </div>
-                </div>
+            <!-- School Info -->
+            <div class="school-info">
+                <small>
+                    <i class="bi bi-info-circle me-1"></i>
+                    Sistem Manajemen Ekstrakurikuler Modern
+                </small>
             </div>
         </div>
     </div>
@@ -265,7 +320,11 @@
     <script>
         // Auto dismiss alerts
         setTimeout(function() {
-            $('.alert').fadeOut('slow');
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            });
         }, 5000);
 
         // Add loading state to login button
