@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Models\Ekstrakurikuler;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Ekstrakurikuler;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 
 class EkstrakurikulerController extends Controller
 {
@@ -155,14 +156,77 @@ class EkstrakurikulerController extends Controller
 
     public function destroy(Ekstrakurikuler $ekstrakurikuler)
     {
-        if ($ekstrakurikuler->gambar) {
-            Storage::disk('public')->delete($ekstrakurikuler->gambar);
+        try {
+            // Gunakan database transaction untuk memastikan konsistensi
+            DB::beginTransaction();
+
+            // 1. Hapus rekomendasi yang terkait
+            DB::table('rekomendasis')
+                ->where('ekstrakurikuler_id', $ekstrakurikuler->id)
+                ->delete();
+
+            // 2. Hapus absensi yang terkait dengan pendaftaran ekstrakurikuler ini
+            $pendaftaranIds = DB::table('pendaftarans')
+                ->where('ekstrakurikuler_id', $ekstrakurikuler->id)
+                ->pluck('id');
+
+            if ($pendaftaranIds->isNotEmpty()) {
+                DB::table('absensis')
+                    ->whereIn('pendaftaran_id', $pendaftaranIds)
+                    ->delete();
+            }
+
+            // 3. Hapus pendaftaran yang terkait
+            DB::table('pendaftarans')
+                ->where('ekstrakurikuler_id', $ekstrakurikuler->id)
+                ->delete();
+
+            // 4. Hapus pengumuman yang terkait (jika ada)
+            if (Schema::hasTable('pengumumans')) {
+                DB::table('pengumumans')
+                    ->where('ekstrakurikuler_id', $ekstrakurikuler->id)
+                    ->delete();
+            }
+
+            // 5. Hapus galeri yang terkait (jika ada)
+            if (Schema::hasTable('galeris')) {
+                // Hapus file gambar/video dari storage terlebih dahulu
+                $galeris = DB::table('galeris')
+                    ->where('ekstrakurikuler_id', $ekstrakurikuler->id)
+                    ->get();
+
+                foreach ($galeris as $galeri) {
+                    if ($galeri->path_file && Storage::disk('public')->exists($galeri->path_file)) {
+                        Storage::disk('public')->delete($galeri->path_file);
+                    }
+                }
+
+                // Hapus record galeri
+                DB::table('galeris')
+                    ->where('ekstrakurikuler_id', $ekstrakurikuler->id)
+                    ->delete();
+            }
+
+            // 6. Hapus gambar ekstrakurikuler dari storage
+            if ($ekstrakurikuler->gambar && Storage::disk('public')->exists($ekstrakurikuler->gambar)) {
+                Storage::disk('public')->delete($ekstrakurikuler->gambar);
+            }
+
+            // 7. Terakhir, hapus ekstrakurikuler itu sendiri
+            $ekstrakurikuler->delete();
+
+            // Commit transaction jika semua berhasil
+            DB::commit();
+
+            return redirect()->route('admin.ekstrakurikuler.index')
+                ->with('success', 'Ekstrakurikuler dan semua data terkait berhasil dihapus!');
+        } catch (\Exception $e) {
+            // Rollback jika ada error
+            DB::rollback();
+
+            return redirect()->route('admin.ekstrakurikuler.index')
+                ->with('error', 'Gagal menghapus ekstrakurikuler: ' . $e->getMessage());
         }
-
-        $ekstrakurikuler->delete();
-
-        return redirect()->route('admin.ekstrakurikuler.index')
-            ->with('success', 'Ekstrakurikuler berhasil dihapus!');
     }
 
     /**
