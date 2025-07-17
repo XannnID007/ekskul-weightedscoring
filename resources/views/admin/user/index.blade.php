@@ -4,20 +4,6 @@
 @section('page-title', 'Kelola ' . ucfirst($role))
 @section('page-description', 'Manajemen data ' . $role)
 
-@section('page-actions')
-    <div class="d-flex gap-2">
-        <a href="{{ route('admin.user.create', ['role' => $role]) }}" class="btn btn-light">
-            <i class="bi bi-person-plus me-1"></i>Tambah {{ ucfirst($role) }}
-        </a>
-        @if ($role == 'siswa')
-            <!-- Optional: Keep manual add option -->
-            <button class="btn btn-outline-light" onclick="showStudentStats()">
-                <i class="bi bi-graph-up me-1"></i>Lihat Statistik
-            </button>
-        @endif
-    </div>
-@endsection
-
 @section('content')
     <!-- Role Tabs -->
     <div class="card mb-4">

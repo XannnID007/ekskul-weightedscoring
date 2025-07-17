@@ -81,7 +81,6 @@
             <hr>
             <span class="text-muted">Belum punya akun? </span>
             <a href="{{ route('register') }}" class="text-decoration-none">
-                <i class="bi bi-person-plus me-1"></i>
                 Daftar sebagai siswa
             </a>
         </div>

@@ -395,9 +395,6 @@
                                     $percentage = 0;
                                 }
                             @endphp
-                            @if ($showBadge)
-                                <span class="badge bg-warning ms-2">{{ $percentage }}%</span>
-                            @endif
                         @endif
                     </a>
 
@@ -417,7 +414,7 @@
                         <a href="{{ route('siswa.ekstrakurikuler.index') }}"
                             class="nav-link {{ request()->routeIs('siswa.ekstrakurikuler.*') ? 'active' : '' }}">
                             <i class="bi bi-collection"></i>
-                            Jelajahi Semua
+                            Ekstrakurikuler
                         </a>
                     @else
                         {{-- Menu untuk siswa yang SUDAH terdaftar --}}
@@ -551,15 +548,12 @@
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
-                                <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i
-                                            class="bi bi-gear me-2"></i>Pengaturan</a></li>
-                                <li>
-                                    <form method="POST" action="{{ route('logout') }}">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item">
-                                            <i class="bi bi-box-arrow-right me-2"></i>Logout
-                                        </button>
-                                    </form>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                    </button>
+                                </form>
                                 </li>
                             </ul>
                         </div>

@@ -3,41 +3,39 @@
 @section('title', 'Daftar Akun Siswa')
 
 @section('content')
-    <h4 class="text-center mb-4">
+    <h5 class="text-center mb-3">
         <i class="bi bi-person-plus me-2 text-primary"></i>
         Daftar Akun Siswa
-    </h4>
+    </h5>
 
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
-        <!-- Name Field -->
-        <div class="mb-3">
-            <label for="name" class="form-label">
-                <i class="bi bi-person me-1"></i>
-                Nama Lengkap
-            </label>
-            <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name"
-                value="{{ old('name') }}" required autocomplete="name" autofocus placeholder="Masukkan nama lengkap Anda">
+        <!-- Row 1: Name and NIS -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="name" class="form-label">
+                    <i class="bi bi-person me-1"></i>
+                    Nama Lengkap
+                </label>
+                <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name"
+                    value="{{ old('name') }}" required autocomplete="name" autofocus placeholder="Nama lengkap">
+                @error('name')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
 
-            @error('name')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <!-- NIS Field -->
-        <div class="mb-3">
-            <label for="nis" class="form-label">
-                <i class="bi bi-card-text me-1"></i>
-                NIS (Nomor Induk Siswa)
-            </label>
-            <input id="nis" type="text" class="form-control @error('nis') is-invalid @enderror" name="nis"
-                value="{{ old('nis') }}" required placeholder="Contoh: 2024001">
-            <div class="form-text">Sesuai dengan NIS di kartu siswa Anda</div>
-
-            @error('nis')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
+            <div class="col-md-6 mb-3">
+                <label for="nis" class="form-label">
+                    <i class="bi bi-card-text me-1"></i>
+                    NIS
+                </label>
+                <input id="nis" type="text" class="form-control @error('nis') is-invalid @enderror" name="nis"
+                    value="{{ old('nis') }}" required placeholder="2024001">
+                @error('nis')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
         </div>
 
         <!-- Email Field -->
@@ -48,43 +46,43 @@
             </label>
             <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email"
                 value="{{ old('email') }}" required autocomplete="email" placeholder="nama@gmail.com">
-
             @error('email')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
 
-        <!-- Password Field -->
-        <div class="mb-3">
-            <label for="password" class="form-label">
-                <i class="bi bi-lock me-1"></i>
-                Password
-            </label>
-            <div class="input-group">
-                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror"
-                    name="password" required autocomplete="new-password" placeholder="Minimal 8 karakter">
-                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password')">
-                    <i class="bi bi-eye"></i>
-                </button>
+        <!-- Row 2: Password Fields -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="password" class="form-label">
+                    <i class="bi bi-lock me-1"></i>
+                    Password
+                </label>
+                <div class="input-group">
+                    <input id="password" type="password" class="form-control @error('password') is-invalid @enderror"
+                        name="password" required autocomplete="new-password" placeholder="Min. 8 karakter">
+                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password')">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+                @error('password')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
 
-            @error('password')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <!-- Confirm Password Field -->
-        <div class="mb-3">
-            <label for="password_confirmation" class="form-label">
-                <i class="bi bi-lock-fill me-1"></i>
-                Konfirmasi Password
-            </label>
-            <div class="input-group">
-                <input id="password_confirmation" type="password" class="form-control" name="password_confirmation" required
-                    autocomplete="new-password" placeholder="Ulangi password yang sama">
-                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password_confirmation')">
-                    <i class="bi bi-eye"></i>
-                </button>
+            <div class="col-md-6 mb-3">
+                <label for="password_confirmation" class="form-label">
+                    <i class="bi bi-lock-fill me-1"></i>
+                    Konfirmasi Password
+                </label>
+                <div class="input-group">
+                    <input id="password_confirmation" type="password" class="form-control" name="password_confirmation"
+                        required autocomplete="new-password" placeholder="Ulangi password">
+                    <button class="btn btn-outline-secondary" type="button"
+                        onclick="togglePassword('password_confirmation')">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -93,14 +91,14 @@
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="terms" required>
                 <label class="form-check-label" for="terms">
-                    Saya setuju dengan Syarat dan Ketentuan penggunaan sistem
+                    Saya setuju dengan Syarat dan Ketentuan
                 </label>
             </div>
         </div>
 
         <!-- Submit Button -->
         <div class="d-grid">
-            <button type="submit" class="btn btn-primary btn-lg">
+            <button type="submit" class="btn btn-primary">
                 <i class="bi bi-person-plus me-2"></i>
                 Daftar Sekarang
             </button>
@@ -113,14 +111,6 @@
                 <i class="bi bi-box-arrow-in-right me-1"></i>
                 Masuk di sini
             </a>
-        </div>
-
-        <!-- Additional Info -->
-        <div class="text-center mt-4">
-            <small class="text-muted">
-                <i class="bi bi-info-circle me-1"></i>
-                Sistem ekstrakurikuler MA Modern Miftahussa'adah
-            </small>
         </div>
     </form>
 @endsection
@@ -183,7 +173,7 @@
             if (password.length === 0) {
                 strengthDiv.innerHTML = '';
             } else {
-                strengthDiv.innerHTML = `<small class="text-${color}">Kekuatan password: ${feedback}</small>`;
+                strengthDiv.innerHTML = `<small class="text-${color}">Kekuatan: ${feedback}</small>`;
             }
         });
 

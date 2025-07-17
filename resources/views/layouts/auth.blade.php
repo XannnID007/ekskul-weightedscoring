@@ -29,7 +29,7 @@
         html,
         body {
             height: 100%;
-            overflow: hidden;
+            overflow-y: auto;
         }
 
         body {
@@ -39,11 +39,12 @@
             align-items: center;
             justify-content: center;
             position: relative;
+            min-height: 100vh;
+            padding: 20px 0;
         }
 
         .auth-container {
             width: 100%;
-            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -52,7 +53,7 @@
 
         .auth-card {
             width: 100%;
-            max-width: 380px;
+            max-width: 480px;
             background: linear-gradient(135deg, var(--bs-gray-800) 0%, #212529 100%);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
@@ -64,32 +65,32 @@
 
         .auth-header {
             text-align: center;
-            padding: 1.5rem 1.5rem 1rem;
+            padding: 1rem 1.25rem 0.75rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .auth-header h3 {
             color: var(--bs-primary);
             font-weight: 600;
-            margin-bottom: 0.5rem;
-            font-size: 1.4rem;
+            margin-bottom: 0.25rem;
+            font-size: 1.25rem;
         }
 
         .auth-header p {
             color: rgba(255, 255, 255, 0.6);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             margin-bottom: 0;
         }
 
         .auth-body {
-            padding: 1.5rem;
+            padding: 1.25rem;
         }
 
         .form-label {
             color: rgba(255, 255, 255, 0.9);
             font-weight: 500;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
+            margin-bottom: 0.4rem;
+            font-size: 0.85rem;
         }
 
         .form-control {
@@ -97,8 +98,9 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #fff;
             border-radius: 8px;
-            padding: 0.75rem 1rem;
+            padding: 0.625rem 0.875rem;
             transition: all 0.3s ease;
+            font-size: 0.9rem;
         }
 
         .form-control:focus {
@@ -133,9 +135,10 @@
             background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-primary-dark) 100%);
             border: none;
             border-radius: 8px;
-            padding: 0.75rem 1.5rem;
+            padding: 0.625rem 1.25rem;
             font-weight: 500;
             transition: all 0.3s ease;
+            font-size: 0.9rem;
         }
 
         .btn-primary:hover {
@@ -156,16 +159,16 @@
 
         .form-check-label {
             color: rgba(255, 255, 255, 0.8);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .school-info {
             background: rgba(32, 178, 170, 0.1);
             border: 1px solid rgba(32, 178, 170, 0.3);
             border-radius: 0 0 16px 16px;
-            padding: 0.75rem;
+            padding: 0.625rem;
             text-align: center;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
 
         .school-info small {
@@ -262,15 +265,19 @@
 
             .auth-header,
             .auth-body {
-                padding: 1.25rem;
+                padding: 1rem;
             }
 
             .auth-header h3 {
-                font-size: 1.2rem;
+                font-size: 1.1rem;
+            }
+
+            .row .col-md-6 {
+                margin-bottom: 0.75rem;
             }
         }
 
-        @media (max-height: 600px) {
+        @media (max-height: 700px) {
             .auth-container {
                 align-items: flex-start;
                 padding-top: 20px;
@@ -293,8 +300,7 @@
             <!-- Auth Header -->
             <div class="auth-header">
                 <h3>
-                    <i class="bi bi-mortarboard-fill me-2"></i>
-                    MiftahXCool
+                    MiftahXKull
                 </h3>
                 <p>MA Modern Miftahussa'adah</p>
             </div>
