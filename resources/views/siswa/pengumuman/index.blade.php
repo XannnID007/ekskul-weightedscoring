@@ -44,7 +44,6 @@
     </div>
 
     @if ($pengumumanPenting > 0)
-        <!-- Alert Pengumuman Penting -->
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             <div class="d-flex align-items-center">
                 <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
