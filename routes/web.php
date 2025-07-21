@@ -106,6 +106,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Laporan
         Route::get('/laporan', [AdminLaporanController::class, 'index'])->name('laporan');
         Route::post('/laporan/export', [AdminLaporanController::class, 'export'])->name('laporan.export');
+        Route::get('/laporan/chart-data', [AdminLaporanController::class, 'chartData'])->name('laporan.chart-data');
     });
 
     // Pembina Routes

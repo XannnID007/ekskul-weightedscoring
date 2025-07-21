@@ -24,7 +24,7 @@ class DashboardController extends Controller
         // Get user's ekstrakurikuler data if registered
         $pendaftaran = $user->pendaftarans()
             ->where('status', 'disetujui')
-            ->with(['ekstrakurikuler.pembina', 'absensis'])
+            ->with(['ekstrakurikuler.pembina'])
             ->first();
 
         $ekstrakurikuler = $pendaftaran ? $pendaftaran->ekstrakurikuler : null;
@@ -52,7 +52,6 @@ class DashboardController extends Controller
         $upcomingSchedule = [];
 
         if ($pendaftaran && $ekstrakurikuler) {
-            $attendanceStats = $this->getAttendanceStats($pendaftaran);
             $upcomingSchedule = $this->getUpcomingSchedule($ekstrakurikuler);
         }
 
@@ -60,40 +59,10 @@ class DashboardController extends Controller
             'rekomendasis',
             'ekstrakurikuler',
             'pendaftaran',
-            'attendanceStats',
             'upcomingSchedule'
         ));
     }
 
-    private function getAttendanceStats($pendaftaran)
-    {
-        $totalAbsensi = $pendaftaran->absensis()->count();
-
-        if ($totalAbsensi === 0) {
-            return [
-                'total_kegiatan' => 0,
-                'hadir' => 0,
-                'izin' => 0,
-                'terlambat' => 0,
-                'alpa' => 0,
-                'persentase_hadir' => 0
-            ];
-        }
-
-        $hadir = $pendaftaran->absensis()->where('status', 'hadir')->count();
-        $izin = $pendaftaran->absensis()->where('status', 'izin')->count();
-        $terlambat = $pendaftaran->absensis()->where('status', 'terlambat')->count();
-        $alpa = $pendaftaran->absensis()->where('status', 'alpa')->count();
-
-        return [
-            'total_kegiatan' => $totalAbsensi,
-            'hadir' => $hadir,
-            'izin' => $izin,
-            'terlambat' => $terlambat,
-            'alpa' => $alpa,
-            'persentase_hadir' => round(($hadir / $totalAbsensi) * 100)
-        ];
-    }
 
     private function getUpcomingSchedule($ekstrakurikuler)
     {

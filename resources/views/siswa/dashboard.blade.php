@@ -14,19 +14,6 @@
             ->first();
         $ekstrakurikuler = $pendaftaran ? $pendaftaran->ekstrakurikuler : null;
 
-        // Mock data untuk statistik kehadiran
-        $attendanceStats = [
-            'total_kegiatan' => 15,
-            'hadir' => 12,
-            'izin' => 2,
-            'terlambat' => 1,
-            'alpa' => 0,
-        ];
-        $attendancePercentage =
-            $attendanceStats['total_kegiatan'] > 0
-                ? round(($attendanceStats['hadir'] / $attendanceStats['total_kegiatan']) * 100)
-                : 0;
-
         // Mock data untuk jadwal mendatang
         $upcomingSchedule = [
             [
@@ -50,7 +37,7 @@
 
     <div class="row g-4">
         <!-- Status Cards -->
-        <div class="col-md-6 col-xl-3">
+        <div class="col-md-6 col-xl-4">
             <div class="card stats-card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
@@ -83,30 +70,7 @@
             </div>
         </div>
 
-        <div class="col-md-6 col-xl-3">
-            <div class="card stats-card success">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-1">Tingkat Kehadiran</h6>
-                            <h2 class="mb-0">
-                                @if ($ekstrakurikuler)
-                                    {{ $attendancePercentage }}%
-                                @else
-                                    -
-                                @endif
-                            </h2>
-                            <small class="opacity-75">Persentase hadir</small>
-                        </div>
-                        <div class="stats-icon">
-                            <i class="bi bi-graph-up"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6 col-xl-3">
+        <div class="col-md-6 col-xl-4">
             <div class="card stats-card warning">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
@@ -123,7 +87,7 @@
             </div>
         </div>
 
-        <div class="col-md-6 col-xl-3">
+        <div class="col-md-6 col-xl-4">
             <div class="card stats-card danger">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">

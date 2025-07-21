@@ -314,6 +314,100 @@
             border-radius: 12px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
+
+        .logout-confirm-popup {
+            background: linear-gradient(135deg, var(--bs-gray-800) 0%, #212529 100%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 16px !important;
+            color: #fff !important;
+        }
+
+        .logout-confirm-title {
+            color: #fff !important;
+            font-weight: 600 !important;
+        }
+
+        .logout-confirm-btn {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+            border: none !important;
+            border-radius: 8px !important;
+            padding: 0.5rem 1.25rem !important;
+            font-weight: 500 !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .logout-confirm-btn:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4) !important;
+        }
+
+        .logout-cancel-btn {
+            background: transparent !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            color: #fff !important;
+            border-radius: 8px !important;
+            padding: 0.5rem 1.25rem !important;
+            font-weight: 500 !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .logout-cancel-btn:hover {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border-color: rgba(255, 255, 255, 0.5) !important;
+            transform: translateY(-2px) !important;
+        }
+
+        .logout-success-popup {
+            background: linear-gradient(135deg, var(--bs-success) 0%, #198754 100%) !important;
+            color: #fff !important;
+            border-radius: 16px !important;
+        }
+
+        /* Dropdown item hover effect */
+        .dropdown-item:hover {
+            background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+            color: var(--bs-primary) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .dropdown-item.text-danger:hover {
+            background-color: rgba(220, 53, 69, 0.1) !important;
+            color: #dc3545 !important;
+        }
+
+        /* Animation for dropdown */
+        .dropdown-menu {
+            animation: fadeInDown 0.3s ease-out;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, var(--bs-gray-800) 0%, #212529 100%);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .logout-confirm-popup {
+                margin: 1rem !important;
+            }
+
+            .logout-confirm-btn,
+            .logout-cancel-btn {
+                padding: 0.75rem 1rem !important;
+                font-size: 0.9rem !important;
+            }
+        }
     </style>
 
     @stack('styles')
@@ -548,15 +642,33 @@
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item">
+
+                                <!-- Profile Link (sesuaikan dengan role) -->
+                                @if (auth()->user()->role === 'siswa')
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('siswa.profil') }}">
+                                            <i class="bi bi-person-gear me-2"></i>Profil Saya
+                                        </a>
+                                    </li>
+                                @endif
+
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+
+                                <!-- Logout dengan Konfirmasi -->
+                                <li>
+                                    <a class="dropdown-item text-danger" href="#" onclick="confirmLogout(event)">
                                         <i class="bi bi-box-arrow-right me-2"></i>Logout
-                                    </button>
-                                </form>
+                                    </a>
                                 </li>
                             </ul>
                         </div>
+
+                        <!-- Hidden Logout Form -->
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
                     </div>
                 </div>
             </nav>
@@ -718,6 +830,81 @@
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        function confirmLogout(event) {
+            event.preventDefault();
+
+            Swal.fire({
+                title: 'Konfirmasi Logout',
+                text: 'Apakah Anda yakin ingin keluar dari sistem?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="bi bi-box-arrow-right me-1"></i>Ya, Logout',
+                cancelButtonText: '<i class="bi bi-x-lg me-1"></i>Batal',
+                reverseButtons: true,
+                customClass: {
+                    popup: 'logout-confirm-popup',
+                    title: 'logout-confirm-title',
+                    confirmButton: 'logout-confirm-btn',
+                    cancelButton: 'logout-cancel-btn'
+                },
+                backdrop: true,
+                allowOutsideClick: false,
+                allowEscapeKey: true,
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                    return new Promise((resolve) => {
+                        // Show loading state
+                        setTimeout(() => {
+                            resolve();
+                        }, 500);
+                    });
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Show success message then logout
+                    Swal.fire({
+                        title: 'Logout Berhasil',
+                        text: 'Anda telah keluar dari sistem. Terima kasih!',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false,
+                        allowOutsideClick: false,
+                        customClass: {
+                            popup: 'logout-success-popup'
+                        }
+                    }).then(() => {
+                        // Submit logout form
+                        document.getElementById('logout-form').submit();
+                    });
+                }
+            });
+        }
+
+        // Optional: Auto logout warning (session akan habis)
+        let logoutWarningShown = false;
+
+        function checkSessionTimeout() {
+            // Cek setiap 5 menit (300000 ms)
+            // Ini contoh untuk warning 5 menit sebelum session habis
+            if (!logoutWarningShown) {
+                // Implementasi sesuai kebutuhan session timeout Anda
+                console.log('Session check...');
+            }
+        }
+
+        // Check session every 5 minutes
+        setInterval(checkSessionTimeout, 300000);
+
+        // Optional: Keyboard shortcut for logout (Ctrl + Shift + L)
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && e.key === 'L') {
+                e.preventDefault();
+                confirmLogout(e);
             }
         });
     </script>

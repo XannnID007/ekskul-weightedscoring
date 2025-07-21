@@ -30,47 +30,51 @@
                         id="uploadForm">
                         @csrf
 
-                        <!-- File Upload -->
+                        <!-- File Upload - Simplified Version -->
                         <div class="mb-4">
                             <label class="form-label">
                                 <i class="bi bi-file-earmark-plus me-1"></i>Pilih File
                                 <span class="text-danger">*</span>
                             </label>
-                            <div class="upload-area" id="uploadArea">
-                                <input type="file" class="form-control d-none" name="file" id="fileInput"
-                                    accept="image/*,video/*" required>
-                                <div class="upload-content text-center p-4">
+
+                            <!-- Simple File Input (Always Visible) -->
+                            <input type="file" class="form-control mb-3" name="file" id="fileInput"
+                                accept="image/*,video/*" required onchange="handleFileChange(this)">
+
+                            <div class="form-text mb-3">
+                                <i class="bi bi-info-circle me-1"></i>
+                                <strong>Format yang didukung:</strong><br>
+                                • <strong>Foto:</strong> JPG, PNG, GIF (Maks. 20MB)<br>
+                                • <strong>Video:</strong> MP4, MOV, AVI (Maks. 20MB)
+                            </div>
+
+                            <!-- Drag & Drop Area (Optional) -->
+                            <div class="upload-drop-zone p-4 text-center" id="dropZone" style="display: none;">
+                                <div class="border border-2 border-dashed rounded p-4">
                                     <i class="bi bi-cloud-upload text-primary" style="font-size: 3rem;"></i>
-                                    <h6 class="mt-3 mb-2">Drag & Drop file atau klik untuk browse</h6>
-                                    <p class="text-muted mb-2">Maksimal 20MB per file</p>
-                                    <p class="text-muted small">
-                                        <strong>Foto:</strong> JPG, PNG, GIF<br>
-                                        <strong>Video:</strong> MP4, MOV, AVI
-                                    </p>
-                                    <button type="button" class="btn btn-outline-primary"
-                                        onclick="$('#fileInput').click()">
-                                        <i class="bi bi-folder2-open me-1"></i>Browse File
-                                    </button>
+                                    <h6 class="mt-3 mb-2">Atau drag & drop file di sini</h6>
+                                    <p class="text-muted mb-0">Maksimal 20MB per file</p>
                                 </div>
                             </div>
 
                             <!-- File Preview -->
-                            <div class="upload-preview mt-3 d-none" id="filePreview">
-                                <div class="card bg-light">
+                            <div class="file-preview mt-3" id="filePreview" style="display: none;">
+                                <div class="card border-primary">
                                     <div class="card-body p-3">
                                         <div class="d-flex align-items-center">
-                                            <div class="preview-container me-3" id="previewContainer">
+                                            <div class="preview-thumbnail me-3" id="previewThumbnail">
                                                 <!-- Preview will be loaded here -->
                                             </div>
                                             <div class="flex-grow-1">
-                                                <h6 class="mb-1" id="fileName"></h6>
-                                                <p class="text-muted mb-1 small" id="fileInfo"></p>
+                                                <h6 class="mb-1" id="previewFileName">No file selected</h6>
+                                                <p class="text-muted mb-1 small" id="previewFileInfo">-</p>
                                                 <div class="progress" style="height: 6px;">
-                                                    <div class="progress-bar" id="uploadProgress" style="width: 0%"></div>
+                                                    <div class="progress-bar bg-primary" id="uploadProgress"
+                                                        style="width: 0%"></div>
                                                 </div>
                                             </div>
                                             <button type="button" class="btn btn-outline-danger btn-sm"
-                                                onclick="removeFile()">
+                                                onclick="clearFile()">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
@@ -255,250 +259,182 @@
     </div>
 @endsection
 
+@push('styles')
+    <style>
+        .upload-drop-zone {
+            transition: all 0.3s ease;
+        }
+
+        .upload-drop-zone.drag-over {
+            background-color: rgba(32, 178, 170, 0.1);
+            border-color: var(--bs-primary) !important;
+        }
+
+        .file-preview .card {
+            border-left: 4px solid var(--bs-primary);
+        }
+
+        .preview-thumbnail {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .preview-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .progress {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+    </style>
+@endpush
+
 @push('scripts')
     <script>
-        $(document).ready(function() {
-            console.log('Upload script loaded');
+        // Simple and reliable file handling
+        function handleFileChange(input) {
+            console.log('File input changed:', input.files);
 
-            // Test if elements exist
-            if ($('#fileInput').length === 0) {
-                console.error('fileInput element not found!');
-            }
-            if ($('#uploadArea').length === 0) {
-                console.error('uploadArea element not found!');
-            }
+            if (input.files && input.files.length > 0) {
+                const file = input.files[0];
+                console.log('Selected file:', file);
 
-            // File input change handler
-            $('#fileInput').change(function(e) {
-                console.log('File input changed:', this.files);
-                if (this.files && this.files.length > 0) {
-                    handleFileSelect(this.files[0]);
-                }
-            });
-
-            // Drag and drop handlers
-            $('#uploadArea').on('dragover', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Drag over');
-                $(this).addClass('drag-over');
-            });
-
-            $('#uploadArea').on('dragleave', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Drag leave');
-                $(this).removeClass('drag-over');
-            });
-
-            $('#uploadArea').on('drop', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('File dropped');
-                $(this).removeClass('drag-over');
-
-                const files = e.originalEvent.dataTransfer.files;
-                console.log('Dropped files:', files);
-
-                if (files.length > 0) {
-                    handleFileSelect(files[0]);
-                }
-            });
-
-            // Click to browse - gunakan event delegation yang lebih spesifik
-            $(document).on('click', '#uploadArea', function(e) {
-                e.preventDefault();
-                console.log('Upload area clicked');
-                $('#fileInput').trigger('click');
-            });
-
-            // Alternative click handler untuk button browse
-            $(document).on('click', '[onclick*="fileInput"]', function(e) {
-                e.preventDefault();
-                console.log('Browse button clicked');
-                $('#fileInput').trigger('click');
-            });
-
-            // Form submit handler
-            $('#uploadForm').submit(function(e) {
-                e.preventDefault();
-                console.log('Form submitted');
-
-                const fileInput = $('#fileInput')[0];
-                if (!fileInput.files || fileInput.files.length === 0) {
-                    showError('Pilih file terlebih dahulu!');
-                    return false;
+                // Validate file
+                if (!validateFile(file)) {
+                    input.value = ''; // Clear invalid file
+                    return;
                 }
 
-                const formData = new FormData(this);
-                const submitBtn = $('#submitBtn');
-                const originalText = submitBtn.html();
+                // Show file preview
+                showFilePreview(file);
 
-                // Disable submit button
-                submitBtn.prop('disabled', true).html(
-                    '<i class="bi bi-spinner-border spinner-border-sm me-1"></i>Uploading...');
-
-                // Show progress
-                $('#uploadProgress').css('width', '0%');
-
-                $.ajax({
-                    url: $(this).attr('action'),
-                    method: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    xhr: function() {
-                        const xhr = new window.XMLHttpRequest();
-                        xhr.upload.addEventListener("progress", function(evt) {
-                            if (evt.lengthComputable) {
-                                const percentComplete = (evt.loaded / evt.total) * 100;
-                                $('#uploadProgress').css('width', percentComplete +
-                                '%');
-                            }
-                        }, false);
-                        return xhr;
-                    },
-                    success: function(response) {
-                        console.log('Upload success:', response);
-                        showSuccess('File berhasil diupload!');
-                        setTimeout(() => {
-                            window.location.href = $('#uploadForm').data('redirect') ||
-                                "{{ route('pembina.galeri.index') }}";
-                        }, 1500);
-                    },
-                    error: function(xhr) {
-                        console.error('Upload error:', xhr);
-                        let errorMessage = 'Terjadi kesalahan saat mengupload file.';
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            errorMessage = xhr.responseJSON.message;
-                        }
-                        if (xhr.responseJSON && xhr.responseJSON.errors) {
-                            errorMessage = Object.values(xhr.responseJSON.errors).flat().join(
-                                '\n');
-                        }
-                        showError(errorMessage);
-
-                        // Re-enable submit button
-                        submitBtn.prop('disabled', false).html(originalText);
-                    }
-                });
-            });
-        });
-
-        function handleFileSelect(file) {
-            console.log('Handling file:', file);
-
-            if (!file) {
-                console.error('No file provided');
-                return;
+                // Show drag drop area for future uploads
+                document.getElementById('dropZone').style.display = 'block';
+            } else {
+                // Hide preview if no file
+                document.getElementById('filePreview').style.display = 'none';
             }
+        }
 
-            // Validate file size (20MB)
-            const maxSize = 20 * 1024 * 1024; // 20MB in bytes
+        function validateFile(file) {
+            // Size validation (20MB)
+            const maxSize = 20 * 1024 * 1024;
             if (file.size > maxSize) {
-                console.error('File too large:', file.size, 'bytes');
-                showError('Ukuran file terlalu besar! Maksimal 20MB.');
-                return;
+                alert('Ukuran file terlalu besar! Maksimal 20MB.');
+                return false;
             }
 
-            // Validate file type
+            // Type validation
             const allowedTypes = [
                 'image/jpeg', 'image/jpg', 'image/png', 'image/gif',
                 'video/mp4', 'video/mov', 'video/avi', 'video/quicktime'
             ];
 
-            console.log('File type:', file.type);
-
             if (!allowedTypes.includes(file.type.toLowerCase())) {
-                console.error('Invalid file type:', file.type);
-                showError('Tipe file tidak didukung! Hanya mendukung JPG, PNG, GIF, MP4, MOV, AVI.');
-                return;
+                alert('Tipe file tidak didukung!\n\nFormat yang diizinkan:\n• Foto: JPG, PNG, GIF\n• Video: MP4, MOV, AVI');
+                return false;
             }
 
-            // Update file input - Method yang lebih kompatibel
-            try {
-                const fileInput = document.getElementById('fileInput');
-                const dt = new DataTransfer();
-                dt.items.add(file);
-                fileInput.files = dt.files;
-                console.log('File added to input:', fileInput.files);
-            } catch (error) {
-                console.error('Error setting file input:', error);
-                // Fallback: trigger change event manually
-                $('#fileInput').trigger('change');
-            }
-
-            // Show preview
-            showFilePreview(file);
+            return true;
         }
 
         function showFilePreview(file) {
-            console.log('Showing preview for:', file.name);
-
-            const filePreview = $('#filePreview');
-            const previewContainer = $('#previewContainer');
-            const fileName = $('#fileName');
-            const fileInfo = $('#fileInfo');
+            const preview = document.getElementById('filePreview');
+            const thumbnail = document.getElementById('previewThumbnail');
+            const fileName = document.getElementById('previewFileName');
+            const fileInfo = document.getElementById('previewFileInfo');
 
             // Update file info
-            fileName.text(file.name);
-            fileInfo.text(`${formatFileSize(file.size)} • ${file.type.split('/')[1].toUpperCase()}`);
+            fileName.textContent = file.name;
+            fileInfo.textContent = `${formatFileSize(file.size)} • ${file.type.split('/')[1].toUpperCase()}`;
 
-            // Create preview
-            previewContainer.empty();
+            // Create thumbnail
+            thumbnail.innerHTML = '';
 
             if (file.type.startsWith('image/')) {
-                console.log('Creating image preview');
-                const img = $('<img>').addClass('img-thumbnail').css({
-                    'width': '60px',
-                    'height': '60px',
-                    'object-fit': 'cover',
-                    'border-radius': '8px'
-                });
+                const img = document.createElement('img');
+                img.alt = 'Preview';
 
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    img.attr('src', e.target.result);
-                    console.log('Image preview loaded');
-                };
-                reader.onerror = function(e) {
-                    console.error('Error reading file:', e);
+                    img.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
 
-                previewContainer.append(img);
+                thumbnail.appendChild(img);
             } else if (file.type.startsWith('video/')) {
-                console.log('Creating video preview');
-                const videoIcon = $('<div>').addClass(
-                    'd-flex align-items-center justify-content-center bg-warning text-white rounded').css({
-                    'width': '60px',
-                    'height': '60px'
-                }).html('<i class="bi bi-play-circle-fill" style="font-size: 2rem;"></i>');
-
-                previewContainer.append(videoIcon);
+                thumbnail.innerHTML = '<i class="bi bi-play-circle-fill text-warning" style="font-size: 2rem;"></i>';
+                thumbnail.style.backgroundColor = '#f8f9fa';
             }
 
-            // Hide upload area, show preview
-            $('#uploadArea').hide();
-            filePreview.removeClass('d-none').show();
-
-            console.log('Preview shown');
+            // Show preview
+            preview.style.display = 'block';
         }
 
-        function removeFile() {
-            console.log('Removing file');
+        function clearFile() {
+            const fileInput = document.getElementById('fileInput');
+            const preview = document.getElementById('filePreview');
+            const progress = document.getElementById('uploadProgress');
 
             // Clear file input
-            $('#fileInput').val('');
+            fileInput.value = '';
 
-            // Hide preview, show upload area
-            $('#filePreview').addClass('d-none');
-            $('#uploadArea').show();
+            // Hide preview
+            preview.style.display = 'none';
 
             // Reset progress
-            $('#uploadProgress').css('width', '0%');
+            progress.style.width = '0%';
 
-            console.log('File removed');
+            console.log('File cleared');
+        }
+
+        function previewFile() {
+            const fileInput = document.getElementById('fileInput');
+
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert('Pilih file terlebih dahulu!');
+                return;
+            }
+
+            const file = fileInput.files[0];
+
+            if (file.type.startsWith('image/')) {
+                // Preview image in new window
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const newWindow = window.open('', '_blank');
+                    newWindow.document.write(`
+                <html>
+                    <head><title>Preview: ${file.name}</title></head>
+                    <body style="margin:0; display:flex; justify-content:center; align-items:center; min-height:100vh; background:#000;">
+                        <img src="${e.target.result}" style="max-width:100%; max-height:100%; object-fit:contain;">
+                    </body>
+                </html>
+            `);
+                };
+                reader.readAsDataURL(file);
+            } else if (file.type.startsWith('video/')) {
+                // Preview video in new window
+                const videoUrl = URL.createObjectURL(file);
+                const newWindow = window.open('', '_blank');
+                newWindow.document.write(`
+            <html>
+                <head><title>Preview: ${file.name}</title></head>
+                <body style="margin:0; display:flex; justify-content:center; align-items:center; min-height:100vh; background:#000;">
+                    <video controls style="max-width:100%; max-height:100%;">
+                        <source src="${videoUrl}" type="${file.type}">
+                    </video>
+                </body>
+            </html>
+        `);
+            }
         }
 
         function formatFileSize(bytes) {
@@ -509,160 +445,79 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        function previewFile() {
-            console.log('Preview file clicked');
+        // Drag and drop functionality (optional enhancement)
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
 
-            const fileInput = $('#fileInput')[0];
-            if (!fileInput.files || fileInput.files.length === 0) {
-                showError('Pilih file terlebih dahulu!');
-                return;
-            }
+            if (dropZone && fileInput) {
+                dropZone.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.classList.add('drag-over');
+                });
 
-            const file = fileInput.files[0];
-            console.log('Previewing file:', file);
+                dropZone.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.classList.remove('drag-over');
+                });
 
-            if (file.type.startsWith('image/')) {
-                // Preview image in modal
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    Swal.fire({
-                        title: 'Preview Gambar',
-                        html: `<img src="${e.target.result}" class="img-fluid" style="max-height: 400px; border-radius: 8px;">`,
-                        width: 'auto',
-                        showCloseButton: true,
-                        showConfirmButton: false
-                    });
-                };
-                reader.readAsDataURL(file);
-            } else if (file.type.startsWith('video/')) {
-                // Preview video in modal
-                const videoUrl = URL.createObjectURL(file);
-                Swal.fire({
-                    title: 'Preview Video',
-                    html: `<video controls style="max-width: 100%; max-height: 400px; border-radius: 8px;">
-                     <source src="${videoUrl}" type="${file.type}">
-                     Browser Anda tidak mendukung tag video.
-                   </video>`,
-                    width: 'auto',
-                    showCloseButton: true,
-                    showConfirmButton: false,
-                    didClose: () => {
-                        URL.revokeObjectURL(videoUrl);
+                dropZone.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.classList.remove('drag-over');
+
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        // Create a new FileList and assign to input
+                        const dt = new DataTransfer();
+                        dt.items.add(files[0]);
+                        fileInput.files = dt.files;
+
+                        // Trigger change event
+                        handleFileChange(fileInput);
                     }
                 });
             }
-        }
 
-        // Enhanced error handling functions
-        function showSuccess(message) {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: message,
-                    timer: 3000,
-                    showConfirmButton: false
+            // Form submit handler
+            const form = document.getElementById('uploadForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const fileInput = document.getElementById('fileInput');
+
+                    if (!fileInput.files || fileInput.files.length === 0) {
+                        e.preventDefault();
+                        alert('Pilih file terlebih dahulu!');
+                        return false;
+                    }
+
+                    // Show loading state
+                    const submitBtn = document.getElementById('submitBtn');
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Mengupload...';
+
+                    // Show progress (fake progress for user feedback)
+                    const progressBar = document.getElementById('uploadProgress');
+                    let progress = 0;
+                    const interval = setInterval(function() {
+                        progress += Math.random() * 15;
+                        if (progress > 90) progress = 90;
+                        progressBar.style.width = progress + '%';
+                    }, 200);
+
+                    // Clear interval after 10 seconds (fallback)
+                    setTimeout(() => clearInterval(interval), 10000);
                 });
-            } else {
-                alert('Berhasil: ' + message);
             }
-        }
-
-        function showError(message) {
-            console.error('Error:', message);
-
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal!',
-                    text: message
-                });
-            } else {
-                alert('Error: ' + message);
-            }
-        }
-
-        // Add enhanced styles
-        const enhancedStyles = `
-    .upload-area {
-        border: 2px dashed #6c757d;
-        border-radius: 12px;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        position: relative;
-        min-height: 200px;
-    }
-    
-    .upload-area:hover,
-    .upload-area.drag-over {
-        border-color: var(--bs-primary, #20b2aa);
-        background-color: rgba(32, 178, 170, 0.1);
-        transform: translateY(-2px);
-    }
-    
-    .upload-content {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 2rem;
-        text-align: center;
-    }
-    
-    .upload-preview .card {
-        border-left: 4px solid var(--bs-primary, #20b2aa);
-    }
-    
-    .preview-container img {
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    
-    .progress {
-        background-color: rgba(255,255,255,0.1);
-    }
-    
-    .progress-bar {
-        background: linear-gradient(90deg, var(--bs-primary, #20b2aa), var(--bs-primary-dark, #17a2b8));
-        transition: width 0.3s ease;
-    }
-    
-    /* Loading animation */
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    
-    .spinner-border-sm {
-        width: 1rem;
-        height: 1rem;
-        border-width: 0.2em;
-        animation: spin 0.75s linear infinite;
-    }
-`;
-
-        // Inject styles
-        if (!document.getElementById('upload-styles')) {
-            const styleSheet = document.createElement('style');
-            styleSheet.id = 'upload-styles';
-            styleSheet.textContent = enhancedStyles;
-            document.head.appendChild(styleSheet);
-        }
-
-        // Test function to check if everything is working
-        function testUpload() {
-            console.log('=== UPLOAD DEBUG INFO ===');
-            console.log('jQuery loaded:', typeof $ !== 'undefined');
-            console.log('SweetAlert loaded:', typeof Swal !== 'undefined');
-            console.log('File input exists:', $('#fileInput').length > 0);
-            console.log('Upload area exists:', $('#uploadArea').length > 0);
-            console.log('Upload form exists:', $('#uploadForm').length > 0);
-            console.log('CSRF token:', $('meta[name="csrf-token"]').attr('content'));
-            console.log('========================');
-        }
-
-        // Run test on page load
-        $(document).ready(function() {
-            setTimeout(testUpload, 1000);
         });
+
+        // Global error handler
+        window.addEventListener('error', function(e) {
+            console.error('JavaScript Error:', e.error);
+        });
+
+        console.log('Upload script loaded successfully');
     </script>
 @endpush

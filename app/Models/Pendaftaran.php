@@ -42,11 +42,6 @@ class Pendaftaran extends Model
         return $this->belongsTo(User::class, 'disetujui_oleh');
     }
 
-    public function absensis()
-    {
-        return $this->hasMany(Absensi::class);
-    }
-
     // Scopes
     public function scopePending($query)
     {

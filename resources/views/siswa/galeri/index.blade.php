@@ -62,85 +62,80 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" class="form-control" id="searchInput" placeholder="Cari berdasarkan judul...">
-                </div>
-            </div>
-        </div>
 
-        <!-- Galeri Grid -->
-        <div class="row g-4" id="galeriGrid">
-            @foreach ($galeris as $galeri)
-                <div class="col-lg-3 col-md-4 col-sm-6 galeri-item" data-type="{{ $galeri->tipe }}"
-                    data-title="{{ strtolower($galeri->judul) }}">
-                    <div class="card galeri-card h-100">
-                        <div class="position-relative">
-                            @if ($galeri->tipe == 'gambar')
-                                <img src="{{ Storage::url($galeri->path_file) }}" class="card-img-top galeri-thumbnail"
-                                    alt="{{ $galeri->judul }}" style="height: 200px; object-fit: cover;"
-                                    data-bs-toggle="modal" data-bs-target="#galeriModal"
-                                    data-src="{{ Storage::url($galeri->path_file) }}" data-title="{{ $galeri->judul }}"
-                                    data-description="{{ $galeri->deskripsi }}" data-type="image">
-                            @else
-                                <div class="position-relative">
-                                    <video class="card-img-top" style="height: 200px; object-fit: cover;" muted>
-                                        <source src="{{ Storage::url($galeri->path_file) }}" type="video/mp4">
-                                    </video>
-                                    <div class="position-absolute top-50 start-50 translate-middle">
-                                        <button class="btn btn-primary btn-lg rounded-circle" data-bs-toggle="modal"
-                                            data-bs-target="#galeriModal" data-src="{{ Storage::url($galeri->path_file) }}"
-                                            data-title="{{ $galeri->judul }}" data-description="{{ $galeri->deskripsi }}"
-                                            data-type="video">
-                                            <i class="bi bi-play-fill"></i>
-                                        </button>
+            <!-- Galeri Grid -->
+            <div class="row g-4" id="galeriGrid">
+                @foreach ($galeris as $galeri)
+                    <div class="col-lg-3 col-md-4 col-sm-6 galeri-item" data-type="{{ $galeri->tipe }}"
+                        data-title="{{ strtolower($galeri->judul) }}">
+                        <div class="card galeri-card h-100">
+                            <div class="position-relative">
+                                @if ($galeri->tipe == 'gambar')
+                                    <img src="{{ Storage::url($galeri->path_file) }}" class="card-img-top galeri-thumbnail"
+                                        alt="{{ $galeri->judul }}" style="height: 200px; object-fit: cover;"
+                                        data-bs-toggle="modal" data-bs-target="#galeriModal"
+                                        data-src="{{ Storage::url($galeri->path_file) }}"
+                                        data-title="{{ $galeri->judul }}" data-description="{{ $galeri->deskripsi }}"
+                                        data-type="image">
+                                @else
+                                    <div class="position-relative">
+                                        <video class="card-img-top" style="height: 200px; object-fit: cover;" muted>
+                                            <source src="{{ Storage::url($galeri->path_file) }}" type="video/mp4">
+                                        </video>
+                                        <div class="position-absolute top-50 start-50 translate-middle">
+                                            <button class="btn btn-primary btn-lg rounded-circle" data-bs-toggle="modal"
+                                                data-bs-target="#galeriModal"
+                                                data-src="{{ Storage::url($galeri->path_file) }}"
+                                                data-title="{{ $galeri->judul }}"
+                                                data-description="{{ $galeri->deskripsi }}" data-type="video">
+                                                <i class="bi bi-play-fill"></i>
+                                            </button>
+                                        </div>
                                     </div>
+                                @endif
+
+                                <!-- Type Badge -->
+                                <div class="position-absolute top-0 end-0 m-2">
+                                    <span class="badge bg-{{ $galeri->tipe == 'gambar' ? 'info' : 'warning' }}">
+                                        <i class="bi bi-{{ $galeri->tipe == 'gambar' ? 'image' : 'play-btn' }} me-1"></i>
+                                        {{ ucfirst($galeri->tipe) }}
+                                    </span>
                                 </div>
-                            @endif
-
-                            <!-- Type Badge -->
-                            <div class="position-absolute top-0 end-0 m-2">
-                                <span class="badge bg-{{ $galeri->tipe == 'gambar' ? 'info' : 'warning' }}">
-                                    <i class="bi bi-{{ $galeri->tipe == 'gambar' ? 'image' : 'play-btn' }} me-1"></i>
-                                    {{ ucfirst($galeri->tipe) }}
-                                </span>
                             </div>
-                        </div>
 
-                        <div class="card-body">
-                            <h6 class="card-title">{{ $galeri->judul }}</h6>
-                            @if ($galeri->deskripsi)
-                                <p class="card-text text-muted small">{{ Str::limit($galeri->deskripsi, 80) }}</p>
-                            @endif
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted">
-                                    {{ $galeri->created_at->diffForHumans() }}
-                                </small>
-                                <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
-                                    data-bs-target="#galeriModal" data-src="{{ Storage::url($galeri->path_file) }}"
-                                    data-title="{{ $galeri->judul }}" data-description="{{ $galeri->deskripsi }}"
-                                    data-type="{{ $galeri->tipe == 'gambar' ? 'image' : 'video' }}">
-                                    <i class="bi bi-eye"></i>
-                                </button>
+                            <div class="card-body">
+                                <h6 class="card-title">{{ $galeri->judul }}</h6>
+                                @if ($galeri->deskripsi)
+                                    <p class="card-text text-muted small">{{ Str::limit($galeri->deskripsi, 80) }}</p>
+                                @endif
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        {{ $galeri->created_at->diffForHumans() }}
+                                    </small>
+                                    <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#galeriModal" data-src="{{ Storage::url($galeri->path_file) }}"
+                                        data-title="{{ $galeri->judul }}" data-description="{{ $galeri->deskripsi }}"
+                                        data-type="{{ $galeri->tipe == 'gambar' ? 'image' : 'video' }}">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            @endforeach
-        </div>
+                @endforeach
+            </div>
 
-        <!-- Pagination -->
-        <div class="d-flex justify-content-center mt-4">
-            {{ $galeris->links() }}
-        </div>
-    @else
-        <!-- No Media -->
-        <div class="text-center py-5">
-            <i class="bi bi-images text-muted" style="font-size: 5rem;"></i>
-            <h4 class="mt-3 mb-2">Belum Ada Media</h4>
-            <p class="text-muted">Pembina belum mengupload foto atau video kegiatan.</p>
-        </div>
+            <!-- Pagination -->
+            <div class="d-flex justify-content-center mt-4">
+                {{ $galeris->links() }}
+            </div>
+        @else
+            <!-- No Media -->
+            <div class="text-center py-5">
+                <i class="bi bi-images text-muted" style="font-size: 5rem;"></i>
+                <h4 class="mt-3 mb-2">Belum Ada Media</h4>
+                <p class="text-muted">Pembina belum mengupload foto atau video kegiatan.</p>
+            </div>
     @endif
 
     <!-- Modal Galeri -->

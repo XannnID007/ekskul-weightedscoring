@@ -70,24 +70,48 @@ class EkstrakurikulerController extends Controller
 
         // Validasi apakah sudah terdaftar ekstrakurikuler lain
         if ($user->sudahTerdaftarEkstrakurikuler()) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda sudah terdaftar pada ekstrakurikuler lain. Setiap siswa hanya dapat mengikuti satu ekstrakurikuler.'
+                ], 400);
+            }
             return redirect()->back()
                 ->with('error', 'Anda sudah terdaftar pada ekstrakurikuler lain. Setiap siswa hanya dapat mengikuti satu ekstrakurikuler.');
         }
 
         // Validasi apakah sudah pernah mendaftar
         if ($user->pendaftarans()->where('ekstrakurikuler_id', $ekstrakurikuler->id)->exists()) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda sudah pernah mendaftar pada ekstrakurikuler ini.'
+                ], 400);
+            }
             return redirect()->back()
                 ->with('error', 'Anda sudah pernah mendaftar pada ekstrakurikuler ini.');
         }
 
         // Validasi kapasitas
         if (!$ekstrakurikuler->masihBisaDaftar()) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ekstrakurikuler ini sudah penuh atau tidak aktif.'
+                ], 400);
+            }
             return redirect()->back()
                 ->with('error', 'Ekstrakurikuler ini sudah penuh atau tidak aktif.');
         }
 
         // Validasi nilai minimal
         if ($user->nilai_rata_rata < $ekstrakurikuler->nilai_minimal) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Nilai rata-rata Anda belum memenuhi syarat minimal untuk ekstrakurikuler ini.'
+                ], 400);
+            }
             return redirect()->back()
                 ->with('error', 'Nilai rata-rata Anda belum memenuhi syarat minimal untuk ekstrakurikuler ini.');
         }
@@ -109,6 +133,13 @@ class EkstrakurikulerController extends Controller
             'tingkat_komitmen' => $request->tingkat_komitmen,
             'status' => 'pending'
         ]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Pendaftaran berhasil dikirim! Menunggu persetujuan dari pembina.'
+            ]);
+        }
 
         return redirect()->route('siswa.pendaftaran')
             ->with('success', 'Pendaftaran berhasil dikirim! Menunggu persetujuan dari pembina.');
