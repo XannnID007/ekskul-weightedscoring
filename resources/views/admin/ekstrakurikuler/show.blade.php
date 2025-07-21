@@ -334,31 +334,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Actions -->
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="mb-0">Aksi</h6>
-                </div>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <a href="{{ route('admin.ekstrakurikuler.edit', $ekstrakurikuler) }}" class="btn btn-warning">
-                            <i class="bi bi-pencil me-1"></i>Edit Ekstrakurikuler
-                        </a>
-                        <button class="btn btn-danger"
-                            onclick="confirmDelete('{{ route('admin.ekstrakurikuler.destroy', $ekstrakurikuler) }}')">
-                            <i class="bi bi-trash me-1"></i>Hapus Ekstrakurikuler
-                        </button>
-                        <hr>
-                        <a href="#" class="btn btn-outline-primary">
-                            <i class="bi bi-download me-1"></i>Export Data Siswa
-                        </a>
-                        <a href="#" class="btn btn-outline-info">
-                            <i class="bi bi-printer me-1"></i>Cetak Laporan
-                        </a>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
