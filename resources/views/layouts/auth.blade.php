@@ -43,6 +43,62 @@
             padding: 20px 0;
         }
 
+        /* Logo Sekolah di pojok kanan atas */
+        .school-logo {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .school-logo:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .school-logo img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 2px solid rgba(32, 178, 170, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .school-logo:hover img {
+            border-color: var(--bs-primary);
+            transform: scale(1.05);
+        }
+
+        .school-logo-text {
+            position: absolute;
+            right: 70px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, var(--bs-gray-800) 0%, #212529 100%);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            white-space: nowrap;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .school-logo:hover .school-logo-text {
+            opacity: 1;
+            transform: translateY(-50%) translateX(-10px);
+        }
+
         .auth-container {
             width: 100%;
             display: flex;
@@ -275,6 +331,21 @@
             .row .col-md-6 {
                 margin-bottom: 0.75rem;
             }
+
+            .school-logo {
+                top: 15px;
+                right: 15px;
+            }
+
+            .school-logo img {
+                width: 40px;
+                height: 40px;
+            }
+
+            .school-logo-text {
+                display: none;
+                /* Hide text on mobile */
+            }
         }
 
         @media (max-height: 700px) {
@@ -283,10 +354,35 @@
                 padding-top: 20px;
             }
         }
+
+        /* Animation untuk logo */
+        @keyframes logoGlow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 10px rgba(32, 178, 170, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 20px rgba(32, 178, 170, 0.6);
+            }
+        }
+
+        .school-logo img {
+            animation: logoGlow 3s ease-in-out infinite;
+        }
     </style>
 </head>
 
 <body>
+    <!-- Logo Sekolah di Pojok Kanan Atas -->
+    <div class="school-logo">
+        <img src="{{ asset('img/logo.jpeg') }}" alt="Logo MA Modern Miftahussa'adah">
+        <div class="school-logo-text">
+            MA Modern Miftahussa'adah
+        </div>
+    </div>
+
     <!-- Floating Background Shapes -->
     <div class="floating-shapes">
         <div class="floating-shape"></div>
@@ -358,6 +454,47 @@
                 if (icon) icon.className = 'bi bi-eye';
             }
         }
+
+        // Logo click effect
+        document.querySelector('.school-logo').addEventListener('click', function() {
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 150);
+        });
+
+        // Easter egg: Double click logo
+        let logoClickCount = 0;
+        document.querySelector('.school-logo').addEventListener('dblclick', function() {
+            // Create welcome message
+            const message = document.createElement('div');
+            message.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-primary-dark) 100%);
+                color: white;
+                padding: 20px 30px;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                z-index: 9999;
+                text-align: center;
+                animation: fadeIn 0.5s ease;
+                font-weight: 500;
+            `;
+            message.innerHTML = `
+                <i class="bi bi-heart-fill text-danger me-2"></i>
+                Selamat datang di MiftahXKull!
+                <br><small>Sistem Ekstrakurikuler Modern</small>
+            `;
+            document.body.appendChild(message);
+
+            setTimeout(() => {
+                message.style.opacity = '0';
+                setTimeout(() => message.remove(), 500);
+            }, 2000);
+        });
     </script>
 
     @stack('scripts')

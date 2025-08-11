@@ -3,10 +3,6 @@
 @section('title', 'Login')
 
 @section('content')
-    <h5 class="text-center mb-4">
-        <i class="bi bi-box-arrow-in-right me-2 text-primary"></i>
-        Masuk ke Sistem
-    </h5>
 
     <form method="POST" action="{{ route('login') }}">
         @csrf
@@ -66,16 +62,6 @@
                 Masuk
             </button>
         </div>
-
-        <!-- Forgot Password Link -->
-        @if (Route::has('password.request'))
-            <div class="text-center mt-3">
-                <a class="text-decoration-none" href="{{ route('password.request') }}">
-                    <i class="bi bi-question-circle me-1"></i>
-                    Lupa password?
-                </a>
-            </div>
-        @endif
 
         <div class="text-center mt-3">
             <hr>

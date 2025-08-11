@@ -3,10 +3,6 @@
 @section('title', 'Daftar Akun Siswa')
 
 @section('content')
-    <h5 class="text-center mb-3">
-        <i class="bi bi-person-plus me-2 text-primary"></i>
-        Daftar Akun Siswa
-    </h5>
 
     <form method="POST" action="{{ route('register') }}">
         @csrf
