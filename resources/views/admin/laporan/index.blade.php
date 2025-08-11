@@ -24,6 +24,7 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .report-card:hover {
@@ -79,61 +80,9 @@
             color: white;
         }
 
-        .report-card.kehadiran .report-icon {
-            background: linear-gradient(135deg, #06b6d4, #0891b2);
-            color: white;
-        }
-
         .report-card.rekomendasi .report-icon {
             background: linear-gradient(135deg, #8b5cf6, #7c3aed);
             color: white;
-        }
-
-        .report-title {
-            font-weight: 600;
-            color: #fff;
-            margin-bottom: 0.5rem;
-        }
-
-        .report-description {
-            color: #9ca3af;
-            font-size: 0.875rem;
-            line-height: 1.5;
-        }
-
-        .report-stats {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .stats-number {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--bs-primary);
-        }
-
-        .stats-label {
-            font-size: 0.75rem;
-            color: #9ca3af;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .export-loading {
-            display: none;
-        }
-
-        .btn-loading {
-            pointer-events: none;
-            opacity: 0.6;
-        }
-
-        .quick-export-section {
-            background: linear-gradient(135deg, var(--bs-gray-800) 0%, var(--bs-dark) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 2rem;
         }
 
         .export-format-card {
@@ -163,11 +112,6 @@
             margin: 0 auto 1rem;
         }
 
-        .format-csv .export-format-icon {
-            background: linear-gradient(135deg, #10b981, #047857);
-            color: white;
-        }
-
         .format-excel .export-format-icon {
             background: linear-gradient(135deg, #059669, #047857);
             color: white;
@@ -176,6 +120,13 @@
         .format-pdf .export-format-icon {
             background: linear-gradient(135deg, #dc2626, #b91c1c);
             color: white;
+        }
+
+        .quick-export-section {
+            background: linear-gradient(135deg, var(--bs-gray-800) 0%, var(--bs-dark) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
         }
     </style>
 @endpush
@@ -274,15 +225,6 @@
         <!-- Quick Export -->
         <div class="col-xl-4">
             <div class="quick-export-section">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="export-format-icon bg-primary me-3">
-                        <i class="bi bi-download"></i>
-                    </div>
-                    <div>
-                        <h5 class="mb-0">Export Cepat</h5>
-                        <small class="text-muted">Pilih format export</small>
-                    </div>
-                </div>
 
                 <div class="row g-3">
                     <div class="col-6">
@@ -308,139 +250,6 @@
                 <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#filterModal">
                     <i class="bi bi-funnel me-2"></i>Export dengan Filter
                 </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Laporan Detail Cards -->
-    <div class="row g-4 mt-2">
-        <div class="col-12">
-            <h5 class="mb-4">
-                <i class="bi bi-file-earmark-text me-2"></i>Laporan Detail
-            </h5>
-        </div>
-
-        <div class="col-xl-4 col-md-6">
-            <div class="report-card siswa" onclick="generateReport('siswa')">
-                <div class="card-body p-4">
-                    <div class="report-icon">
-                        <i class="bi bi-people"></i>
-                    </div>
-                    <h6 class="report-title">Laporan Data Siswa</h6>
-                    <p class="report-description">
-                        Laporan lengkap data siswa termasuk profil, minat, dan status ekstrakurikuler
-                    </p>
-                    <div class="report-stats">
-                        <div class="row text-center">
-                            <div class="col-6">
-                                <div class="stats-number">{{ $stats['total_siswa'] ?? 0 }}</div>
-                                <div class="stats-label">Total Siswa</div>
-                            </div>
-                            <div class="col-6">
-                                <div class="stats-number">{{ $stats['siswa_baru_hari_ini'] ?? 0 }}</div>
-                                <div class="stats-label">Hari Ini</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-4 col-md-6">
-            <div class="report-card ekstrakurikuler" onclick="generateReport('ekstrakurikuler')">
-                <div class="card-body p-4">
-                    <div class="report-icon">
-                        <i class="bi bi-collection"></i>
-                    </div>
-                    <h6 class="report-title">Laporan Ekstrakurikuler</h6>
-                    <p class="report-description">
-                        Data lengkap ekstrakurikuler, kapasitas, pembina, dan tingkat partisipasi
-                    </p>
-                    <div class="report-stats">
-                        <div class="row text-center">
-                            <div class="col-6">
-                                <div class="stats-number">{{ $stats['total_ekstrakurikuler'] ?? 0 }}</div>
-                                <div class="stats-label">Total Ekskul</div>
-                            </div>
-                            <div class="col-6">
-                                <div class="stats-number">{{ $stats['total_pembina'] ?? 0 }}</div>
-                                <div class="stats-label">Pembina</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-4 col-md-6">
-            <div class="report-card pendaftaran" onclick="generateReport('pendaftaran')">
-                <div class="card-body p-4">
-                    <div class="report-icon">
-                        <i class="bi bi-clipboard-check"></i>
-                    </div>
-                    <h6 class="report-title">Laporan Pendaftaran</h6>
-                    <p class="report-description">
-                        Analisis pendaftaran siswa dengan status approval dan rejection
-                    </p>
-                    <div class="report-stats">
-                        <div class="row text-center">
-                            <div class="col-4">
-                                <div class="stats-number text-warning">{{ $stats['pendaftaran_pending'] ?? 0 }}</div>
-                                <div class="stats-label">Pending</div>
-                            </div>
-                            <div class="col-4">
-                                <div class="stats-number text-success">{{ $stats['pendaftaran_disetujui'] ?? 0 }}</div>
-                                <div class="stats-label">Disetujui</div>
-                            </div>
-                            <div class="col-4">
-                                <div class="stats-number text-danger">{{ $stats['pendaftaran_ditolak'] ?? 0 }}</div>
-                                <div class="stats-label">Ditolak</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-4 col-md-6">
-            <div class="report-card rekomendasi" onclick="generateReport('rekomendasi')">
-                <div class="card-body p-4">
-                    <div class="report-icon">
-                        <i class="bi bi-stars"></i>
-                    </div>
-                    <h6 class="report-title">Analisis Rekomendasi</h6>
-                    <p class="report-description">
-                        Laporan efektivitas sistem rekomendasi dan preferensi siswa
-                    </p>
-                    <div class="report-stats">
-                        <div class="text-center">
-                            <div class="stats-number">{{ $stats['profil_belum_lengkap'] ?? 0 }}</div>
-                            <div class="stats-label">Profil Belum Lengkap</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-4 col-md-6">
-            <div class="report-card" style="background: linear-gradient(135deg, #6366f1, #4f46e5);"
-                onclick="generateCustomReport()">
-                <div class="card-body p-4">
-                    <div class="report-icon" style="background: rgba(255,255,255,0.2);">
-                        <i class="bi bi-gear"></i>
-                    </div>
-                    <h6 class="report-title">Laporan Custom</h6>
-                    <p class="report-description">
-                        Buat laporan sesuai kebutuhan dengan filter dan parameter khusus
-                    </p>
-                    <div class="report-stats">
-                        <div class="text-center">
-                            <button class="btn btn-sm btn-outline-light">
-                                <i class="bi bi-plus-circle me-1"></i>Buat Laporan
-                            </button>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -566,9 +375,37 @@
                 }
             });
 
-            // Simulate report generation
+            // Submit form untuk export
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ route('admin.laporan.export') }}';
+
+            // Add CSRF token
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = '{{ csrf_token() }}';
+            form.appendChild(csrfInput);
+
+            // Add type
+            const typeInput = document.createElement('input');
+            typeInput.type = 'hidden';
+            typeInput.name = 'type';
+            typeInput.value = type;
+            form.appendChild(typeInput);
+
+            // Add format
+            const formatInput = document.createElement('input');
+            formatInput.type = 'hidden';
+            formatInput.name = 'format';
+            formatInput.value = 'excel';
+            form.appendChild(formatInput);
+
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+
             setTimeout(() => {
-                window.open(`{{ route('admin.laporan.export') }}?type=${type}`, '_blank');
                 Swal.fire({
                     icon: 'success',
                     title: 'Laporan Berhasil!',
@@ -589,45 +426,43 @@
                     <div class="spinner-border spinner-border-sm" role="status"></div>
                 </div>
                 <h6 class="mb-1">Memproses...</h6>
-                <small class="text-muted">Sedang membuat file</small>
             `;
-            btn.classList.add('btn-loading');
+            btn.style.pointerEvents = 'none';
 
-            // Simulate export process
+            // Submit form untuk export
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ route('admin.laporan.export') }}';
+
+            // Add CSRF token
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = '{{ csrf_token() }}';
+            form.appendChild(csrfInput);
+
+            // Add type
+            const typeInput = document.createElement('input');
+            typeInput.type = 'hidden';
+            typeInput.name = 'type';
+            typeInput.value = type;
+            form.appendChild(typeInput);
+
+            // Add format
+            const formatInput = document.createElement('input');
+            formatInput.type = 'hidden';
+            formatInput.name = 'format';
+            formatInput.value = format;
+            form.appendChild(formatInput);
+
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+
+            // Restore button after delay
             setTimeout(() => {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '{{ route('admin.laporan.export') }}';
-                form.style.display = 'none';
-
-                // Add CSRF token
-                const csrfInput = document.createElement('input');
-                csrfInput.type = 'hidden';
-                csrfInput.name = '_token';
-                csrfInput.value = '{{ csrf_token() }}';
-                form.appendChild(csrfInput);
-
-                // Add type
-                const typeInput = document.createElement('input');
-                typeInput.type = 'hidden';
-                typeInput.name = 'type';
-                typeInput.value = type;
-                form.appendChild(typeInput);
-
-                // Add format
-                const formatInput = document.createElement('input');
-                formatInput.type = 'hidden';
-                formatInput.name = 'format';
-                formatInput.value = format;
-                form.appendChild(formatInput);
-
-                document.body.appendChild(form);
-                form.submit();
-                document.body.removeChild(form);
-
-                // Restore button
                 btn.innerHTML = originalContent;
-                btn.classList.remove('btn-loading');
+                btn.style.pointerEvents = 'auto';
 
                 Swal.fire({
                     icon: 'success',
@@ -650,15 +485,33 @@
                 showLoaderOnConfirm: true,
                 preConfirm: () => {
                     return new Promise((resolve) => {
-                        setTimeout(() => {
-                            resolve();
-                        }, 3000);
+                        // Submit form
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '{{ route('admin.laporan.export') }}';
+
+                        const csrfInput = document.createElement('input');
+                        csrfInput.type = 'hidden';
+                        csrfInput.name = '_token';
+                        csrfInput.value = '{{ csrf_token() }}';
+                        form.appendChild(csrfInput);
+
+                        const typeInput = document.createElement('input');
+                        typeInput.type = 'hidden';
+                        typeInput.name = 'type';
+                        typeInput.value = 'all';
+                        form.appendChild(typeInput);
+
+                        document.body.appendChild(form);
+                        form.submit();
+                        document.body.removeChild(form);
+
+                        setTimeout(() => resolve(), 1000);
                     });
                 },
                 allowOutsideClick: () => !Swal.isLoading()
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.open('{{ route('admin.laporan.export') }}?type=all', '_blank');
                     Swal.fire({
                         icon: 'success',
                         title: 'Export Berhasil!',
@@ -668,6 +521,75 @@
                     });
                 }
             });
+        }
+
+        function applyFilterAndExport() {
+            const form = document.getElementById('filterForm');
+            const formData = new FormData(form);
+
+            // Validate dates
+            const startDate = formData.get('start_date');
+            const endDate = formData.get('end_date');
+
+            if (startDate > endDate) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Tanggal mulai tidak boleh lebih besar dari tanggal akhir.'
+                });
+                return;
+            }
+
+            // Show loading
+            Swal.fire({
+                title: 'Memproses Export...',
+                text: 'Mohon tunggu sebentar.',
+                icon: 'info',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Create and submit form
+            const exportForm = document.createElement('form');
+            exportForm.method = 'POST';
+            exportForm.action = '{{ route('admin.laporan.export') }}';
+
+            // Add CSRF token
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = '{{ csrf_token() }}';
+            exportForm.appendChild(csrfInput);
+
+            // Add form data
+            for (let [key, value] of formData.entries()) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key === 'report_type' ? 'type' : (key === 'export_format' ? 'format' : key);
+                input.value = value;
+                exportForm.appendChild(input);
+            }
+
+            document.body.appendChild(exportForm);
+            exportForm.submit();
+            document.body.removeChild(exportForm);
+
+            // Close modal and show success
+            setTimeout(() => {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('filterModal'));
+                modal.hide();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Export Berhasil!',
+                    text: 'File telah didownload sesuai filter yang dipilih.',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            }, 1500);
         }
 
         // Period toggle for chart
@@ -689,14 +611,5 @@
                 chartPendaftaran.update();
             });
         });
-
-        function generateCustomReport() {
-            Swal.fire({
-                title: 'Laporan Custom',
-                text: 'Fitur laporan custom akan segera tersedia!',
-                icon: 'info',
-                confirmButtonText: 'OK'
-            });
-        }
     </script>
 @endpush

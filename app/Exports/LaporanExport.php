@@ -176,7 +176,21 @@ class EkstrakurikulerSheet implements FromCollection, WithHeadings, WithMapping,
           static $no = 0;
           $no++;
 
-          $kategori = is_array($ekskul->kategori) ? implode(', ', $ekskul->kategori) : '';
+          // Handle kategori safely
+          $kategori = '';
+          if ($ekskul->kategori) {
+               if (is_array($ekskul->kategori)) {
+                    $kategori = implode(', ', $ekskul->kategori);
+               } elseif (is_string($ekskul->kategori)) {
+                    $decoded = json_decode($ekskul->kategori, true);
+                    if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                         $kategori = implode(', ', $decoded);
+                    } else {
+                         $kategori = $ekskul->kategori;
+                    }
+               }
+          }
+
           $okupansi = $ekskul->kapasitas_maksimal > 0 ?
                round(($ekskul->peserta_saat_ini / $ekskul->kapasitas_maksimal) * 100, 1) : 0;
 

@@ -3,203 +3,155 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laporan {{ ucfirst($type) }} - MA Modern Miftahussa'adah</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'DejaVu Sans', Arial, sans-serif;
-            font-size: 12px;
-            line-height: 1.4;
+            font-family: DejaVu Sans, Arial, sans-serif;
+            font-size: 10px;
+            line-height: 1.3;
             color: #333;
+            margin: 15px;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 3px solid #20B2AA;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #20B2AA;
         }
 
         .header h1 {
-            font-size: 24px;
+            font-size: 18px;
             color: #20B2AA;
-            margin-bottom: 5px;
+            margin: 0 0 5px 0;
         }
 
         .header h2 {
-            font-size: 18px;
-            color: #666;
-            margin-bottom: 10px;
-        }
-
-        .header .school-name {
             font-size: 14px;
-            color: #888;
-            margin-bottom: 5px;
-        }
-
-        .header .period {
-            font-size: 12px;
             color: #666;
-            font-style: italic;
+            margin: 0 0 8px 0;
         }
 
-        .summary-stats {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
+        .header .info {
+            font-size: 9px;
+            color: #888;
         }
 
-        .stat-item {
+        .stats {
+            background: #f5f5f5;
+            padding: 10px;
+            margin-bottom: 20px;
             text-align: center;
-            flex: 1;
+        }
+
+        .stats table {
+            width: 100%;
+            margin: 0;
+        }
+
+        .stats td {
+            width: 25%;
+            padding: 5px;
         }
 
         .stat-number {
-            font-size: 24px;
+            font-size: 16px;
             font-weight: bold;
             color: #20B2AA;
-            display: block;
         }
 
         .stat-label {
-            font-size: 11px;
+            font-size: 8px;
             color: #666;
             text-transform: uppercase;
-            margin-top: 5px;
-        }
-
-        .section {
-            margin-bottom: 30px;
         }
 
         .section-title {
-            font-size: 16px;
+            font-size: 12px;
             font-weight: bold;
-            color: #333;
-            margin-bottom: 15px;
-            padding-bottom: 5px;
-            border-bottom: 2px solid #20B2AA;
+            background: #20B2AA;
+            color: white;
+            padding: 5px 10px;
+            margin: 15px 0 10px 0;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
-            font-size: 10px;
+            margin-bottom: 15px;
+            font-size: 8px;
         }
 
-        table th {
-            background-color: #20B2AA;
-            color: white;
-            padding: 8px 6px;
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 3px;
             text-align: left;
+        }
+
+        th {
+            background: #f0f0f0;
             font-weight: bold;
-            border: 1px solid #ddd;
+            font-size: 7px;
         }
 
-        table td {
-            padding: 6px;
-            border: 1px solid #ddd;
-            vertical-align: top;
-        }
-
-        table tbody tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-
-        table tbody tr:hover {
-            background-color: #e8f4f8;
-        }
-
-        .status-badge {
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 9px;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .status-pending {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-
-        .status-disetujui {
-            background-color: #d1e7dd;
-            color: #0f5132;
-        }
-
-        .status-ditolak {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-        .gender-badge {
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 9px;
-            font-weight: bold;
-        }
-
-        .gender-l {
-            background-color: #cfe2ff;
-            color: #084298;
-        }
-
-        .gender-p {
-            background-color: #f7d6e6;
-            color: #b02a5b;
-        }
-
-        .footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 50px;
-            text-align: center;
-            font-size: 10px;
-            color: #666;
-            border-top: 1px solid #ddd;
-            padding-top: 10px;
-            background: white;
-        }
-
-        .page-number:before {
-            content: "Halaman " counter(page);
+        tr:nth-child(even) {
+            background: #f9f9f9;
         }
 
         .text-center {
             text-align: center;
         }
 
-        .text-right {
-            text-align: right;
+        .badge {
+            padding: 1px 4px;
+            border-radius: 2px;
+            font-size: 7px;
+            font-weight: bold;
         }
 
-        .mb-0 {
-            margin-bottom: 0;
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
         }
 
-        .mt-20 {
-            margin-top: 20px;
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
         }
 
         .no-data {
             text-align: center;
             color: #666;
             font-style: italic;
-            padding: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 15px;
+            left: 15px;
+            right: 15px;
+            text-align: center;
+            font-size: 7px;
+            color: #666;
+            border-top: 1px solid #ddd;
+            padding-top: 5px;
+        }
+
+        .page-break {
+            page-break-before: always;
         }
     </style>
 </head>
@@ -208,222 +160,200 @@
     <!-- Header -->
     <div class="header">
         <h1>LAPORAN {{ strtoupper($type == 'all' ? 'LENGKAP' : $type) }}</h1>
-        <h2>Sistem Manajemen Ekstrakurikuler</h2>
-        <div class="school-name">MA Modern Miftahussa'adah</div>
-        <div class="period">
-            Periode: {{ $start_date->format('d/m/Y') }} - {{ $end_date->format('d/m/Y') }}
-        </div>
-        <div class="period">
-            Digenerate pada: {{ now()->format('d/m/Y H:i:s') }}
+        <h2>MA Modern Miftahussa'adah</h2>
+        <div class="info">
+            Periode: {{ $start_date->format('d/m/Y') }} - {{ $end_date->format('d/m/Y') }}<br>
+            Digenerate: {{ $generated_at->format('d/m/Y H:i:s') }}
         </div>
     </div>
 
-    <!-- Summary Statistics -->
-    <div class="summary-stats">
-        <div class="stat-item">
-            <span class="stat-number">{{ $stats['total_siswa'] }}</span>
-            <div class="stat-label">Total Siswa</div>
-        </div>
-        <div class="stat-item">
-            <span class="stat-number">{{ $stats['total_ekstrakurikuler'] }}</span>
-            <div class="stat-label">Ekstrakurikuler</div>
-        </div>
-        <div class="stat-item">
-            <span class="stat-number">{{ $stats['total_pendaftaran'] }}</span>
-            <div class="stat-label">Pendaftaran</div>
-        </div>
-        <div class="stat-item">
-            <span class="stat-number">{{ $stats['partisipasi_persen'] }}%</span>
-            <div class="stat-label">Partisipasi</div>
-        </div>
+    <!-- Summary Stats -->
+    <div class="stats">
+        <table>
+            <tr>
+                <td>
+                    <div class="stat-number">{{ $stats['total_siswa'] }}</div>
+                    <div class="stat-label">Total Siswa</div>
+                </td>
+                <td>
+                    <div class="stat-number">{{ $stats['total_ekstrakurikuler'] }}</div>
+                    <div class="stat-label">Ekstrakurikuler</div>
+                </td>
+                <td>
+                    <div class="stat-number">{{ $stats['total_pendaftaran'] }}</div>
+                    <div class="stat-label">Pendaftaran</div>
+                </td>
+                <td>
+                    <div class="stat-number">{{ $stats['partisipasi_persen'] }}%</div>
+                    <div class="stat-label">Partisipasi</div>
+                </td>
+            </tr>
+        </table>
     </div>
 
-    <!-- Content based on type -->
+    <!-- Data Siswa -->
     @if ($type == 'siswa' || $type == 'all')
-        <div class="section">
-            <h3 class="section-title">Data Siswa</h3>
-            @if (isset($siswa) && $siswa->count() > 0)
-                <table>
-                    <thead>
+        <div class="section-title">Data Siswa</div>
+        @if (isset($siswa) && $siswa->count() > 0)
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%">No</th>
+                        <th style="width: 25%">Nama</th>
+                        <th style="width: 20%">Email</th>
+                        <th style="width: 10%">NIS</th>
+                        <th style="width: 8%">L/P</th>
+                        <th style="width: 8%">Nilai</th>
+                        <th style="width: 24%">Ekstrakurikuler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($siswa as $index => $s)
+                        @php
+                            $pendaftaran = $s->pendaftarans()->where('status', 'disetujui')->first();
+                        @endphp
                         <tr>
-                            <th width="5%">No</th>
-                            <th width="20%">Nama</th>
-                            <th width="15%">Email</th>
-                            <th width="10%">NIS</th>
-                            <th width="8%">Gender</th>
-                            <th width="10%">Nilai</th>
-                            <th width="15%">Ekstrakurikuler</th>
-                            <th width="12%">Status</th>
-                            <th width="10%">Tgl Daftar</th>
+                            <td class="text-center">{{ $index + 1 }}</td>
+                            <td>{{ $s->name }}</td>
+                            <td>{{ $s->email }}</td>
+                            <td class="text-center">{{ $s->nis ?? '-' }}</td>
+                            <td class="text-center">{{ $s->jenis_kelamin ?? '-' }}</td>
+                            <td class="text-center">{{ $s->nilai_rata_rata ?? '-' }}</td>
+                            <td>{{ $pendaftaran ? $pendaftaran->ekstrakurikuler->nama : 'Belum terdaftar' }}</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($siswa as $index => $s)
-                            @php
-                                $pendaftaran = $s->pendaftarans()->where('status', 'disetujui')->first();
-                            @endphp
-                            <tr>
-                                <td class="text-center">{{ $index + 1 }}</td>
-                                <td>{{ $s->name }}</td>
-                                <td>{{ $s->email }}</td>
-                                <td class="text-center">{{ $s->nis ?? '-' }}</td>
-                                <td class="text-center">
-                                    @if ($s->jenis_kelamin == 'L')
-                                        <span class="gender-badge gender-l">L</span>
-                                    @elseif($s->jenis_kelamin == 'P')
-                                        <span class="gender-badge gender-p">P</span>
-                                    @else
-                                        -
-                                    @endif
-                                </td>
-                                <td class="text-center">{{ $s->nilai_rata_rata ?? '-' }}</td>
-                                <td>{{ $pendaftaran ? $pendaftaran->ekstrakurikuler->nama : '-' }}</td>
-                                <td class="text-center">
-                                    @if ($pendaftaran)
-                                        <span class="status-badge status-disetujui">Terdaftar</span>
-                                    @else
-                                        <span class="status-badge status-pending">Belum</span>
-                                    @endif
-                                </td>
-                                <td class="text-center">{{ $s->created_at->format('d/m/Y') }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            @else
-                <div class="no-data">Tidak ada data siswa yang ditemukan</div>
-            @endif
-        </div>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <div class="no-data">Tidak ada data siswa</div>
+        @endif
     @endif
 
+    <!-- Data Ekstrakurikuler -->
     @if ($type == 'ekstrakurikuler' || $type == 'all')
-        <div class="section">
-            <h3 class="section-title">Data Ekstrakurikuler</h3>
-            @if (isset($ekstrakurikulers) && $ekstrakurikulers->count() > 0)
-                <table>
-                    <thead>
+        @if ($type == 'all')
+            <div class="page-break"></div>
+        @endif
+        <div class="section-title">Data Ekstrakurikuler</div>
+        @if (isset($ekstrakurikulers) && $ekstrakurikulers->count() > 0)
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%">No</th>
+                        <th style="width: 30%">Nama</th>
+                        <th style="width: 20%">Pembina</th>
+                        <th style="width: 15%">Kategori</th>
+                        <th style="width: 10%">Kapasitas</th>
+                        <th style="width: 10%">Peserta</th>
+                        <th style="width: 10%">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($ekstrakurikulers as $index => $ekskul)
                         <tr>
-                            <th width="5%">No</th>
-                            <th width="25%">Nama Ekstrakurikuler</th>
-                            <th width="20%">Pembina</th>
-                            <th width="15%">Kategori</th>
-                            <th width="8%">Kapasitas</th>
-                            <th width="8%">Peserta</th>
-                            <th width="12%">Jadwal</th>
-                            <th width="7%">Status</th>
+                            <td class="text-center">{{ $index + 1 }}</td>
+                            <td>{{ $ekskul->nama }}</td>
+                            <td>{{ $ekskul->pembina->name ?? '-' }}</td>
+                            <td>{{ is_array($ekskul->kategori) ? implode(', ', $ekskul->kategori) : '-' }}</td>
+                            <td class="text-center">{{ $ekskul->kapasitas_maksimal }}</td>
+                            <td class="text-center">{{ $ekskul->peserta_saat_ini }}</td>
+                            <td class="text-center">
+                                <span class="badge badge-{{ $ekskul->is_active ? 'success' : 'danger' }}">
+                                    {{ $ekskul->is_active ? 'Aktif' : 'Nonaktif' }}
+                                </span>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($ekstrakurikulers as $index => $ekskul)
-                            <tr>
-                                <td class="text-center">{{ $index + 1 }}</td>
-                                <td>{{ $ekskul->nama }}</td>
-                                <td>{{ $ekskul->pembina->name ?? '-' }}</td>
-                                <td>{{ is_array($ekskul->kategori) ? implode(', ', $ekskul->kategori) : '-' }}</td>
-                                <td class="text-center">{{ $ekskul->kapasitas_maksimal }}</td>
-                                <td class="text-center">{{ $ekskul->peserta_saat_ini }}</td>
-                                <td>{{ $ekskul->jadwal_string }}</td>
-                                <td class="text-center">
-                                    @if ($ekskul->is_active)
-                                        <span class="status-badge status-disetujui">Aktif</span>
-                                    @else
-                                        <span class="status-badge status-ditolak">Nonaktif</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            @else
-                <div class="no-data">Tidak ada data ekstrakurikuler yang ditemukan</div>
-            @endif
-        </div>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <div class="no-data">Tidak ada data ekstrakurikuler</div>
+        @endif
     @endif
 
+    <!-- Data Pendaftaran -->
     @if ($type == 'pendaftaran' || $type == 'all')
-        <div class="section">
-            <h3 class="section-title">Data Pendaftaran</h3>
-            @if (isset($pendaftarans) && $pendaftarans->count() > 0)
-                <table>
-                    <thead>
+        @if ($type == 'all')
+            <div class="page-break"></div>
+        @endif
+        <div class="section-title">Data Pendaftaran</div>
+        @if (isset($pendaftarans) && $pendaftarans->count() > 0)
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%">No</th>
+                        <th style="width: 25%">Nama Siswa</th>
+                        <th style="width: 30%">Ekstrakurikuler</th>
+                        <th style="width: 15%">Status</th>
+                        <th style="width: 10%">Komitmen</th>
+                        <th style="width: 15%">Tanggal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($pendaftarans as $index => $pendaftaran)
                         <tr>
-                            <th width="5%">No</th>
-                            <th width="20%">Nama Siswa</th>
-                            <th width="25%">Ekstrakurikuler</th>
-                            <th width="15%">Pembina</th>
-                            <th width="10%">Status</th>
-                            <th width="10%">Komitmen</th>
-                            <th width="15%">Tgl Daftar</th>
+                            <td class="text-center">{{ $index + 1 }}</td>
+                            <td>{{ $pendaftaran->user->name }}</td>
+                            <td>{{ $pendaftaran->ekstrakurikuler->nama }}</td>
+                            <td class="text-center">
+                                <span
+                                    class="badge badge-{{ $pendaftaran->status == 'disetujui' ? 'success' : ($pendaftaran->status == 'pending' ? 'warning' : 'danger') }}">
+                                    {{ ucfirst($pendaftaran->status) }}
+                                </span>
+                            </td>
+                            <td class="text-center">{{ ucfirst($pendaftaran->tingkat_komitmen ?? '-') }}</td>
+                            <td class="text-center">{{ $pendaftaran->created_at->format('d/m/Y') }}</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($pendaftarans as $index => $pendaftaran)
-                            <tr>
-                                <td class="text-center">{{ $index + 1 }}</td>
-                                <td>{{ $pendaftaran->user->name }}</td>
-                                <td>{{ $pendaftaran->ekstrakurikuler->nama }}</td>
-                                <td>{{ $pendaftaran->ekstrakurikuler->pembina->name ?? '-' }}</td>
-                                <td class="text-center">
-                                    @if ($pendaftaran->status == 'pending')
-                                        <span class="status-badge status-pending">Pending</span>
-                                    @elseif($pendaftaran->status == 'disetujui')
-                                        <span class="status-badge status-disetujui">Disetujui</span>
-                                    @else
-                                        <span class="status-badge status-ditolak">Ditolak</span>
-                                    @endif
-                                </td>
-                                <td class="text-center">{{ ucfirst($pendaftaran->tingkat_komitmen ?? '-') }}</td>
-                                <td class="text-center">{{ $pendaftaran->created_at->format('d/m/Y') }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            @else
-                <div class="no-data">Tidak ada data pendaftaran yang ditemukan</div>
-            @endif
-        </div>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <div class="no-data">Tidak ada data pendaftaran</div>
+        @endif
     @endif
 
+    <!-- Data Rekomendasi -->
     @if ($type == 'rekomendasi' || $type == 'all')
-        <div class="section">
-            <h3 class="section-title">Data Rekomendasi</h3>
-            @if (isset($rekomendasis) && $rekomendasis->count() > 0)
-                <table>
-                    <thead>
+        @if ($type == 'all')
+            <div class="page-break"></div>
+        @endif
+        <div class="section-title">Data Rekomendasi</div>
+        @if (isset($rekomendasis) && $rekomendasis->count() > 0)
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%">No</th>
+                        <th style="width: 25%">Nama Siswa</th>
+                        <th style="width: 30%">Ekstrakurikuler</th>
+                        <th style="width: 10%">Skor Minat</th>
+                        <th style="width: 10%">Skor Akademik</th>
+                        <th style="width: 10%">Total Skor</th>
+                        <th style="width: 10%">Tanggal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($rekomendasis as $index => $rekomendasi)
                         <tr>
-                            <th width="5%">No</th>
-                            <th width="25%">Nama Siswa</th>
-                            <th width="25%">Ekstrakurikuler</th>
-                            <th width="10%">Skor Minat</th>
-                            <th width="10%">Skor Akademik</th>
-                            <th width="10%">Total Skor</th>
-                            <th width="15%">Tanggal</th>
+                            <td class="text-center">{{ $index + 1 }}</td>
+                            <td>{{ $rekomendasi->user->name }}</td>
+                            <td>{{ $rekomendasi->ekstrakurikuler->nama }}</td>
+                            <td class="text-center">{{ number_format($rekomendasi->skor_minat, 1) }}</td>
+                            <td class="text-center">{{ number_format($rekomendasi->skor_akademik, 1) }}</td>
+                            <td class="text-center">{{ number_format($rekomendasi->total_skor, 1) }}</td>
+                            <td class="text-center">{{ $rekomendasi->created_at->format('d/m/Y') }}</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($rekomendasis as $index => $rekomendasi)
-                            <tr>
-                                <td class="text-center">{{ $index + 1 }}</td>
-                                <td>{{ $rekomendasi->user->name }}</td>
-                                <td>{{ $rekomendasi->ekstrakurikuler->nama }}</td>
-                                <td class="text-center">{{ number_format($rekomendasi->skor_minat, 1) }}</td>
-                                <td class="text-center">{{ number_format($rekomendasi->skor_akademik, 1) }}</td>
-                                <td class="text-center">{{ number_format($rekomendasi->total_skor, 1) }}</td>
-                                <td class="text-center">{{ $rekomendasi->created_at->format('d/m/Y') }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            @else
-                <div class="no-data">Tidak ada data rekomendasi yang ditemukan</div>
-            @endif
-        </div>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <div class="no-data">Tidak ada data rekomendasi</div>
+        @endif
     @endif
 
     <!-- Footer -->
     <div class="footer">
-        <div>MA Modern Miftahussa'adah - Sistem Manajemen Ekstrakurikuler</div>
-        <div class="page-number"></div>
+        MA Modern Miftahussa'adah - Sistem Manajemen Ekstrakurikuler<br>
+        Laporan {{ ucfirst($type) }} | {{ $start_date->format('d/m/Y') }} - {{ $end_date->format('d/m/Y') }}
     </div>
 </body>
 

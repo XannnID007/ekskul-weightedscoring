@@ -32,19 +32,20 @@ class LaporanController extends Controller
 
     public function export(Request $request)
     {
-        $request->validate([
-            'type' => 'nullable|string|in:all,siswa,ekstrakurikuler,pendaftaran,rekomendasi',
-            'format' => 'nullable|string|in:excel,pdf',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date'
-        ]);
-
-        $type = $request->input('type', 'all');
-        $format = $request->input('format', 'excel');
-        $startDate = $request->start_date ? Carbon::parse($request->start_date) : Carbon::now()->startOfMonth();
-        $endDate = $request->end_date ? Carbon::parse($request->end_date) : Carbon::now();
-
         try {
+            $request->validate([
+                'type' => 'nullable|string|in:all,siswa,ekstrakurikuler,pendaftaran,rekomendasi',
+                'format' => 'nullable|string|in:excel,pdf',
+                'start_date' => 'nullable|date',
+                'end_date' => 'nullable|date|after_or_equal:start_date'
+            ]);
+
+            $type = $request->input('type', 'all');
+            $format = $request->input('format', 'excel');
+            $startDate = $request->start_date ? Carbon::parse($request->start_date) : Carbon::now()->startOfMonth();
+            $endDate = $request->end_date ? Carbon::parse($request->end_date) : Carbon::now();
+
+            // Set memory dan time limit untuk export
             ini_set('memory_limit', '512M');
             set_time_limit(300);
 
@@ -55,6 +56,7 @@ class LaporanController extends Controller
             }
         } catch (\Exception $e) {
             Log::error('Export Error: ' . $e->getMessage());
+
             return redirect()->back()->with('error', 'Gagal mengexport data: ' . $e->getMessage());
         }
     }
@@ -62,6 +64,7 @@ class LaporanController extends Controller
     private function exportExcel($type, $startDate, $endDate)
     {
         $filename = 'laporan_' . $type . '_' . $startDate->format('Y-m-d') . '_' . $endDate->format('Y-m-d') . '.xlsx';
+
         return Excel::download(new LaporanExport($type, $startDate, $endDate), $filename);
     }
 
@@ -73,6 +76,13 @@ class LaporanController extends Controller
         $pdf = Pdf::loadView('admin.laporan.pdf', $data);
         $pdf->setPaper('A4', 'portrait');
 
+        // Set options untuk PDF
+        $pdf->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isPhpEnabled' => true,
+            'defaultFont' => 'DejaVu Sans'
+        ]);
+
         return $pdf->download($filename);
     }
 
@@ -82,7 +92,8 @@ class LaporanController extends Controller
             'type' => $type,
             'start_date' => $startDate,
             'end_date' => $endDate,
-            'stats' => $this->getOverallStats()
+            'stats' => $this->getOverallStats(),
+            'generated_at' => now()
         ];
 
         switch ($type) {
@@ -90,6 +101,7 @@ class LaporanController extends Controller
                 $data['siswa'] = User::siswa()
                     ->whereBetween('created_at', [$startDate, $endDate])
                     ->with(['pendaftarans.ekstrakurikuler'])
+                    ->orderBy('name')
                     ->limit(100)
                     ->get();
                 break;
@@ -97,6 +109,7 @@ class LaporanController extends Controller
             case 'ekstrakurikuler':
                 $data['ekstrakurikulers'] = Ekstrakurikuler::with(['pembina', 'pendaftarans'])
                     ->withCount(['pendaftarans as total_pendaftar'])
+                    ->orderBy('nama')
                     ->get();
                 break;
 
@@ -118,10 +131,28 @@ class LaporanController extends Controller
 
             case 'all':
             default:
-                $data['siswa'] = User::siswa()->with(['pendaftarans.ekstrakurikuler'])->limit(50)->get();
-                $data['ekstrakurikulers'] = Ekstrakurikuler::with(['pembina'])->withCount('pendaftarans')->limit(20)->get();
-                $data['pendaftarans'] = Pendaftaran::with(['user', 'ekstrakurikuler'])->whereBetween('created_at', [$startDate, $endDate])->limit(50)->get();
-                $data['rekomendasis'] = Rekomendasi::with(['user', 'ekstrakurikuler'])->limit(30)->get();
+                $data['siswa'] = User::siswa()
+                    ->with(['pendaftarans.ekstrakurikuler'])
+                    ->orderBy('name')
+                    ->limit(50)
+                    ->get();
+
+                $data['ekstrakurikulers'] = Ekstrakurikuler::with(['pembina'])
+                    ->withCount('pendaftarans')
+                    ->orderBy('nama')
+                    ->limit(20)
+                    ->get();
+
+                $data['pendaftarans'] = Pendaftaran::with(['user', 'ekstrakurikuler'])
+                    ->whereBetween('created_at', [$startDate, $endDate])
+                    ->orderBy('created_at', 'desc')
+                    ->limit(50)
+                    ->get();
+
+                $data['rekomendasis'] = Rekomendasi::with(['user', 'ekstrakurikuler'])
+                    ->orderBy('total_skor', 'desc')
+                    ->limit(30)
+                    ->get();
                 break;
         }
 
