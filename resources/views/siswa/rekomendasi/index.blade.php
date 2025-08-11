@@ -32,65 +32,6 @@
         </div>
     @endif
 
-    <!-- How Algorithm Works -->
-    <div class="row g-4 mb-4">
-        <div class="col-12">
-            <div class="card border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                <div class="card-body text-white p-4">
-                    <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <h4 class="mb-3">
-                                <i class="bi bi-cpu me-2"></i>Bagaimana Sistem Rekomendasi Bekerja?
-                            </h4>
-                            <p class="mb-3 opacity-90">
-                                Sistem kami menggunakan <strong>Weighted Scoring Algorithm</strong> yang menganalisis
-                                berbagai faktor untuk memberikan rekomendasi terbaik:
-                            </p>
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="bg-white bg-opacity-20 rounded-circle p-2 me-3">
-                                            <i class="bi bi-heart-fill"></i>
-                                        </div>
-                                        <div>
-                                            <strong>50% Minat</strong>
-                                            <br><small class="opacity-75">Kecocokan dengan minat Anda</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="bg-white bg-opacity-20 rounded-circle p-2 me-3">
-                                            <i class="bi bi-trophy-fill"></i>
-                                        </div>
-                                        <div>
-                                            <strong>30% Akademik</strong>
-                                            <br><small class="opacity-75">Nilai dan prestasi akademik</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="bg-white bg-opacity-20 rounded-circle p-2 me-3">
-                                            <i class="bi bi-clock-fill"></i>
-                                        </div>
-                                        <div>
-                                            <strong>20% Jadwal</strong>
-                                            <br><small class="opacity-75">Kesesuaian waktu kegiatan</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 text-center">
-                            <i class="bi bi-stars" style="font-size: 6rem; opacity: 0.3;"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     @if ($rekomendasis->count() > 0)
         <!-- Top 3 Recommendations -->
         <div class="row g-4 mb-4">
