@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" data-bs-theme="dark">
+<html lang="id" data-bs-theme="light">
 
 <head>
     <meta charset="UTF-8">
@@ -20,22 +20,32 @@
 
     <style>
         :root {
-            --bs-primary: #20b2aa;
-            --bs-primary-dark: #17a2b8;
-            --bs-primary-light: #4dd0e1;
-            --bs-secondary: #6c757d;
-            --bs-success: #20c997;
-            --bs-info: #0dcaf0;
-            --bs-warning: #ffc107;
-            --bs-danger: #dc3545;
-            --bs-dark: #212529;
-            --bs-gray-900: #1a1d20;
-            --bs-gray-800: #343a40;
+            --bs-primary: #3c9ae7;
+            --bs-primary-dark: #3362e4;
+            --bs-primary-light: #63d0f1;
+            --bs-secondary: #64748b;
+            --bs-success: #10b981;
+            --bs-info: #06b6d4;
+            --bs-warning: #f59e0b;
+            --bs-danger: #ef4444;
+            --bs-light: #f8fafc;
+            --bs-white: #ffffff;
+            --bs-gray-50: #f9fafb;
+            --bs-gray-100: #f1f5f9;
+            --bs-gray-200: #e2e8f0;
+            --bs-gray-300: #cbd5e1;
+            --bs-gray-400: #94a3b8;
+            --bs-gray-500: #64748b;
+            --bs-gray-600: #475569;
+            --bs-gray-700: #334155;
+            --bs-gray-800: #1e293b;
+            --bs-gray-900: #0f172a;
         }
 
         body {
-            background-color: var(--bs-gray-900);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bs-gray-100);
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--bs-gray-800);
         }
 
         /* Sidebar Styles */
@@ -45,66 +55,95 @@
             left: 0;
             height: 100vh;
             width: 280px;
-            background: linear-gradient(135deg, var(--bs-gray-800) 0%, var(--bs-dark) 100%);
+            background: var(--bs-white);
             z-index: 1000;
             transition: all 0.3s ease;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            border-right: 1px solid var(--bs-gray-200);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
         }
 
         .sidebar-header {
             padding: 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--bs-gray-200);
+            background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-primary-dark) 100%);
+            color: white;
         }
 
         .sidebar-header h4 {
-            color: var(--bs-primary);
-            font-weight: 600;
+            color: white;
+            font-weight: 700;
             margin: 0;
+            font-size: 1.25rem;
+        }
+
+        .sidebar-header small {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.8rem;
         }
 
         .sidebar-menu {
             padding: 1rem 0;
+            background: var(--bs-white);
         }
 
         .sidebar-menu .nav-link {
             display: flex;
             align-items: center;
-            padding: 0.75rem 1.5rem;
-            color: #e9ecef;
+            padding: 0.875rem 1.5rem;
+            color: var(--bs-gray-600);
             text-decoration: none;
             transition: all 0.3s ease;
             border-left: 3px solid transparent;
+            font-weight: 500;
+            margin: 0 0.5rem;
+            border-radius: 0.5rem;
+            border-left: none;
         }
 
         .sidebar-menu .nav-link:hover {
-            background-color: rgba(32, 178, 170, 0.1);
+            background-color: var(--bs-gray-100);
             color: var(--bs-primary);
-            border-left-color: var(--bs-primary);
+            transform: translateX(5px);
         }
 
         .sidebar-menu .nav-link.active {
-            background-color: rgba(32, 178, 170, 0.2);
-            color: var(--bs-primary);
-            border-left-color: var(--bs-primary);
+            background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-primary-light) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .sidebar-menu .nav-link.active:hover {
+            transform: translateX(0);
         }
 
         .sidebar-menu .nav-link i {
             margin-right: 0.75rem;
             width: 20px;
             text-align: center;
+            font-size: 1.1rem;
         }
 
         .sidebar-section-header {
-            margin-top: 1rem;
+            margin-top: 1.5rem;
+            padding: 0 1.5rem;
         }
 
         .sidebar-section-header:first-child {
             margin-top: 0;
         }
 
+        .sidebar-section-header small {
+            color: var(--bs-gray-400);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.7rem;
+        }
+
         .nav-link .badge {
             font-size: 0.65rem;
             padding: 0.25em 0.5em;
+            margin-left: auto;
         }
 
         .sidebar-menu .nav-link:hover .badge {
@@ -134,14 +173,17 @@
         .main-content {
             margin-left: 280px;
             min-height: 100vh;
-            background-color: var(--bs-gray-900);
+            background-color: var(--bs-gray-100);
         }
 
         /* Navbar */
         .top-navbar {
-            background: linear-gradient(135deg, var(--bs-dark) 0%, var(--bs-gray-800) 100%);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--bs-white);
+            border-bottom: 1px solid var(--bs-gray-200);
             backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            position: relative;
+            z-index: 1020;
         }
 
         /* Content Area */
@@ -151,16 +193,23 @@
 
         /* Cards */
         .card {
-            background: linear-gradient(135deg, var(--bs-gray-800) 0%, var(--bs-dark) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--bs-white);
+            border: 1px solid var(--bs-gray-200);
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
         }
 
         .card-header {
-            background: transparent;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--bs-gray-50);
+            border-bottom: 1px solid var(--bs-gray-200);
             font-weight: 600;
+            color: var(--bs-gray-700);
         }
 
         /* Stats Cards */
@@ -168,65 +217,233 @@
             background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-primary-dark) 100%);
             color: white;
             border: none;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(30px, -30px);
         }
 
         .stats-card.success {
-            background: linear-gradient(135deg, var(--bs-success) 0%, #10b981 100%);
+            background: linear-gradient(135deg, var(--bs-success) 0%, #059669 100%);
         }
 
         .stats-card.warning {
-            background: linear-gradient(135deg, var(--bs-warning) 0%, #f59e0b 100%);
+            background: linear-gradient(135deg, var(--bs-warning) 0%, #d97706 100%);
         }
 
         .stats-card.danger {
-            background: linear-gradient(135deg, var(--bs-danger) 0%, #ef4444 100%);
+            background: linear-gradient(135deg, var(--bs-danger) 0%, #dc2626 100%);
+        }
+
+        .stats-card.info {
+            background: linear-gradient(135deg, var(--bs-info) 0%, #0891b2 100%);
         }
 
         .stats-card .stats-icon {
             font-size: 2.5rem;
-            opacity: 0.8;
+            opacity: 0.9;
+            z-index: 2;
+            position: relative;
+        }
+
+        .stats-card .card-body {
+            position: relative;
+            z-index: 2;
         }
 
         /* Buttons */
         .btn-primary {
             background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-primary-dark) 100%);
             border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
         }
 
         .btn-primary:hover {
             background: linear-gradient(135deg, var(--bs-primary-dark) 0%, var(--bs-primary) 100%);
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-outline-primary {
+            border-color: var(--bs-primary);
+            color: var(--bs-primary);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
         }
 
         /* Tables */
-        .table-dark {
-            --bs-table-bg: var(--bs-gray-800);
-            --bs-table-striped-bg: rgba(255, 255, 255, 0.05);
+        .table {
+            --bs-table-bg: var(--bs-white);
+            --bs-table-striped-bg: var(--bs-gray-50);
+            --bs-table-hover-bg: var(--bs-gray-100);
         }
 
         /* Forms */
         .form-control,
         .form-select {
-            background-color: var(--bs-gray-800);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
+            background-color: var(--bs-white);
+            border: 1px solid var(--bs-gray-300);
+            color: var(--bs-gray-700);
+            border-radius: 8px;
+            transition: all 0.3s ease;
         }
 
         .form-control:focus,
         .form-select:focus {
-            background-color: var(--bs-gray-800);
+            background-color: var(--bs-white);
             border-color: var(--bs-primary);
-            box-shadow: 0 0 0 0.2rem rgba(32, 178, 170, 0.25);
-            color: #fff;
+            box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.25);
+            color: var(--bs-gray-700);
+        }
+
+        .form-label {
+            color: var(--bs-gray-700);
+            font-weight: 500;
         }
 
         /* Page Header */
         .page-header {
-            background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-primary-dark) 100%);
+            background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-primary-light) 100%);
             color: white;
             padding: 2rem;
             border-radius: 12px;
             margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            z-index: 1010;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(50px, -50px);
+        }
+
+        .page-header h2,
+        .page-header p {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Alerts */
+        .alert {
+            border: none;
+            border-radius: 10px;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-left-color: var(--bs-success);
+            color: #047857;
+        }
+
+        .alert-danger {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-left-color: var(--bs-danger);
+            color: #dc2626;
+        }
+
+        .alert-warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            border-left-color: var(--bs-warning);
+            color: #d97706;
+        }
+
+        .alert-info {
+            background-color: rgba(6, 182, 212, 0.1);
+            border-left-color: var(--bs-info);
+            color: #0891b2;
+        }
+
+        /* Dropdown */
+        .dropdown-menu {
+            border: 1px solid var(--bs-gray-200);
+            border-radius: 10px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+            background: var(--bs-white);
+            animation: fadeInDown 0.3s ease-out;
+            z-index: 1025;
+            position: absolute;
+            top: 100%;
+            left: auto;
+            right: 0;
+            min-width: 200px;
+        }
+
+        .dropdown-toggle::after {
+            display: inline-block;
+            margin-left: 0.5em;
+            vertical-align: 0.255em;
+            content: "";
+            border-top: 0.3em solid;
+            border-right: 0.3em solid transparent;
+            border-bottom: 0;
+            border-left: 0.3em solid transparent;
+        }
+
+        .dropdown-toggle:empty::after {
+            margin-left: 0;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            color: var(--bs-gray-700);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            margin: 0.25rem 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--bs-gray-100);
+            color: var(--bs-primary);
+        }
+
+        .dropdown-item.text-danger:hover {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--bs-danger);
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: var(--bs-white);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--bs-gray-200);
+        }
+
+        .breadcrumb-item+.breadcrumb-item::before {
+            color: var(--bs-gray-400);
+        }
+
+        .breadcrumb-item.active {
+            color: var(--bs-primary);
         }
 
         /* Responsive */
@@ -242,6 +459,10 @@
             .main-content {
                 margin-left: 0;
             }
+
+            .content-wrapper {
+                padding: 1rem;
+            }
         }
 
         /* Custom Scrollbar */
@@ -250,18 +471,24 @@
         }
 
         ::-webkit-scrollbar-track {
-            background: var(--bs-gray-800);
+            background: var(--bs-gray-100);
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--bs-primary);
+            background: var(--bs-gray-400);
             border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--bs-gray-500);
         }
 
         /* Badge Styles */
         .badge {
             font-size: 0.75em;
             padding: 0.5em 0.75em;
+            border-radius: 6px;
+            font-weight: 500;
         }
 
         /* Custom Badge Colors */
@@ -297,93 +524,6 @@
             }
         }
 
-        /* Auth Layout Styles */
-        .auth-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, var(--bs-gray-900) 0%, var(--bs-gray-800) 100%);
-        }
-
-        .auth-card {
-            width: 100%;
-            max-width: 400px;
-            background: var(--bs-gray-800);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        .logout-confirm-popup {
-            background: linear-gradient(135deg, var(--bs-gray-800) 0%, #212529 100%) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            border-radius: 16px !important;
-            color: #fff !important;
-        }
-
-        .logout-confirm-title {
-            color: #fff !important;
-            font-weight: 600 !important;
-        }
-
-        .logout-confirm-btn {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
-            border: none !important;
-            border-radius: 8px !important;
-            padding: 0.5rem 1.25rem !important;
-            font-weight: 500 !important;
-            transition: all 0.3s ease !important;
-        }
-
-        .logout-confirm-btn:hover {
-            transform: translateY(-2px) !important;
-            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4) !important;
-        }
-
-        .logout-cancel-btn {
-            background: transparent !important;
-            border: 1px solid rgba(255, 255, 255, 0.3) !important;
-            color: #fff !important;
-            border-radius: 8px !important;
-            padding: 0.5rem 1.25rem !important;
-            font-weight: 500 !important;
-            transition: all 0.3s ease !important;
-        }
-
-        .logout-cancel-btn:hover {
-            background: rgba(255, 255, 255, 0.1) !important;
-            border-color: rgba(255, 255, 255, 0.5) !important;
-            transform: translateY(-2px) !important;
-        }
-
-        .logout-success-popup {
-            background: linear-gradient(135deg, var(--bs-success) 0%, #198754 100%) !important;
-            color: #fff !important;
-            border-radius: 16px !important;
-        }
-
-        /* Dropdown item hover effect */
-        .dropdown-item:hover {
-            background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
-            color: var(--bs-primary) !important;
-            transition: all 0.3s ease !important;
-        }
-
-        .dropdown-item.text-danger:hover {
-            background-color: rgba(220, 53, 69, 0.1) !important;
-            color: #dc3545 !important;
-        }
-
-        /* Animation for dropdown */
-        .dropdown-menu {
-            animation: fadeInDown 0.3s ease-out;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: linear-gradient(135deg, var(--bs-gray-800) 0%, #212529 100%);
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
         @keyframes fadeInDown {
             from {
                 opacity: 0;
@@ -396,17 +536,97 @@
             }
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .logout-confirm-popup {
-                margin: 1rem !important;
-            }
+        /* Data Table Customization */
+        .dataTables_wrapper .dataTables_length select,
+        .dataTables_wrapper .dataTables_filter input {
+            border: 1px solid var(--bs-gray-300);
+            border-radius: 6px;
+            padding: 0.375rem 0.75rem;
+        }
 
-            .logout-confirm-btn,
-            .logout-cancel-btn {
-                padding: 0.75rem 1rem !important;
-                font-size: 0.9rem !important;
-            }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: var(--bs-primary) !important;
+            color: white !important;
+            border: 1px solid var(--bs-primary) !important;
+            border-radius: 6px !important;
+        }
+
+        /* Navigation Link Info Box */
+        .nav-item .bg-primary {
+            background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-primary-light) 100%) !important;
+            border: 1px solid rgba(79, 70, 229, 0.2);
+        }
+
+        /* Sidebar Divider */
+        .sidebar hr.sidebar-divider {
+            border-color: var(--bs-gray-200);
+            margin: 1rem 1.5rem;
+        }
+
+        /* Success/Error Messages Improvements */
+        .swal2-popup {
+            border-radius: 12px !important;
+        }
+
+        .swal2-success .swal2-success-ring {
+            border-color: var(--bs-success) !important;
+        }
+
+        .swal2-error .swal2-error-line {
+            background-color: var(--bs-danger) !important;
+        }
+
+        /* Loading States */
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Hover Effects for Interactive Elements */
+        .clickable {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .clickable:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Profile Image Styling */
+        .avatar {
+            border: 2px solid var(--bs-white);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Progress Bars */
+        .progress {
+            border-radius: 6px;
+            background-color: var(--bs-gray-200);
+        }
+
+        .progress-bar {
+            border-radius: 6px;
+        }
+
+        /* Status Indicators */
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .status-indicator.online {
+            background-color: var(--bs-success);
+        }
+
+        .status-indicator.offline {
+            background-color: var(--bs-gray-400);
+        }
+
+        .status-indicator.pending {
+            background-color: var(--bs-warning);
         }
     </style>
 
@@ -419,7 +639,7 @@
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h4>MiftahXCool</h4>
-                <small class="text-muted">MA Modern Miftahussa'adah</small>
+                <small>MA Modern Miftahussa'adah</small>
             </div>
 
             <div class="sidebar-menu">
@@ -481,33 +701,18 @@
                         class="nav-link {{ request()->routeIs('siswa.profil') ? 'active' : '' }}">
                         <i class="bi bi-person-circle"></i>
                         Lengkapi Profil
-                        @if (class_exists('App\Services\RekomendasiService'))
-                            @php
-                                try {
-                                    $profilCheck = app('App\Services\RekomendasiService')->cekKelengkapanProfil(
-                                        auth()->user(),
-                                    );
-                                    $showBadge = $profilCheck['persentase'] < 100;
-                                    $percentage = $profilCheck['persentase'];
-                                } catch (Exception $e) {
-                                    $showBadge = false;
-                                    $percentage = 0;
-                                }
-                            @endphp
-                        @endif
                     </a>
 
                     @if (!auth()->user()->sudahTerdaftarEkstrakurikuler())
-                        {{-- Menu untuk siswa yang BELUM terdaftar --}}
                         <div class="sidebar-section-header">
-                            <small class="text-muted px-3 py-2 d-block">CARI EKSTRAKURIKULER</small>
+                            <small>CARI EKSTRAKURIKULER</small>
                         </div>
 
                         <a href="{{ route('siswa.rekomendasi') }}"
                             class="nav-link {{ request()->routeIs('siswa.rekomendasi*') ? 'active' : '' }}">
                             <i class="bi bi-stars"></i>
                             Rekomendasi
-                            <span class="badge bg-primary ms-2">AI</span>
+                            <span class="badge bg-primary">AI</span>
                         </a>
 
                         <a href="{{ route('siswa.ekstrakurikuler.index') }}"
@@ -516,7 +721,6 @@
                             Ekstrakurikuler
                         </a>
                     @else
-                        {{-- Menu untuk siswa yang SUDAH terdaftar --}}
                         @php
                             $pendaftaran = auth()
                                 ->user()
@@ -528,13 +732,12 @@
                         @endphp
 
                         <div class="sidebar-section-header">
-                            <small class="text-muted px-3 py-2 d-block">KEGIATAN SAYA</small>
+                            <small>KEGIATAN SAYA</small>
                         </div>
 
                         @if ($ekstrakurikuler)
-                            {{-- Info Ekstrakurikuler yang diikuti --}}
                             <div class="nav-item px-3 py-2 mb-2">
-                                <div class="bg-primary bg-opacity-10 rounded p-2">
+                                <div class="bg-light border rounded p-2">
                                     <div class="d-flex align-items-center">
                                         @if ($ekstrakurikuler->gambar)
                                             <img src="{{ Storage::url($ekstrakurikuler->gambar) }}"
@@ -563,42 +766,22 @@
                             Jadwal Kegiatan
                         </a>
 
-                        {{-- MENU BARU: Galeri --}}
                         <a href="{{ route('siswa.galeri.index') }}"
                             class="nav-link {{ request()->routeIs('siswa.galeri*') ? 'active' : '' }}">
                             <i class="bi bi-images"></i>
                             Galeri Kegiatan
-                            @php
-                                $totalGaleri = $ekstrakurikuler ? $ekstrakurikuler->galeris()->count() : 0;
-                            @endphp
-                            @if ($totalGaleri > 0)
-                                <span class="badge bg-info ms-2">{{ $totalGaleri }}</span>
-                            @endif
                         </a>
 
-                        {{-- MENU BARU: Pengumuman --}}
                         <a href="{{ route('siswa.pengumuman.index') }}"
                             class="nav-link {{ request()->routeIs('siswa.pengumuman*') ? 'active' : '' }}">
                             <i class="bi bi-megaphone"></i>
                             Pengumuman
-                            @php
-                                $pengumumanBaru = $ekstrakurikuler
-                                    ? $ekstrakurikuler
-                                        ->pengumumans()
-                                        ->where('created_at', '>=', now()->subDays(7))
-                                        ->count()
-                                    : 0;
-                            @endphp
-                            @if ($pengumumanBaru > 0)
-                                <span class="badge bg-warning ms-2">{{ $pengumumanBaru }}</span>
-                            @endif
                         </a>
 
-                        {{-- Divider --}}
                         <hr class="sidebar-divider">
 
                         <div class="sidebar-section-header">
-                            <small class="text-muted px-3 py-2 d-block">LAINNYA</small>
+                            <small>LAINNYA</small>
                         </div>
 
                         <a href="{{ route('siswa.ekstrakurikuler.index') }}"
@@ -616,7 +799,7 @@
                             $pendingCount = auth()->user()->pendaftarans()->where('status', 'pending')->count();
                         @endphp
                         @if ($pendingCount > 0)
-                            <span class="badge bg-warning ms-2">{{ $pendingCount }}</span>
+                            <span class="badge bg-warning">{{ $pendingCount }}</span>
                         @endif
                     </a>
                 @endif
@@ -628,40 +811,40 @@
             <!-- Top Navbar -->
             <nav class="navbar navbar-expand-lg top-navbar">
                 <div class="container-fluid">
-                    <button class="btn btn-outline-light d-lg-none" type="button" onclick="toggleSidebar()">
+                    <button class="btn btn-outline-secondary d-lg-none" type="button" onclick="toggleSidebar()">
                         <i class="bi bi-list"></i>
                     </button>
 
                     <div class="navbar-nav ms-auto">
                         <!-- User Dropdown -->
                         <div class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                                data-bs-toggle="dropdown">
-                                <i class="bi bi-person-circle me-1"></i>
+                            <a class="nav-link dropdown-toggle text-dark d-flex align-items-center" href="#"
+                                id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle me-2"></i>
                                 {{ auth()->user()->name }}
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li>
-                                    <h6 class="dropdown-header">{{ ucfirst(auth()->user()->role) }}</h6>
+                                    <h6 class="dropdown-header">
+                                        <i class="bi bi-person-badge me-1"></i>
+                                        {{ ucfirst(auth()->user()->role) }}
+                                    </h6>
                                 </li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
 
-                                <!-- Profile Link (sesuaikan dengan role) -->
                                 @if (auth()->user()->role === 'siswa')
                                     <li>
                                         <a class="dropdown-item" href="{{ route('siswa.profil') }}">
                                             <i class="bi bi-person-gear me-2"></i>Profil Saya
                                         </a>
                                     </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
                                 @endif
 
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-
-                                <!-- Logout dengan Konfirmasi -->
                                 <li>
                                     <a class="dropdown-item text-danger" href="#" onclick="confirmLogout(event)">
                                         <i class="bi bi-box-arrow-right me-2"></i>Logout
@@ -670,7 +853,6 @@
                             </ul>
                         </div>
 
-                        <!-- Hidden Logout Form -->
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                             @csrf
                         </form>
@@ -721,6 +903,20 @@
                 @if (session('error'))
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         <i class="bi bi-exclamation-circle me-2"></i>{{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                @if (session('warning'))
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle me-2"></i>{{ session('warning') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                @if (session('info'))
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        <i class="bi bi-info-circle me-2"></i>{{ session('info') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @endif
@@ -800,10 +996,12 @@
                 text: "Data yang dihapus tidak dapat dikembalikan!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
                 confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal'
+                cancelButtonText: 'Batal',
+                background: '#ffffff',
+                color: '#1e293b'
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.location.href = url;
@@ -818,7 +1016,9 @@
                 title: 'Berhasil!',
                 text: message,
                 timer: 3000,
-                showConfirmButton: false
+                showConfirmButton: false,
+                background: '#ffffff',
+                color: '#1e293b'
             });
         }
 
@@ -827,7 +1027,9 @@
             Swal.fire({
                 icon: 'error',
                 title: 'Gagal!',
-                text: message
+                text: message,
+                background: '#ffffff',
+                color: '#1e293b'
             });
         }
 
@@ -846,24 +1048,19 @@
                 text: 'Apakah Anda yakin ingin keluar dari sistem?',
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
                 confirmButtonText: '<i class="bi bi-box-arrow-right me-1"></i>Ya, Logout',
                 cancelButtonText: '<i class="bi bi-x-lg me-1"></i>Batal',
                 reverseButtons: true,
-                customClass: {
-                    popup: 'logout-confirm-popup',
-                    title: 'logout-confirm-title',
-                    confirmButton: 'logout-confirm-btn',
-                    cancelButton: 'logout-cancel-btn'
-                },
+                background: '#ffffff',
+                color: '#1e293b',
                 backdrop: true,
                 allowOutsideClick: false,
                 allowEscapeKey: true,
                 showLoaderOnConfirm: true,
                 preConfirm: () => {
                     return new Promise((resolve) => {
-                        // Show loading state
                         setTimeout(() => {
                             resolve();
                         }, 500);
@@ -871,7 +1068,6 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Show success message then logout
                     Swal.fire({
                         title: 'Logout Berhasil',
                         text: 'Anda telah keluar dari sistem. Terima kasih!',
@@ -879,38 +1075,100 @@
                         timer: 1500,
                         showConfirmButton: false,
                         allowOutsideClick: false,
-                        customClass: {
-                            popup: 'logout-success-popup'
-                        }
+                        background: '#ffffff',
+                        color: '#1e293b'
                     }).then(() => {
-                        // Submit logout form
                         document.getElementById('logout-form').submit();
                     });
                 }
             });
         }
 
-        // Optional: Auto logout warning (session akan habis)
-        let logoutWarningShown = false;
+        // Card hover animations
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                if (!this.classList.contains('stats-card')) {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.1)';
+                }
+            });
 
-        function checkSessionTimeout() {
-            // Cek setiap 5 menit (300000 ms)
-            // Ini contoh untuk warning 5 menit sebelum session habis
-            if (!logoutWarningShown) {
-                // Implementasi sesuai kebutuhan session timeout Anda
-                console.log('Session check...');
+            card.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('stats-card')) {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.05)';
+                }
+            });
+        });
+
+        // Smooth scroll for sidebar links
+        document.querySelectorAll('.sidebar-menu .nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Add smooth transition effect
+                this.style.transition = 'all 0.3s ease';
+            });
+        });
+
+        // Auto close mobile sidebar when clicking outside
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggleButton = document.querySelector('.btn[onclick="toggleSidebar()"]');
+
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(event.target) && !toggleButton.contains(event.target)) {
+                    sidebar.classList.remove('show');
+                }
             }
-        }
+        });
 
-        // Check session every 5 minutes
-        setInterval(checkSessionTimeout, 300000);
-
-        // Optional: Keyboard shortcut for logout (Ctrl + Shift + L)
+        // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
+            // Ctrl + Shift + L for logout
             if (e.ctrlKey && e.shiftKey && e.key === 'L') {
                 e.preventDefault();
                 confirmLogout(e);
             }
+
+            // Escape key to close mobile sidebar
+            if (e.key === 'Escape' && window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('show');
+            }
+        });
+
+        // Page loading animation
+        window.addEventListener('load', function() {
+            document.body.classList.add('loaded');
+
+            // Animate stats cards
+            const statsCards = document.querySelectorAll('.stats-card');
+            statsCards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards for animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card:not(.stats-card)');
+            cards.forEach(card => {
+                observer.observe(card);
+            });
         });
     </script>
 
