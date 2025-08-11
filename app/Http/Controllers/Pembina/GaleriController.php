@@ -10,17 +10,29 @@ use Illuminate\Support\Facades\Storage;
 
 class GaleriController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $user = Auth::user();
-        $ekstrakurikulerIds = $user->ekstrakurikulerSebagaiPembina()->pluck('id');
+        $pembina = Auth::user();
 
-        $galeris = Galeri::with('ekstrakurikuler')
-            ->whereIn('ekstrakurikuler_id', $ekstrakurikulerIds)
-            ->orderBy('created_at', 'desc')
-            ->paginate(12);
+        // 1. Ambil semua ID ekstrakurikuler yang dibina oleh user ini
+        $ekstrakurikulerIds = $pembina->ekstrakurikulerSebagaiPembina()->pluck('id');
 
-        return view('pembina.galeri.index', compact('galeris'));
+        // 2. Buat query untuk Galeri
+        $galeriQuery = Galeri::with('ekstrakurikuler')
+            ->whereIn('ekstrakurikuler_id', $ekstrakurikulerIds); // Gunakan whereIn, bukan where('pembina_id')
+
+        // 3. Terapkan sorting berdasarkan request
+        $sort = $request->input('sort', 'terbaru'); // Default ke 'terbaru'
+        if ($sort == 'terlama') {
+            $galeriQuery->orderBy('created_at', 'asc');
+        } else {
+            $galeriQuery->orderBy('created_at', 'desc');
+        }
+
+        // 4. Ambil data dengan paginasi
+        $galeri = $galeriQuery->paginate(9);
+
+        return view('pembina.galeri.index', compact('galeri'));
     }
 
     public function create()
@@ -174,6 +186,22 @@ class GaleriController extends Controller
             ->with('success', 'File galeri berhasil dihapus!');
     }
 
+    public function download(Galeri $galeri)
+    {
+        // Pastikan galeri ini milik ekstrakurikuler yang dibina oleh user
+        if ($galeri->ekstrakurikuler->pembina_id !== Auth::id()) {
+            abort(403, 'Akses ditolak.');
+        }
+
+        // Cek apakah file ada di storage
+        if (!Storage::disk('public')->exists($galeri->path_file)) {
+            return redirect()->back()->with('error', 'File tidak ditemukan.');
+        }
+
+        // Lakukan proses download
+        return Storage::disk('public')->download($galeri->path_file, $galeri->judul . '.' . pathinfo($galeri->path_file, PATHINFO_EXTENSION));
+    }
+
     public function bulkUpload(Request $request)
     {
         $request->validate([
@@ -221,5 +249,23 @@ class GaleriController extends Controller
 
         return redirect()->route('pembina.galeri.index')
             ->with('success', "Berhasil mengupload {$uploaded} file!");
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids');
+        if ($ids) {
+            $galeri = Galeri::whereIn('id', $ids)
+                ->where('pembina_id', Auth::id())
+                ->get();
+
+            foreach ($galeri as $item) {
+                Storage::disk('public')->delete($item->media);
+                $item->delete();
+            }
+
+            return redirect()->route('pembina.galeri.index')->with('success', 'Foto yang dipilih berhasil dihapus.');
+        }
+        return redirect()->route('pembina.galeri.index')->with('error', 'Tidak ada foto yang dipilih.');
     }
 }

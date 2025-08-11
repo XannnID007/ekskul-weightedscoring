@@ -15,6 +15,7 @@ use App\Http\Controllers\Siswa\ProfilController as SiswaProfilController;
 use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
 use App\Http\Controllers\Pembina\GaleriController as PembinaGaleriController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Pembina\SiswaController as PembinaSiswaController;
 
 // Siswa Controllers
 use App\Http\Controllers\Siswa\DashboardController as SiswaDashboardController;
@@ -119,12 +120,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/pendaftaran/{pendaftaran}/approve', [PembinaPendaftaranController::class, 'approve'])->name('pendaftaran.approve');
         Route::post('/pendaftaran/{pendaftaran}/reject', [PembinaPendaftaranController::class, 'reject'])->name('pendaftaran.reject');
 
+        Route::get('/siswa', [PembinaSiswaController::class, 'index'])->name('siswa.index');
         // Pengumuman Management
         Route::resource('pengumuman', PembinaPengumumanController::class);
 
         // Galeri Management
         Route::resource('galeri', PembinaGaleriController::class);
+        Route::get('/galeri/{galeri}/download', [PembinaGaleriController::class, 'download'])->name('galeri.download');
         Route::delete('/galeri/{galeri}/force', [PembinaGaleriController::class, 'forceDelete'])->name('galeri.force-delete');
+        Route::delete('/galeri/bulk-destroy', [PembinaGaleriController::class, 'bulkDestroy'])->name('galeri.bulkDestroy');
     });
 
     // Siswa Routes

@@ -455,6 +455,11 @@
                         <i class="bi bi-person-plus"></i>
                         Kelola Pendaftaran
                     </a>
+                    <a href="{{ route('pembina.siswa.index') }}"
+                        class="nav-link {{ request()->routeIs('pembina.siswa.*') ? 'active' : '' }}">
+                        <i class="bi bi-people"></i>
+                        Data Siswa
+                    </a>
                     <a href="{{ route('pembina.pengumuman.index') }}"
                         class="nav-link {{ request()->routeIs('pembina.pengumuman.*') ? 'active' : '' }}">
                         <i class="bi bi-megaphone"></i>
