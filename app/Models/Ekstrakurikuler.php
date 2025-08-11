@@ -1,4 +1,5 @@
 <?php
+// app/Models/Ekstrakurikuler.php
 
 namespace App\Models;
 
@@ -97,5 +98,96 @@ class Ekstrakurikuler extends Model
     public function getKategoriStringAttribute()
     {
         return is_array($this->kategori) ? implode(', ', $this->kategori) : '';
+    }
+
+    /**
+     * Hitung dan update peserta saat ini secara manual
+     * Useful untuk maintenance atau sinkronisasi data
+     */
+    public function recalculateCapacity()
+    {
+        $jumlahDisetujui = $this->pendaftarans()
+            ->where('status', 'disetujui')
+            ->count();
+
+        $this->updateQuietly([
+            'peserta_saat_ini' => $jumlahDisetujui
+        ]);
+
+        return $jumlahDisetujui;
+    }
+
+    /**
+     * Get persentase kapasitas terisi
+     */
+    public function getPersentaseKapasitasAttribute()
+    {
+        if ($this->kapasitas_maksimal <= 0) {
+            return 0;
+        }
+
+        return round(($this->peserta_saat_ini / $this->kapasitas_maksimal) * 100, 1);
+    }
+
+    /**
+     * Get sisa kapasitas
+     */
+    public function getSisaKapasitasAttribute()
+    {
+        return max(0, $this->kapasitas_maksimal - $this->peserta_saat_ini);
+    }
+
+    /**
+     * Check apakah hampir penuh (80% atau lebih)
+     */
+    public function isHampirPenuh()
+    {
+        return $this->persentase_kapasitas >= 80;
+    }
+
+    /**
+     * Get status kapasitas dalam bentuk string
+     */
+    public function getStatusKapasitasAttribute()
+    {
+        if ($this->peserta_saat_ini >= $this->kapasitas_maksimal) {
+            return 'penuh';
+        } elseif ($this->isHampirPenuh()) {
+            return 'hampir_penuh';
+        } elseif ($this->peserta_saat_ini > 0) {
+            return 'tersedia';
+        } else {
+            return 'kosong';
+        }
+    }
+
+    /**
+     * Boot method untuk handling events
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Ketika ekstrakurikuler dibuat, set peserta_saat_ini = 0
+        static::creating(function ($ekstrakurikuler) {
+            if (!isset($ekstrakurikuler->peserta_saat_ini)) {
+                $ekstrakurikuler->peserta_saat_ini = 0;
+            }
+        });
+
+        // Ketika ekstrakurikuler dihapus, bersihkan data terkait
+        static::deleting(function ($ekstrakurikuler) {
+            // Hapus semua pendaftaran terkait
+            $ekstrakurikuler->pendaftarans()->delete();
+            $ekstrakurikuler->rekomendasis()->delete();
+
+            if ($ekstrakurikuler->pengumumans()) {
+                $ekstrakurikuler->pengumumans()->delete();
+            }
+
+            if ($ekstrakurikuler->galeris()) {
+                $ekstrakurikuler->galeris()->delete();
+            }
+        });
     }
 }

@@ -1,4 +1,5 @@
 <?php
+// app/Http/Controllers/Pembina/PendaftaranController.php
 
 namespace App\Http\Controllers\Pembina;
 
@@ -8,6 +9,7 @@ use App\Models\Ekstrakurikuler;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PendaftaranController extends Controller
 {
@@ -53,14 +55,6 @@ class PendaftaranController extends Controller
                 ], 403);
             }
 
-            // Cek apakah masih ada kapasitas
-            if (!$pendaftaran->ekstrakurikuler->masihBisaDaftar()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Kapasitas ekstrakurikuler sudah penuh.'
-                ], 400);
-            }
-
             // Cek apakah status masih pending
             if ($pendaftaran->status !== 'pending') {
                 return response()->json([
@@ -69,31 +63,53 @@ class PendaftaranController extends Controller
                 ], 400);
             }
 
+            // Refresh data ekstrakurikuler untuk memastikan data terbaru
+            $pendaftaran->ekstrakurikuler->refresh();
+
+            // Cek apakah masih ada kapasitas
+            if (!$pendaftaran->ekstrakurikuler->masihBisaDaftar()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kapasitas ekstrakurikuler sudah penuh.'
+                ], 400);
+            }
+
             // Gunakan database transaction untuk memastikan konsistensi data
             DB::beginTransaction();
 
             try {
-                // Update status pendaftaran
+                // Update status pendaftaran - ini akan trigger event untuk update kapasitas
                 $pendaftaran->update([
                     'status' => 'disetujui',
                     'disetujui_pada' => now(),
                     'disetujui_oleh' => Auth::id()
                 ]);
 
-                // Update peserta saat ini
-                $pendaftaran->ekstrakurikuler->increment('peserta_saat_ini');
+                // Log activity
+                Log::info('Pendaftaran approved', [
+                    'pendaftaran_id' => $pendaftaran->id,
+                    'user_id' => $pendaftaran->user_id,
+                    'ekstrakurikuler_id' => $pendaftaran->ekstrakurikuler_id,
+                    'approved_by' => Auth::id()
+                ]);
 
                 DB::commit();
 
                 return response()->json([
                     'success' => true,
-                    'message' => 'Pendaftaran berhasil disetujui!'
+                    'message' => 'Pendaftaran berhasil disetujui!',
+                    'new_capacity' => $pendaftaran->ekstrakurikuler->fresh()->peserta_saat_ini
                 ]);
             } catch (\Exception $e) {
                 DB::rollBack();
                 throw $e;
             }
         } catch (\Exception $e) {
+            Log::error('Error approving pendaftaran', [
+                'pendaftaran_id' => $pendaftaran->id,
+                'error' => $e->getMessage()
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat memproses pendaftaran: ' . $e->getMessage()
@@ -125,16 +141,26 @@ class PendaftaranController extends Controller
                 ], 400);
             }
 
-            // Update status pendaftaran
+            // Update status pendaftaran - ini akan trigger event untuk update kapasitas
             $pendaftaran->update([
                 'status' => 'ditolak',
                 'alasan_penolakan' => $request->alasan_penolakan,
                 'disetujui_oleh' => Auth::id()
             ]);
 
+            // Log activity
+            Log::info('Pendaftaran rejected', [
+                'pendaftaran_id' => $pendaftaran->id,
+                'user_id' => $pendaftaran->user_id,
+                'ekstrakurikuler_id' => $pendaftaran->ekstrakurikuler_id,
+                'rejected_by' => Auth::id(),
+                'reason' => $request->alasan_penolakan
+            ]);
+
             return response()->json([
                 'success' => true,
-                'message' => 'Pendaftaran berhasil ditolak.'
+                'message' => 'Pendaftaran berhasil ditolak.',
+                'new_capacity' => $pendaftaran->ekstrakurikuler->fresh()->peserta_saat_ini
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
@@ -142,6 +168,11 @@ class PendaftaranController extends Controller
                 'message' => 'Data tidak valid: ' . implode(', ', $e->validator->errors()->all())
             ], 422);
         } catch (\Exception $e) {
+            Log::error('Error rejecting pendaftaran', [
+                'pendaftaran_id' => $pendaftaran->id,
+                'error' => $e->getMessage()
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat memproses penolakan: ' . $e->getMessage()
@@ -180,14 +211,15 @@ class PendaftaranController extends Controller
                 $failed = [];
 
                 foreach ($pendaftarans as $pendaftaran) {
+                    // Refresh data ekstrakurikuler
+                    $pendaftaran->ekstrakurikuler->refresh();
+
                     if ($pendaftaran->ekstrakurikuler->masihBisaDaftar()) {
                         $pendaftaran->update([
                             'status' => 'disetujui',
                             'disetujui_pada' => now(),
                             'disetujui_oleh' => Auth::id()
                         ]);
-
-                        $pendaftaran->ekstrakurikuler->increment('peserta_saat_ini');
                         $approved++;
                     } else {
                         $failed[] = $pendaftaran->user->name . ' (kapasitas penuh)';
@@ -212,6 +244,11 @@ class PendaftaranController extends Controller
                 throw $e;
             }
         } catch (\Exception $e) {
+            Log::error('Error in bulk approve', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id()
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat memproses bulk approval: ' . $e->getMessage()
