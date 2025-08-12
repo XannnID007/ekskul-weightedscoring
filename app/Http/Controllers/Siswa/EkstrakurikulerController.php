@@ -68,7 +68,20 @@ class EkstrakurikulerController extends Controller
     {
         $user = Auth::user();
 
-        // Validasi apakah sudah terdaftar ekstrakurikuler lain
+        // ✅ VALIDASI UTAMA: Cek apakah sudah punya pendaftaran (termasuk pending)
+        $existingPendaftaran = $user->pendaftarans()->count();
+        if ($existingPendaftaran > 0) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda sudah memiliki pendaftaran ekstrakurikuler. Setiap siswa hanya dapat mendaftar satu ekstrakurikuler.'
+                ], 400);
+            }
+            return redirect()->back()
+                ->with('error', 'Anda sudah memiliki pendaftaran ekstrakurikuler. Setiap siswa hanya dapat mendaftar satu ekstrakurikuler.');
+        }
+
+        // ✅ VALIDASI TAMBAHAN: Cek apakah sudah terdaftar (status disetujui)
         if ($user->sudahTerdaftarEkstrakurikuler()) {
             if ($request->expectsJson()) {
                 return response()->json([
@@ -80,7 +93,7 @@ class EkstrakurikulerController extends Controller
                 ->with('error', 'Anda sudah terdaftar pada ekstrakurikuler lain. Setiap siswa hanya dapat mengikuti satu ekstrakurikuler.');
         }
 
-        // Validasi apakah sudah pernah mendaftar
+        // ✅ VALIDASI SPESIFIK: Cek pendaftaran pada ekstrakurikuler yang sama
         if ($user->pendaftarans()->where('ekstrakurikuler_id', $ekstrakurikuler->id)->exists()) {
             if ($request->expectsJson()) {
                 return response()->json([
@@ -92,7 +105,7 @@ class EkstrakurikulerController extends Controller
                 ->with('error', 'Anda sudah pernah mendaftar pada ekstrakurikuler ini.');
         }
 
-        // Validasi kapasitas
+        // ✅ VALIDASI KAPASITAS
         if (!$ekstrakurikuler->masihBisaDaftar()) {
             if ($request->expectsJson()) {
                 return response()->json([
@@ -104,8 +117,8 @@ class EkstrakurikulerController extends Controller
                 ->with('error', 'Ekstrakurikuler ini sudah penuh atau tidak aktif.');
         }
 
-        // Validasi nilai minimal
-        if ($user->nilai_rata_rata < $ekstrakurikuler->nilai_minimal) {
+        // ✅ VALIDASI NILAI MINIMAL
+        if ($user->nilai_rata_rata && $user->nilai_rata_rata < $ekstrakurikuler->nilai_minimal) {
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
@@ -124,24 +137,49 @@ class EkstrakurikulerController extends Controller
             'konfirmasi' => 'required|accepted'
         ]);
 
-        Pendaftaran::create([
-            'user_id' => $user->id,
-            'ekstrakurikuler_id' => $ekstrakurikuler->id,
-            'motivasi' => $request->motivasi,
-            'pengalaman' => $request->pengalaman,
-            'harapan' => $request->harapan,
-            'tingkat_komitmen' => $request->tingkat_komitmen,
-            'status' => 'pending'
-        ]);
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Pendaftaran berhasil dikirim! Menunggu persetujuan dari pembina.'
-            ]);
+        // ✅ DOUBLE CHECK: Sekali lagi cek sebelum insert
+        $doubleCheck = $user->pendaftarans()->count();
+        if ($doubleCheck > 0) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tidak dapat memproses pendaftaran. Anda sudah memiliki pendaftaran ekstrakurikuler lain.'
+                ], 400);
+            }
+            return redirect()->back()
+                ->with('error', 'Tidak dapat memproses pendaftaran. Anda sudah memiliki pendaftaran ekstrakurikuler lain.');
         }
 
-        return redirect()->route('siswa.pendaftaran')
-            ->with('success', 'Pendaftaran berhasil dikirim! Menunggu persetujuan dari pembina.');
+        try {
+            Pendaftaran::create([
+                'user_id' => $user->id,
+                'ekstrakurikuler_id' => $ekstrakurikuler->id,
+                'motivasi' => $request->motivasi,
+                'pengalaman' => $request->pengalaman,
+                'harapan' => $request->harapan,
+                'tingkat_komitmen' => $request->tingkat_komitmen,
+                'status' => 'pending'
+            ]);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Pendaftaran berhasil dikirim! Menunggu persetujuan dari pembina.'
+                ]);
+            }
+
+            return redirect()->route('siswa.pendaftaran')
+                ->with('success', 'Pendaftaran berhasil dikirim! Menunggu persetujuan dari pembina.');
+        } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terjadi kesalahan saat memproses pendaftaran. Silakan coba lagi.'
+                ], 500);
+            }
+
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan saat memproses pendaftaran. Silakan coba lagi.');
+        }
     }
 }
