@@ -5,7 +5,7 @@
 @section('page-description', 'Berikut adalah daftar pengumuman yang pernah Anda buat.')
 
 @section('page-actions')
-    <a href="{{ route('pembina.pengumuman.create') }}" class="btn btn-primary">
+    <a href="{{ route('pembina.pengumuman.create') }}" class="btn btn-light">
         <i class="bi bi-plus-lg me-1"></i>Buat Pengumuman Baru
     </a>
 @endsection

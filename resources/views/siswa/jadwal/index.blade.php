@@ -13,36 +13,56 @@
             ->with(['ekstrakurikuler.pembina'])
             ->first();
         $ekstrakurikuler = $pendaftaran ? $pendaftaran->ekstrakurikuler : null;
+
+        // Mock data untuk jadwal mendatang (sesuai kode asli Anda)
+        $upcomingEvents = $ekstrakurikuler
+            ? [
+                [
+                    'title' => $ekstrakurikuler->nama . ' - Latihan Rutin',
+                    'date' => 'Senin, 1 Jul 2024',
+                    'time' => '15:30 - 17:00',
+                    'type' => 'rutin',
+                    'is_today' => false,
+                    'is_tomorrow' => true,
+                ],
+                [
+                    'title' => 'Pertandingan Antar Sekolah',
+                    'date' => 'Sabtu, 6 Jul 2024',
+                    'time' => '08:00 - 12:00',
+                    'type' => 'kompetisi',
+                    'is_today' => false,
+                    'is_tomorrow' => false,
+                ],
+            ]
+            : [];
     @endphp
 
     @if ($ekstrakurikuler)
         <div class="row g-4">
-            <!-- Info Card -->
             <div class="col-12">
-                <div class="card border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                    <div class="card-body text-white p-4">
-                        <div class="row align-items-center">
-                            <div class="col-md-3 text-center">
-                                @if ($ekstrakurikuler->gambar)
-                                    <img src="{{ Storage::url($ekstrakurikuler->gambar) }}" alt="{{ $ekstrakurikuler->nama }}"
-                                        class="rounded-3 shadow" width="120" height="120" style="object-fit: cover;">
-                                @else
-                                    <div class="bg-white bg-opacity-20 rounded-3 d-inline-flex align-items-center justify-content-center shadow"
-                                        style="width: 120px; height: 120px;">
-                                        <i class="bi bi-collection text-white fs-1"></i>
-                                    </div>
-                                @endif
-                            </div>
-                            <div class="col-md-6">
-                                <h3 class="mb-2">{{ $ekstrakurikuler->nama }}</h3>
-                                <p class="mb-3 opacity-90">{{ Str::limit($ekstrakurikuler->deskripsi, 120) }}</p>
+                <div class="card">
+                    <div class="card-body p-4">
+                        <div class="d-flex flex-column flex-md-row align-items-center">
+                            @if ($ekstrakurikuler->gambar)
+                                <img src="{{ Storage::url($ekstrakurikuler->gambar) }}" alt="{{ $ekstrakurikuler->nama }}"
+                                    class="rounded-3 me-md-4 mb-3 mb-md-0" width="100" height="100"
+                                    style="object-fit: cover;">
+                            @else
+                                <div class="bg-primary-subtle text-primary rounded-3 d-flex align-items-center justify-content-center me-md-4 mb-3 mb-md-0"
+                                    style="width: 100px; height: 100px;">
+                                    <i class="bi bi-collection fs-1"></i>
+                                </div>
+                            @endif
+                            <div class="flex-grow-1">
+                                <h3 class="mb-1">{{ $ekstrakurikuler->nama }}</h3>
+                                <p class="text-muted mb-2">{{ Str::limit($ekstrakurikuler->deskripsi, 120) }}</p>
                                 <div class="d-flex gap-4">
                                     <div>
-                                        <small class="opacity-75 d-block">Pembina</small>
+                                        <small class="text-muted d-block">PEMBINA</small>
                                         <strong>{{ $ekstrakurikuler->pembina->name ?? 'Belum ditentukan' }}</strong>
                                     </div>
                                     <div>
-                                        <small class="opacity-75 d-block">Jadwal Rutin</small>
+                                        <small class="text-muted d-block">JADWAL RUTIN</small>
                                         <strong>{{ $ekstrakurikuler->jadwal_string ?? 'Belum ditentukan' }}</strong>
                                     </div>
                                 </div>
@@ -52,19 +72,11 @@
                 </div>
             </div>
 
-            <!-- Calendar View -->
             <div class="col-xl-8">
                 <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            <i class="bi bi-calendar3 me-2"></i>Kalender Kegiatan
-                        </h5>
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-outline-primary btn-sm active"
-                                id="monthView">Bulan</button>
-                            <button type="button" class="btn btn-outline-primary btn-sm" id="weekView">Minggu</button>
-                            <button type="button" class="btn btn-outline-primary btn-sm" id="dayView">Hari</button>
-                        </div>
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-calendar3 text-primary me-2"></i>Kalender Kegiatan</h5>
+                        {{-- Anda bisa menempatkan tombol view (bulan, minggu, hari) di sini jika diperlukan --}}
                     </div>
                     <div class="card-body">
                         <div id="calendar"></div>
@@ -72,64 +84,27 @@
                 </div>
             </div>
 
-            <!-- Upcoming Events & Stats -->
             <div class="col-xl-4">
-                <!-- Upcoming Events -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h6 class="mb-0">
-                            <i class="bi bi-clock text-warning me-2"></i>Kegiatan Mendatang
-                        </h6>
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-clock-history text-primary me-2"></i>Kegiatan Mendatang</h5>
                     </div>
                     <div class="card-body">
-                        @php
-                            $upcomingEvents = [
-                                [
-                                    'title' => $ekstrakurikuler->nama . ' - Latihan Rutin',
-                                    'date' => 'Senin, 1 Jul 2024',
-                                    'time' => '15:30 - 17:00',
-                                    'type' => 'rutin',
-                                    'is_today' => false,
-                                    'is_tomorrow' => true,
-                                ],
-                                [
-                                    'title' => 'Pertandingan Antar Sekolah',
-                                    'date' => 'Sabtu, 6 Jul 2024',
-                                    'time' => '08:00 - 12:00',
-                                    'type' => 'kompetisi',
-                                    'is_today' => false,
-                                    'is_tomorrow' => false,
-                                ],
-                            ];
-                        @endphp
-
                         @forelse ($upcomingEvents as $event)
-                            <div class="d-flex align-items-start {{ !$loop->last ? 'border-bottom pb-3 mb-3' : '' }}">
+                            <div class="info-list-item">
                                 <div
-                                    class="bg-{{ $event['type'] == 'kompetisi' ? 'warning' : 'primary' }} rounded-circle p-2 me-3">
-                                    <i
-                                        class="bi bi-{{ $event['type'] == 'kompetisi' ? 'trophy' : 'calendar-event' }} text-white"></i>
+                                    class="icon-wrapper bg-{{ $event['type'] == 'kompetisi' ? 'warning' : 'primary' }}-subtle text-{{ $event['type'] == 'kompetisi' ? 'warning' : 'primary' }}-emphasis">
+                                    <i class="bi bi-{{ $event['type'] == 'kompetisi' ? 'trophy' : 'calendar-event' }}"></i>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h6 class="mb-1">{{ $event['title'] }}</h6>
-                                    <p class="text-muted small mb-1">
-                                        {{ $event['date'] }}
-                                        @if ($event['is_today'])
-                                            <span class="badge bg-success ms-1">Hari Ini</span>
-                                        @elseif($event['is_tomorrow'])
-                                            <span class="badge bg-info ms-1">Besok</span>
-                                        @endif
-                                    </p>
-                                    <small class="text-success">{{ $event['time'] }}</small>
+                                    <h6 class="mb-1 fw-bold">{{ $event['title'] }}</h6>
+                                    <p class="text-muted small mb-0">{{ $event['date'] }} | {{ $event['time'] }}</p>
                                 </div>
-                                @if ($event['type'] == 'kompetisi')
-                                    <span class="badge bg-warning">Kompetisi</span>
-                                @endif
                             </div>
                         @empty
-                            <div class="text-center py-3">
-                                <i class="bi bi-calendar-x text-muted fs-2"></i>
-                                <p class="text-muted mt-2 mb-0">Tidak ada kegiatan mendatang</p>
+                            <div class="text-center py-3 text-muted">
+                                <i class="bi bi-calendar-x fs-1"></i>
+                                <p class="mt-2 mb-0">Tidak ada kegiatan mendatang</p>
                             </div>
                         @endforelse
                     </div>
@@ -137,7 +112,6 @@
             </div>
         </div>
     @else
-        <!-- No Ekstrakurikuler -->
         <div class="row justify-content-center">
             <div class="col-lg-6">
                 <div class="card text-center">
@@ -265,6 +239,48 @@
 
 @push('styles')
     <style>
+        /* Info List di sidebar kanan */
+        .info-list-item {
+            display: flex;
+            align-items: center;
+            padding: 0.85rem 0;
+            border-bottom: 1px solid var(--bs-gray-200);
+        }
+
+        .info-list-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .info-list-item .icon-wrapper {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            background-color: var(--bs-gray-100);
+            color: var(--bs-gray-600);
+            font-size: 1.25rem;
+        }
+
+        /* Kustomisasi FullCalendar */
+        .fc-theme-bootstrap5 .fc-button-primary {
+            background-color: var(--bs-primary) !important;
+            border-color: var(--bs-primary) !important;
+        }
+
+        .fc-theme-bootstrap5 .fc-button-primary:hover {
+            background-color: var(--bs-primary-dark) !important;
+            border-color: var(--bs-primary-dark) !important;
+        }
+
+        .fc .fc-daygrid-day.fc-day-today {
+            background-color: var(--bs-primary-bg-subtle) !important;
+        }
+
         .circular-progress {
             transform: rotate(-90deg);
         }

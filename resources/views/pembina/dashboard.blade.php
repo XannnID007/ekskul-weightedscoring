@@ -4,6 +4,80 @@
 @section('page-title', 'Dashboard Pembina')
 @section('page-description', 'Selamat datang, ' . auth()->user()->name)
 
+@push('styles')
+    <style>
+        /* === Gaya Konsisten untuk Kartu Statistik === */
+        .stats-card {
+            border: 1px solid var(--bs-gray-200);
+            border-left: 5px solid var(--bs-primary);
+            transition: all 0.3s ease;
+            opacity: 0;
+            /* Untuk animasi */
+        }
+
+        .stats-card .stats-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            background-color: rgba(60, 154, 231, 0.1);
+            color: var(--bs-primary);
+        }
+
+        .stats-card h2 {
+            font-weight: 700;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .stats-card.success {
+            border-left-color: var(--bs-success);
+        }
+
+        .stats-card.success .stats-icon {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--bs-success);
+        }
+
+        .stats-card.warning {
+            border-left-color: var(--bs-warning);
+        }
+
+        .stats-card.warning .stats-icon {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--bs-warning);
+        }
+
+        .stats-card.danger {
+            border-left-color: var(--bs-danger);
+        }
+
+        .stats-card.danger .stats-icon {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--bs-danger);
+        }
+
+        /* Animasi saat halaman dimuat */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+@endpush
+
 @section('content')
     <div class="row g-4">
         <!-- Stats Cards -->
@@ -46,7 +120,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="card-title mb-1">Pendaftaran Pending</h6>
+                            <h6 class="card-title mb-1">Pending</h6>
                             <h2 class="mb-0">{{ $stats['pendaftaran_pending'] }}</h2>
                             <small class="opacity-75">Menunggu review</small>
                         </div>

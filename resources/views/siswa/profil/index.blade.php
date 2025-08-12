@@ -6,12 +6,95 @@
 
 @push('styles')
     <style>
-        /* Custom Checkbox Card Styles */
+        /* 1. MENGGANTI TEMA GELAP MENJADI TERANG */
+        .profile-card {
+            background: var(--bs-white);
+            /* Diubah dari hitam ke putih */
+            border: 1px solid var(--bs-gray-200);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+        }
+
+        .profile-card .card-header {
+            background: transparent;
+            /* Header dibuat transparan */
+            color: var(--bs-gray-800);
+            border-bottom: 1px solid var(--bs-gray-200);
+            border-radius: 16px 16px 0 0;
+        }
+
+        /* 2. MENYESUAIKAN GAYA PILIHAN MINAT */
+        .interest-label {
+            background: var(--bs-gray-50);
+            /* Latar abu-abu lembut */
+            border: 1px solid var(--bs-gray-200);
+            color: var(--bs-gray-700);
+            border-radius: 12px;
+            /* ... properti lain tetap sama ... */
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            position: relative;
+        }
+
+        .interest-label:hover {
+            border-color: var(--bs-primary);
+            background: var(--bs-primary-bg-subtle);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(var(--bs-primary-rgb), 0.1);
+        }
+
+        .interest-checkbox:checked+.interest-label {
+            background: linear-gradient(135deg, var(--bs-primary), var(--bs-info));
+            border-color: var(--bs-primary);
+            color: white;
+            box-shadow: 0 6px 20px rgba(var(--bs-primary-rgb), 0.3);
+        }
+
+        /* 3. MENYESUAIKAN KOMPONEN LAINNYA */
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            /* Jarak antar seksi diperjelas */
+            margin-top: 1.5rem;
+        }
+
+        .section-header:first-of-type {
+            margin-top: 0;
+        }
+
+        .section-header i {
+            background: var(--bs-primary-bg-subtle);
+            color: var(--bs-primary);
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .interest-info {
+            background: var(--bs-info-bg-subtle);
+            border: 1px solid var(--bs-info-border-subtle);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .interest-info i {
+            color: var(--bs-info);
+        }
+
+        /* ===== Kode Bawaan (sedikit disesuaikan) ===== */
         .interest-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
-            margin-top: 1rem;
         }
 
         .interest-item {
@@ -21,81 +104,30 @@
         .interest-checkbox {
             position: absolute;
             opacity: 0;
-            cursor: pointer;
-            height: 0;
-            width: 0;
-        }
-
-        .interest-label {
-            display: flex;
-            align-items: center;
-            padding: 1rem 1.25rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            min-height: 60px;
-        }
-
-        .interest-label::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(32, 178, 170, 0.1), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .interest-label:hover {
-            border-color: var(--bs-primary);
-            background: rgba(32, 178, 170, 0.1);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(32, 178, 170, 0.2);
-        }
-
-        .interest-label:hover::before {
-            left: 100%;
-        }
-
-        .interest-checkbox:checked+.interest-label {
-            background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-primary-dark) 100%);
-            border-color: var(--bs-primary);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(32, 178, 170, 0.4);
         }
 
         .interest-icon {
-            width: 24px;
-            height: 24px;
             margin-right: 0.75rem;
-            opacity: 0.8;
             transition: all 0.3s ease;
         }
 
         .interest-checkbox:checked+.interest-label .interest-icon {
-            opacity: 1;
             transform: scale(1.1);
         }
 
         .interest-text {
             font-weight: 500;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
         }
 
         .interest-checkbox:checked+.interest-label .interest-text {
             font-weight: 600;
         }
 
-        /* Checkmark animation */
+        /* Checkmark (tanda centang) */
         .interest-label::after {
-            content: '✓';
+            content: '\f26a';
+            /* Ikon centang Bootstrap */
+            font-family: 'bootstrap-icons';
             position: absolute;
             right: 0.75rem;
             top: 50%;
@@ -108,90 +140,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: bold;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .interest-checkbox:checked+.interest-label::after {
             transform: translateY(-50%) scale(1);
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .interest-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-                gap: 0.75rem;
-            }
-
-            .interest-label {
-                padding: 0.75rem 1rem;
-                min-height: 50px;
-            }
-
-            .interest-text {
-                font-size: 0.85rem;
-            }
-        }
-
-        /* Form improvements */
-        .form-control:focus,
-        .form-select:focus {
-            border-color: var(--bs-primary);
-            box-shadow: 0 0 0 0.2rem rgba(32, 178, 170, 0.25);
-        }
-
-        .progress {
-            transition: all 0.3s ease;
-        }
-
-        /* Section headers */
-        .section-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid rgba(32, 178, 170, 0.2);
-        }
-
-        .section-header i {
-            background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-primary-dark) 100%);
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 0.75rem;
-        }
-
-        /* Enhanced card styling */
-        .profile-card {
-            background: linear-gradient(135deg, var(--bs-gray-800) 0%, #212529 100%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        }
-
-        .profile-card .card-header {
-            background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-primary-dark) 100%);
-            color: white;
-            border-radius: 16px 16px 0 0;
-            border-bottom: none;
-        }
-
-        /* Interest requirement info */
-        .interest-info {
-            background: rgba(32, 178, 170, 0.1);
-            border: 1px solid rgba(32, 178, 170, 0.3);
-            border-radius: 8px;
-            padding: 0.75rem 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .interest-info i {
-            color: var(--bs-primary);
         }
     </style>
 @endpush

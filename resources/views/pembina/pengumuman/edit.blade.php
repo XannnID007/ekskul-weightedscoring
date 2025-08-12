@@ -5,7 +5,7 @@
 @section('page-description', 'Ubah data pada form di bawah ini untuk memperbarui pengumuman.')
 
 @section('page-actions')
-    <a href="{{ route('pembina.pengumuman.show', $pengumuman) }}" class="btn btn-outline-light">
+    <a href="{{ route('pembina.pengumuman.show', $pengumuman) }}" class="btn btn-light">
         <i class="bi bi-x-lg me-1"></i>Batal
     </a>
 @endsection

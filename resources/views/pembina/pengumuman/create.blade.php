@@ -5,7 +5,7 @@
 @section('page-description', 'Isi form di bawah ini untuk membuat pengumuman baru.')
 
 @section('page-actions')
-    <a href="{{ route('pembina.pengumuman.index') }}" class="btn btn-outline-light">
+    <a href="{{ route('pembina.pengumuman.index') }}" class="btn btn-light">
         <i class="bi bi-arrow-left me-1"></i>Kembali ke Riwayat
     </a>
 @endsection

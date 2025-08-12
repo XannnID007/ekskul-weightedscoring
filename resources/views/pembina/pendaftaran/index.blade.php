@@ -4,241 +4,148 @@
 @section('page-title', 'Kelola Pendaftaran')
 @section('page-description', 'Kelola pendaftaran siswa pada ekstrakurikuler yang Anda bina')
 
-@section('page-actions')
-    <div class="d-flex gap-2">
-        <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#filterModal">
-            <i class="bi bi-funnel me-1"></i>Filter
-        </button>
-        <div class="dropdown">
-            <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                <i class="bi bi-download me-1"></i>Export
-            </button>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#" onclick="exportData('pdf')">
-                        <i class="bi bi-file-pdf me-2"></i>PDF
-                    </a></li>
-                <li><a class="dropdown-item" href="#" onclick="exportData('excel')">
-                        <i class="bi bi-file-excel me-2"></i>Excel
-                    </a></li>
-            </ul>
-        </div>
-    </div>
-@endsection
-
 @section('content')
-    <!-- Stats Cards -->
     <div class="row g-4 mb-4">
+        {{-- Kartu-kartu ini sekarang akan otomatis menggunakan style yang baru ditambahkan --}}
         <div class="col-xl-3 col-md-6">
             <div class="card stats-card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-1">Total Pendaftaran</h6>
-                            <h2 class="mb-0">{{ $stats['total'] }}</h2>
-                            <small class="opacity-75">Semua status</small>
-                        </div>
-                        <div class="stats-icon">
-                            <i class="bi bi-clipboard-data"></i>
-                        </div>
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-muted mb-1">Total Pendaftaran</h6>
+                        <h2 class="mb-0">{{ $stats['total'] }}</h2>
                     </div>
+                    <div class="stats-icon"><i class="bi bi-clipboard-data"></i></div>
                 </div>
             </div>
         </div>
-
         <div class="col-xl-3 col-md-6">
             <div class="card stats-card warning">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-1">Menunggu Review</h6>
-                            <h2 class="mb-0">{{ $stats['pending'] }}</h2>
-                            <small class="opacity-75">Perlu diproses</small>
-                        </div>
-                        <div class="stats-icon">
-                            <i class="bi bi-clock-history"></i>
-                        </div>
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-muted mb-1">Menunggu Review</h6>
+                        <h2 class="mb-0">{{ $stats['pending'] }}</h2>
                     </div>
+                    <div class="stats-icon"><i class="bi bi-clock-history"></i></div>
                 </div>
             </div>
         </div>
-
         <div class="col-xl-3 col-md-6">
             <div class="card stats-card success">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-1">Disetujui</h6>
-                            <h2 class="mb-0">{{ $stats['disetujui'] }}</h2>
-                            <small class="opacity-75">Siswa aktif</small>
-                        </div>
-                        <div class="stats-icon">
-                            <i class="bi bi-check-circle"></i>
-                        </div>
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-muted mb-1">Disetujui</h6>
+                        <h2 class="mb-0">{{ $stats['disetujui'] }}</h2>
                     </div>
+                    <div class="stats-icon"><i class="bi bi-check-circle"></i></div>
                 </div>
             </div>
         </div>
-
         <div class="col-xl-3 col-md-6">
             <div class="card stats-card danger">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title mb-1">Ditolak</h6>
-                            <h2 class="mb-0">{{ $stats['ditolak'] }}</h2>
-                            <small class="opacity-75">Tidak diterima</small>
-                        </div>
-                        <div class="stats-icon">
-                            <i class="bi bi-x-circle"></i>
-                        </div>
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-muted mb-1">Ditolak</h6>
+                        <h2 class="mb-0">{{ $stats['ditolak'] }}</h2>
                     </div>
+                    <div class="stats-icon"><i class="bi bi-x-circle"></i></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Main Content -->
     <div class="card">
-        <div class="card-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">
-                    <i class="bi bi-people text-primary me-2"></i>Daftar Pendaftaran
-                </h5>
-                <div class="d-flex gap-2">
-                    <!-- Quick Actions -->
-                    @if ($stats['pending'] > 0)
-                        <button class="btn btn-outline-success btn-sm" onclick="bulkApprove()">
-                            <i class="bi bi-check-all me-1"></i>Setujui Semua
-                        </button>
-                    @endif
-                </div>
+        <div class="card-header bg-white border-0 pt-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-people text-primary me-2"></i>Daftar Pendaftaran</h5>
+            <div>
+                @if ($stats['pending'] > 0)
+                    <button class="btn btn-success btn-sm" onclick="bulkApprove()">
+                        <i class="bi bi-check-all me-1"></i>Setujui Semua Pending
+                    </button>
+                @endif
             </div>
         </div>
         <div class="card-body">
             @if ($pendaftarans->count() > 0)
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
-                        <thead class="table-dark">
+                        <thead>
                             <tr>
-                                <th>
-                                    <input type="checkbox" class="form-check-input" id="selectAll">
-                                </th>
+                                <th style="width: 5%;"><input type="checkbox" class="form-check-input" id="selectAll"></th>
                                 <th>Siswa</th>
                                 <th>Ekstrakurikuler</th>
                                 <th>Tanggal Daftar</th>
-                                <th>Komitmen</th>
                                 <th>Status</th>
-                                <th>Aksi</th>
+                                <th style="width: 15%;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($pendaftarans as $pendaftaran)
                                 <tr>
-                                    <td>
-                                        <input type="checkbox" class="form-check-input pendaftaran-checkbox"
-                                            value="{{ $pendaftaran->id }}">
-                                    </td>
+                                    <td><input type="checkbox" class="form-check-input pendaftaran-checkbox"
+                                            value="{{ $pendaftaran->id }}"></td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <div
-                                                class="avatar-sm bg-primary rounded-circle me-3 d-flex align-items-center justify-content-center">
-                                                <i class="bi bi-person text-white"></i>
+                                            <div class="user-avatar-sm me-3">
+                                                <span>{{ strtoupper(substr($pendaftaran->user->name, 0, 2)) }}</span>
                                             </div>
                                             <div>
-                                                <strong>{{ $pendaftaran->user->name }}</strong>
-                                                <br>
-                                                <small class="text-muted">
-                                                    {{ $pendaftaran->user->nis ?: 'NIS belum diisi' }}
-                                                </small>
-                                                <br>
-                                                <small class="text-muted">
-                                                    <i class="bi bi-envelope me-1"></i>{{ $pendaftaran->user->email }}
-                                                </small>
+                                                <strong>{{ $pendaftaran->user->name }}</strong><br>
+                                                <small
+                                                    class="text-muted">{{ $pendaftaran->user->nis ?: 'NIS belum ada' }}</small>
                                             </div>
                                         </div>
                                     </td>
                                     <td>
                                         <strong>{{ $pendaftaran->ekstrakurikuler->nama }}</strong>
-                                        <br>
-                                        <small class="text-muted">
-                                            {{ $pendaftaran->ekstrakurikuler->jadwal_string }}
-                                        </small>
                                     </td>
                                     <td>
-                                        <span class="text-muted">{{ $pendaftaran->created_at->format('d M Y') }}</span>
-                                        <br>
-                                        <small class="text-muted">{{ $pendaftaran->created_at->format('H:i') }}</small>
+                                        <small
+                                            class="text-muted">{{ $pendaftaran->created_at->format('d M Y, H:i') }}</small>
                                     </td>
                                     <td>
-                                        @php
-                                            $commitmentColors = [
-                                                'tinggi' => 'success',
-                                                'sedang' => 'warning',
-                                                'rendah' => 'danger',
-                                            ];
-                                            $color = $commitmentColors[$pendaftaran->tingkat_komitmen] ?? 'secondary';
-                                        @endphp
-                                        <span class="badge bg-{{ $color }}">
-                                            {{ ucfirst($pendaftaran->tingkat_komitmen) }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        @if ($pendaftaran->status === 'pending')
-                                            <span class="badge bg-warning">
-                                                <i class="bi bi-clock me-1"></i>Pending
-                                            </span>
-                                        @elseif($pendaftaran->status === 'disetujui')
-                                            <span class="badge bg-success">
-                                                <i class="bi bi-check-circle me-1"></i>Disetujui
-                                            </span>
+                                        @if ($pendaftaran->status == 'pending')
+                                            <span
+                                                class="badge bg-warning-subtle text-warning-emphasis rounded-pill">Pending</span>
+                                        @elseif($pendaftaran->status == 'disetujui')
+                                            <span
+                                                class="badge bg-success-subtle text-success-emphasis rounded-pill">Disetujui</span>
                                         @else
-                                            <span class="badge bg-danger">
-                                                <i class="bi bi-x-circle me-1"></i>Ditolak
-                                            </span>
+                                            <span
+                                                class="badge bg-danger-subtle text-danger-emphasis rounded-pill">Ditolak</span>
                                         @endif
                                     </td>
                                     <td>
-                                        <div class="btn-group" role="group">
-                                            <a href="{{ route('pembina.pendaftaran.show', $pendaftaran) }}"
-                                                class="btn btn-outline-primary btn-sm">
-                                                <i class="bi bi-eye me-1"></i>Detail
-                                            </a>
-
-                                            @if ($pendaftaran->status === 'pending')
-                                                <div class="btn-group" role="group">
-                                                    <button type="button" class="btn btn-success btn-sm"
-                                                        onclick="quickApprove({{ $pendaftaran->id }})">
-                                                        <i class="bi bi-check me-1"></i>Setujui
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger btn-sm"
-                                                        onclick="quickReject({{ $pendaftaran->id }})">
-                                                        <i class="bi bi-x me-1"></i>Tolak
-                                                    </button>
-                                                </div>
-                                            @endif
-                                        </div>
+                                        <a href="{{ route('pembina.pendaftaran.show', $pendaftaran) }}"
+                                            class="btn btn-light btn-sm">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        @if ($pendaftaran->status === 'pending')
+                                            <button type="button" class="btn btn-success btn-sm"
+                                                onclick="quickApprove({{ $pendaftaran->id }})">
+                                                <i class="bi bi-check-lg"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-danger btn-sm"
+                                                onclick="quickReject({{ $pendaftaran->id }})">
+                                                <i class="bi bi-x-lg"></i>
+                                            </button>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
-
-                <!-- Pagination -->
                 <div class="d-flex justify-content-between align-items-center mt-4">
-                    <div class="text-muted">
-                        Menampilkan {{ $pendaftarans->firstItem() }}-{{ $pendaftarans->lastItem() }}
-                        dari {{ $pendaftarans->total() }} pendaftaran
+                    <div class="text-muted small">
+                        Menampilkan {{ $pendaftarans->firstItem() }}-{{ $pendaftarans->lastItem() }} dari
+                        {{ $pendaftarans->total() }} data
                     </div>
                     {{ $pendaftarans->links() }}
                 </div>
             @else
-                <div class="text-center py-5">
-                    <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
-                    <p class="text-muted mt-3">Belum ada pendaftaran masuk</p>
-                    <small class="text-muted">
-                        Pendaftaran akan muncul di sini ketika siswa mendaftar ke ekstrakurikuler yang Anda bina
-                    </small>
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox fs-1"></i>
+                    <p class="mt-3">Belum ada pendaftaran masuk</p>
                 </div>
             @endif
         </div>
@@ -488,11 +395,71 @@
 @push('styles')
     <style>
         .stats-card {
+            border: 1px solid var(--bs-gray-200);
+            border-left: 5px solid var(--bs-primary);
             transition: all 0.3s ease;
         }
 
+        .stats-card .stats-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            background-color: rgba(60, 154, 231, 0.1);
+            color: var(--bs-primary);
+        }
+
+        .stats-card h2 {
+            font-weight: 700;
+        }
+
         .stats-card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .stats-card.success {
+            border-left-color: var(--bs-success);
+        }
+
+        .stats-card.success .stats-icon {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--bs-success);
+        }
+
+        .stats-card.warning {
+            border-left-color: var(--bs-warning);
+        }
+
+        .stats-card.warning .stats-icon {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--bs-warning);
+        }
+
+        .stats-card.danger {
+            border-left-color: var(--bs-danger);
+        }
+
+        .stats-card.danger .stats-icon {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--bs-danger);
+        }
+
+        /* Gaya untuk Avatar di Tabel */
+        .user-avatar-sm {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--bs-primary-bg-subtle);
+            color: var(--bs-primary-emphasis);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
         }
 
         .avatar-sm {

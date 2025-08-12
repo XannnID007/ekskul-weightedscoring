@@ -6,181 +6,96 @@
 @section('page-description', 'Pengumuman dari ' . $ekstrakurikuler->nama)
 
 @section('page-actions')
-    <a href="{{ route('siswa.pengumuman.index') }}" class="btn btn-outline-light">
+    <a href="{{ route('siswa.pengumuman.index') }}" class="btn btn-light">
         <i class="bi bi-arrow-left me-1"></i>Kembali ke Pengumuman
     </a>
 @endsection
 
 @section('content')
     <div class="row g-4">
-        <!-- Main Content -->
         <div class="col-xl-8">
-            <!-- Pengumuman Card -->
             <div class="card">
-                <!-- Header -->
-                <div class="card-header {{ $pengumuman->is_penting ? 'bg-warning text-dark' : '' }}">
-                    <div class="d-flex align-items-center">
-                        <div class="me-3">
-                            <div class="bg-{{ $pengumuman->is_penting ? 'dark' : 'primary' }} rounded-circle p-2">
-                                <i
-                                    class="bi bi-{{ $pengumuman->is_penting ? 'exclamation-triangle' : 'megaphone' }} text-white"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1">
-                            <h5 class="mb-1">{{ $pengumuman->judul }}</h5>
-                            <div class="d-flex align-items-center gap-3">
-                                <small>
-                                    <i class="bi bi-person me-1"></i>
-                                    {{ $pengumuman->pembuat->name ?? 'Admin' }}
-                                </small>
-                                <small>
-                                    <i class="bi bi-clock me-1"></i>
-                                    {{ $pengumuman->created_at->diffForHumans() }}
-                                </small>
-                                <small>
-                                    <i class="bi bi-calendar me-1"></i>
-                                    {{ $pengumuman->created_at->format('d M Y, H:i') }}
-                                </small>
-                            </div>
-                        </div>
-                        @if ($pengumuman->is_penting)
-                            <div>
-                                <span class="badge bg-dark">
-                                    <i class="bi bi-star-fill me-1"></i>Penting
-                                </span>
-                            </div>
-                        @endif
+                <div class="card-header bg-white border-0 p-4">
+                    @if ($pengumuman->is_penting)
+                        <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill mb-2">
+                            Penting
+                        </span>
+                    @endif
+                    <h2 class="card-title">{{ $pengumuman->judul }}</h2>
+                    <div class="d-flex align-items-center text-muted small gap-3">
+                        <span><i class="bi bi-person me-1"></i> {{ $pengumuman->pembuat->name ?? 'Admin' }}</span>
+                        <span><i class="bi bi-clock me-1"></i> {{ $pengumuman->created_at->diffForHumans() }}</span>
                     </div>
                 </div>
 
-                <!-- Content -->
-                <div class="card-body">
+                <div class="card-body p-4 pt-0">
                     <div class="pengumuman-content">
                         {!! nl2br(e($pengumuman->konten)) !!}
                     </div>
                 </div>
 
-                <!-- Footer Actions -->
-                <div class="card-footer bg-transparent">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <small class="text-muted">
-                            <i class="bi bi-eye me-1"></i>Dibaca pada {{ now()->format('d M Y, H:i') }}
-                        </small>
+                <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        Dipublikasikan: {{ $pengumuman->created_at->format('d M Y, H:i') }}
+                    </small>
+                    {{-- Tombol Aksi Tambahan --}}
+                    <div>
+                        {{-- Share and Print buttons can be added here if needed --}}
                     </div>
                 </div>
             </div>
-
-            @if ($pengumuman->is_penting)
-                <!-- Important Notice -->
-                <div class="alert alert-warning mt-4" role="alert">
-                    <div class="d-flex align-items-center">
-                        <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
-                        <div>
-                            <h6 class="alert-heading mb-1">Pengumuman Penting!</h6>
-                            <p class="mb-0">Pengumuman ini ditandai sebagai prioritas tinggi. Pastikan Anda memahami dan
-                                mengikuti instruksi yang diberikan.</p>
-                        </div>
-                    </div>
-                </div>
-            @endif
         </div>
 
-        <!-- Sidebar -->
         <div class="col-xl-4">
-            <!-- Ekstrakurikuler Info -->
             <div class="card mb-4">
-                <div class="card-header">
-                    <h6 class="mb-0">
-                        <i class="bi bi-info-circle me-2"></i>Informasi Ekstrakurikuler
-                    </h6>
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-collection text-primary me-2"></i>Ekstrakurikuler</h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-3">
                         @if ($ekstrakurikuler->gambar)
                             <img src="{{ Storage::url($ekstrakurikuler->gambar) }}" alt="{{ $ekstrakurikuler->nama }}"
-                                class="rounded me-3" width="60" height="60" style="object-fit: cover;">
+                                class="rounded-3 me-3" width="60" height="60" style="object-fit: cover;">
                         @else
-                            <div class="bg-primary rounded d-flex align-items-center justify-content-center me-3"
+                            <div class="bg-primary-subtle text-primary rounded-3 d-flex align-items-center justify-content-center me-3"
                                 style="width: 60px; height: 60px;">
-                                <i class="bi bi-collection text-white"></i>
+                                <i class="bi bi-collection fs-3"></i>
                             </div>
                         @endif
                         <div>
-                            <h6 class="mb-1">{{ $ekstrakurikuler->nama }}</h6>
+                            <h6 class="mb-0">{{ $ekstrakurikuler->nama }}</h6>
                             <small class="text-muted">{{ $ekstrakurikuler->pembina->name ?? 'Pembina' }}</small>
                         </div>
                     </div>
-
-                    <div class="row g-3 small">
-                        <div class="col-12">
-                            <strong>Jadwal Kegiatan:</strong><br>
-                            <span class="text-muted">{{ $ekstrakurikuler->jadwal_string }}</span>
-                        </div>
-                        <div class="col-6">
-                            <strong>Peserta:</strong><br>
-                            <span class="text-muted">{{ $ekstrakurikuler->peserta_saat_ini }} siswa</span>
-                        </div>
-                        <div class="col-6">
-                            <strong>Kapasitas:</strong><br>
-                            <span class="text-muted">{{ $ekstrakurikuler->kapasitas_maksimal }} siswa</span>
-                        </div>
-                    </div>
-
-                    <hr>
-
                     <div class="d-grid">
                         <a href="{{ route('siswa.jadwal') }}" class="btn btn-outline-primary btn-sm">
-                            <i class="bi bi-calendar3 me-1"></i>Lihat Jadwal Kegiatan
+                            <i class="bi bi-calendar3 me-1"></i>Lihat Jadwal Lengkap
                         </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Other Announcements -->
             @if ($pengumumanLainnya->count() > 0)
                 <div class="card">
-                    <div class="card-header">
-                        <h6 class="mb-0">
-                            <i class="bi bi-megaphone me-2"></i>Pengumuman Lainnya
-                        </h6>
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-megaphone-fill text-primary me-2"></i>Pengumuman Lainnya</h5>
                     </div>
                     <div class="card-body">
                         @foreach ($pengumumanLainnya as $other)
-                            <div class="d-flex align-items-start {{ !$loop->last ? 'mb-3 pb-3 border-bottom' : '' }}">
-                                <div class="me-3">
-                                    <div class="bg-{{ $other->is_penting ? 'warning' : 'primary' }} rounded-circle p-1"
-                                        style="width: 32px; height: 32px;">
-                                        <i
-                                            class="bi bi-{{ $other->is_penting ? 'exclamation-triangle' : 'megaphone' }} text-white small"></i>
-                                    </div>
+                            <div class="info-list-item">
+                                <div
+                                    class="icon-wrapper bg-{{ $other->is_penting ? 'warning' : 'primary' }}-subtle text-{{ $other->is_penting ? 'warning' : 'primary' }}-emphasis">
+                                    <i class="bi bi-{{ $other->is_penting ? 'exclamation-lg' : 'megaphone' }}"></i>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h6 class="mb-1">
-                                        <a href="{{ route('siswa.pengumuman.show', $other) }}"
-                                            class="text-decoration-none">
-                                            {{ Str::limit($other->judul, 50) }}
-                                        </a>
-                                        @if ($other->is_penting)
-                                            <span class="badge bg-warning text-dark ms-1">
-                                                <i class="bi bi-star-fill"></i>
-                                            </span>
-                                        @endif
-                                    </h6>
-                                    <p class="text-muted small mb-1">
-                                        {{ Str::limit($other->konten, 80) }}
-                                    </p>
-                                    <small class="text-muted">
-                                        {{ $other->created_at->diffForHumans() }}
-                                    </small>
+                                    <a href="{{ route('siswa.pengumuman.show', $other) }}"
+                                        class="text-decoration-none text-dark">
+                                        <h6 class="mb-1 fw-bold stretched-link">{{ Str::limit($other->judul, 35) }}</h6>
+                                    </a>
+                                    <p class="text-muted small mb-0">{{ $other->created_at->diffForHumans() }}</p>
                                 </div>
                             </div>
                         @endforeach
-
-                        <div class="text-center mt-3">
-                            <a href="{{ route('siswa.pengumuman.index') }}" class="btn btn-outline-primary btn-sm">
-                                Lihat Semua Pengumuman
-                            </a>
-                        </div>
                     </div>
                 </div>
             @endif
@@ -190,10 +105,36 @@
 
 @push('styles')
     <style>
+        .info-list-item {
+            display: flex;
+            align-items: center;
+            padding: 0.85rem 0;
+            border-bottom: 1px solid var(--bs-gray-200);
+        }
+
+        .info-list-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .info-list-item .icon-wrapper {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            background-color: var(--bs-gray-100);
+            color: var(--bs-gray-600);
+            font-size: 1.25rem;
+        }
+
         .pengumuman-content {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             line-height: 1.8;
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--bs-gray-700);
         }
 
         .pengumuman-content p {

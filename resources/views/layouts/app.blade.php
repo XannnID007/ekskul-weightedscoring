@@ -535,14 +535,14 @@
                             class="nav-text">Dashboard</span></a>
                     <a href="{{ route('admin.ekstrakurikuler.index') }}"
                         class="nav-link {{ request()->routeIs('admin.ekstrakurikuler.*') ? 'active' : '' }}"
-                        data-tooltip="Ekstrakurikuler"><i class="bi bi-collection"></i><span
-                            class="nav-text">Ekstrakurikuler</span></a>
+                        data-tooltip="Ekstrakurikuler"><i class="bi bi-collection"></i><span class="nav-text">Kelola
+                            Ekstrakurikuler</span></a>
                     <a href="{{ route('admin.user.index', ['role' => 'siswa']) }}"
                         class="nav-link {{ request()->is('admin/user*') ? 'active' : '' }}" data-tooltip="Pengguna"><i
-                            class="bi bi-people"></i><span class="nav-text">Pengguna</span></a>
+                            class="bi bi-people"></i><span class="nav-text">Kelola Pengguna</span></a>
                     <a href="{{ route('admin.laporan') }}"
                         class="nav-link {{ request()->routeIs('admin.laporan') ? 'active' : '' }}" data-tooltip="Laporan"><i
-                            class="bi bi-file-earmark-text"></i><span class="nav-text">Laporan</span></a>
+                            class="bi bi-file-earmark-text"></i><span class="nav-text">Generate Laporan</span></a>
 
                     {{-- Menu untuk Pembina --}}
                 @elseif(auth()->user()->role === 'pembina')
@@ -553,18 +553,18 @@
                             class="nav-text">Dashboard</span></a>
                     <a href="{{ route('pembina.pendaftaran.index') }}"
                         class="nav-link {{ request()->routeIs('pembina.pendaftaran.*') ? 'active' : '' }}"
-                        data-tooltip="Pendaftaran"><i class="bi bi-person-plus"></i><span
-                            class="nav-text">Pendaftaran</span></a>
+                        data-tooltip="Pendaftaran"><i class="bi bi-person-plus"></i><span class="nav-text">Kelola
+                            Pendaftaran</span></a>
                     <a href="{{ route('pembina.siswa.index') }}"
                         class="nav-link {{ request()->routeIs('pembina.siswa.*') ? 'active' : '' }}"
-                        data-tooltip="Data Siswa"><i class="bi bi-people"></i><span class="nav-text">Data Siswa</span></a>
+                        data-tooltip="Data Siswa"><i class="bi bi-people"></i><span class="nav-text">Kelola Siswa</span></a>
                     <a href="{{ route('pembina.pengumuman.index') }}"
                         class="nav-link {{ request()->routeIs('pembina.pengumuman.*') ? 'active' : '' }}"
-                        data-tooltip="Pengumuman"><i class="bi bi-megaphone"></i><span
-                            class="nav-text">Pengumuman</span></a>
+                        data-tooltip="Pengumuman"><i class="bi bi-megaphone"></i><span class="nav-text">Kelola
+                            Pengumuman</span></a>
                     <a href="{{ route('pembina.galeri.index') }}"
                         class="nav-link {{ request()->routeIs('pembina.galeri.*') ? 'active' : '' }}"
-                        data-tooltip="Galeri"><i class="bi bi-images"></i><span class="nav-text">Galeri</span></a>
+                        data-tooltip="Galeri"><i class="bi bi-images"></i><span class="nav-text">Kelola Galeri</span></a>
 
                     {{-- Menu untuk Siswa --}}
                 @else
@@ -600,6 +600,20 @@
                             class="nav-link {{ request()->routeIs('siswa.pengumuman*') ? 'active' : '' }}"
                             data-tooltip="Pengumuman"><i class="bi bi-megaphone"></i><span
                                 class="nav-text">Pengumuman</span></a>
+
+                        <div class="sidebar-section-header"><small>Lainnya</small></div>
+                        <a href="{{ route('siswa.pendaftaran') }}"
+                            class="nav-link {{ request()->routeIs('siswa.pendaftaran') ? 'active' : '' }}"
+                            data-tooltip="Status Pendaftaran">
+                            <i class="bi bi-clipboard-check"></i>
+                            <span class="nav-text">Status Pendaftaran</span>
+                        </a>
+                        <a href="{{ route('siswa.ekstrakurikuler.index') }}"
+                            class="nav-link {{ request()->routeIs('siswa.ekstrakurikuler.*') ? 'active' : '' }}"
+                            data-tooltip="Lihat Ekstrakurikuler">
+                            <i class="bi bi-eye"></i>
+                            <span class="nav-text">Lihat Ekstrakurikuler</span>
+                        </a>
                     @endif
                 @endif
             </div>

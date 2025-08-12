@@ -4,6 +4,123 @@
 @section('page-title', 'Detail Pendaftaran')
 @section('page-description', 'Review lengkap pendaftaran siswa')
 
+@push('styles')
+    <style>
+        /* 1. KARTU HEADER ATAS */
+        /* Membuat avatar lebih konsisten dengan avatar inisial */
+        .avatar-lg {
+            width: 80px;
+            height: 80px;
+            background-color: var(--bs-primary-bg-subtle) !important;
+            color: var(--bs-primary) !important;
+        }
+
+        .avatar-lg i {
+            color: var(--bs-primary) !important;
+        }
+
+        /* 2. KARTU DATA SISWA & INFO EKSTRAKURIKULER */
+        /* Mengubah daftar info biasa menjadi list yang rapi */
+        .card-body>.mb-3 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.85rem 0;
+            margin-bottom: 0 !important;
+            border-bottom: 1px solid var(--bs-gray-100);
+        }
+
+        .card-body>.mb-3:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .card-body>.mb-3>label {
+            margin-bottom: 0;
+        }
+
+        .card-body>.mb-3 p {
+            text-align: right;
+        }
+
+        /* 3. KARTU FORM PENDAFTARAN */
+        /* Menghilangkan efek "card di dalam card" agar lebih bersih */
+        .card-body .card.bg-light {
+            background-color: transparent !important;
+            border: none !important;
+        }
+
+        .card-body .card.bg-light .card-body {
+            padding: 0;
+            margin-bottom: 1rem;
+        }
+
+        .card-body .card.bg-light h6 {
+            border-bottom: 1px solid var(--bs-gray-200);
+            padding-bottom: 0.5rem;
+        }
+
+        /* 4. KONSISTENSI BADGE */
+        /* Mengubah semua badge menjadi gaya "subtle" dan "pill" */
+        .badge {
+            padding: 0.5em 0.9em;
+            border-radius: 50rem;
+            font-weight: 600;
+        }
+
+        .badge.bg-warning {
+            background-color: var(--bs-warning-bg-subtle) !important;
+            color: var(--bs-warning-emphasis) !important;
+        }
+
+        .badge.bg-success {
+            background-color: var(--bs-success-bg-subtle) !important;
+            color: var(--bs-success-emphasis) !important;
+        }
+
+        .badge.bg-danger {
+            background-color: var(--bs-danger-bg-subtle) !important;
+            color: var(--bs-danger-emphasis) !important;
+        }
+
+        .badge.bg-info {
+            background-color: var(--bs-info-bg-subtle) !important;
+            color: var(--bs-info-emphasis) !important;
+        }
+
+        .badge.bg-secondary {
+            background-color: var(--bs-secondary-bg-subtle) !important;
+            color: var(--bs-secondary-emphasis) !important;
+        }
+
+        /* 5. MEMPERCANTIK TIMELINE */
+        /* Menggunakan warna tema */
+        .timeline::before {
+            background: var(--bs-gray-200);
+        }
+
+        .timeline-marker {
+            left: -24px;
+            width: 16px;
+            height: 16px;
+            border: 3px solid var(--bs-white);
+            box-shadow: none;
+        }
+
+        .timeline-marker.bg-primary {
+            background-color: var(--bs-primary) !important;
+        }
+
+        .timeline-marker.bg-success {
+            background-color: var(--bs-success) !important;
+        }
+
+        .timeline-marker.bg-danger {
+            background-color: var(--bs-danger) !important;
+        }
+    </style>
+@endpush
+
 @section('page-actions')
     <div class="d-flex gap-2">
         <a href="{{ route('pembina.pendaftaran.index') }}" class="btn btn-outline-light">
@@ -79,7 +196,7 @@
             <div class="card h-100">
                 <div class="card-header">
                     <h5 class="mb-0">
-                        <i class="bi bi-person-badge text-primary me-2"></i>Data Siswa
+                        Data Siswa
                     </h5>
                 </div>
                 <div class="card-body">
@@ -162,7 +279,7 @@
             <div class="card h-100">
                 <div class="card-header">
                     <h5 class="mb-0">
-                        <i class="bi bi-clipboard-data text-primary me-2"></i>Form Pendaftaran
+                        Form Pendaftaran
                     </h5>
                 </div>
                 <div class="card-body">
@@ -172,7 +289,7 @@
                             <div class="card bg-light border-0">
                                 <div class="card-body">
                                     <h6 class="text-primary mb-3">
-                                        <i class="bi bi-heart-fill me-2"></i>Motivasi Bergabung
+                                        Motivasi Bergabung
                                     </h6>
                                     <p class="mb-0 text-justify">{{ $pendaftaran->motivasi }}</p>
                                 </div>
@@ -184,7 +301,7 @@
                             <div class="card bg-light border-0">
                                 <div class="card-body">
                                     <h6 class="text-primary mb-3">
-                                        <i class="bi bi-star-fill me-2"></i>Pengalaman Terkait
+                                        Pengalaman Terkait
                                     </h6>
                                     <p class="mb-0 text-justify">
                                         {{ $pendaftaran->pengalaman ?: 'Tidak ada pengalaman khusus yang disebutkan.' }}
@@ -198,7 +315,7 @@
                             <div class="card bg-light border-0">
                                 <div class="card-body">
                                     <h6 class="text-primary mb-3">
-                                        <i class="bi bi-bullseye me-2"></i>Harapan dan Tujuan
+                                        Harapan dan Tujuan
                                     </h6>
                                     <p class="mb-0 text-justify">{{ $pendaftaran->harapan }}</p>
                                 </div>
@@ -210,7 +327,7 @@
                             <div class="card bg-light border-0">
                                 <div class="card-body text-center">
                                     <h6 class="text-primary mb-3">
-                                        <i class="bi bi-speedometer2 me-2"></i>Tingkat Komitmen
+                                        Tingkat Komitmen
                                     </h6>
                                     @php
                                         $commitmentColors = [
@@ -242,7 +359,7 @@
                             <div class="card bg-light border-0">
                                 <div class="card-body text-center">
                                     <h6 class="text-primary mb-3">
-                                        <i class="bi bi-graph-up me-2"></i>Kesesuaian Nilai
+                                        Kesesuaian Nilai
                                     </h6>
                                     @php
                                         $nilaiSiswa = $pendaftaran->user->nilai_rata_rata ?? 0;
@@ -275,7 +392,7 @@
             <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">
-                        <i class="bi bi-heart text-primary me-2"></i>Minat Siswa
+                        Minat Siswa
                     </h5>
                 </div>
                 <div class="card-body">
@@ -309,21 +426,15 @@
                             $tingkatKecocokan = count($kecocokan) / count($kategoriEkskul);
                         }
                     @endphp
+
                     @if (!empty($minatSiswa))
-                        <div class="d-flex flex-wrap gap-2">
+                        <label class="text-muted small">DAFTAR MINAT</label>
+                        <div class="d-flex flex-wrap gap-2 mb-4">
                             @foreach ($minatSiswa as $minat)
-                                <span class="badge bg-primary fs-6 px-3 py-2">{{ ucfirst($minat) }}</span>
+                                <span
+                                    class="badge bg-primary-subtle text-primary-emphasis rounded-pill fs-6 px-3 py-2">{{ ucfirst($minat) }}</span>
                             @endforeach
                         </div>
-
-                        <!-- Analisis Kesesuaian -->
-                        @if (!empty($minatSiswa))
-                            <div class="d-flex flex-wrap gap-2">
-                                @foreach ($minatSiswa as $minat)
-                                    <span class="badge bg-primary fs-6 px-3 py-2">{{ ucfirst($minat) }}</span>
-                                @endforeach
-                            </div>
-                        @endif
 
                         @if (!empty($kecocokan))
                             <div class="mt-2">
@@ -343,7 +454,7 @@
 
                         <div class="mt-3 p-3 bg-light-300 rounded">
                             <h6 class="text-success mb-2">
-                                <i class="bi bi-puzzle me-1"></i>Analisis Kesesuaian
+                                Analisis Kesesuaian
                             </h6>
                             <div class="progress mb-2" style="height: 8px;">
                                 <div class="progress-bar bg-{{ $tingkatKecocokan >= 0.6 ? 'success' : ($tingkatKecocokan >= 0.3 ? 'warning' : 'danger') }}"
@@ -374,7 +485,7 @@
             <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">
-                        <i class="bi bi-collection text-primary me-2"></i>Info Ekstrakurikuler
+                        Info Ekstrakurikuler
                     </h5>
                 </div>
                 <div class="card-body">
@@ -425,7 +536,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0">
-                            <i class="bi bi-clock-history text-primary me-2"></i>Riwayat Pendaftaran
+                            Riwayat Pendaftaran
                         </h5>
                     </div>
                     <div class="card-body">
