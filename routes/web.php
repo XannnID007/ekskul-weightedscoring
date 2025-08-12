@@ -159,6 +159,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/pendaftaran', [SiswaPendaftaranController::class, 'index'])->name('pendaftaran');
         Route::delete('/pendaftaran/{pendaftaran}', [SiswaPendaftaranController::class, 'cancel'])->name('pendaftaran.cancel');
 
+        // Tambahan route untuk AJAX calls
+        Route::get('/pendaftaran/status', [SiswaPendaftaranController::class, 'getStatus'])->name('pendaftaran.status');
+        Route::get('/pendaftaran/{pendaftaran}/track', [SiswaPendaftaranController::class, 'track'])->name('pendaftaran.track');
+        Route::post('/pendaftaran/{pendaftaran}/reapply', [SiswaPendaftaranController::class, 'reapply'])->name('pendaftaran.reapply');
+
         // Routes untuk siswa yang SUDAH terdaftar ekstrakurikuler
         Route::middleware(['ensure.student.registered'])->group(function () {
             Route::get('/jadwal', [SiswaJadwalController::class, 'index'])->name('jadwal');

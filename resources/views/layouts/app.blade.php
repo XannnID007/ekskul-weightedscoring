@@ -568,52 +568,89 @@
 
                     {{-- Menu untuk Siswa --}}
                 @else
-                    <div class="sidebar-section-header"><small>Navigasi Utama</small></div>
-                    <a href="{{ route('siswa.dashboard') }}"
-                        class="nav-link {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}"
-                        data-tooltip="Dashboard"><i class="bi bi-speedometer2"></i><span
-                            class="nav-text">Dashboard</span></a>
-                    <a href="{{ route('siswa.profil') }}"
-                        class="nav-link {{ request()->routeIs('siswa.profil') ? 'active' : '' }}"
-                        data-tooltip="Profil Saya"><i class="bi bi-person-circle"></i><span class="nav-text">Profil
-                            Saya</span></a>
-
-                    @if (!auth()->user()->sudahTerdaftarEkstrakurikuler())
-                        <div class="sidebar-section-header"><small>Pendaftaran</small></div>
-                        <a href="{{ route('siswa.rekomendasi') }}"
-                            class="nav-link {{ request()->routeIs('siswa.rekomendasi*') ? 'active' : '' }}"
-                            data-tooltip="Rekomendasi AI"><i class="bi bi-stars"></i><span
-                                class="nav-text">Rekomendasi</span><span class="badge bg-primary ms-auto">AI</span></a>
-                        <a href="{{ route('siswa.ekstrakurikuler.index') }}"
-                            class="nav-link {{ request()->routeIs('siswa.ekstrakurikuler.*') ? 'active' : '' }}"
-                            data-tooltip="Lihat Ekstrakurikuler"><i class="bi bi-collection"></i><span
-                                class="nav-text">Lihat Ekstrakurikuler</span></a>
-                    @else
-                        <div class="sidebar-section-header"><small>Kegiatan Saya</small></div>
-                        <a href="{{ route('siswa.jadwal') }}"
-                            class="nav-link {{ request()->routeIs('siswa.jadwal*') ? 'active' : '' }}"
-                            data-tooltip="Jadwal"><i class="bi bi-calendar3"></i><span class="nav-text">Jadwal</span></a>
-                        <a href="{{ route('siswa.galeri.index') }}"
-                            class="nav-link {{ request()->routeIs('siswa.galeri*') ? 'active' : '' }}"
-                            data-tooltip="Galeri"><i class="bi bi-images"></i><span class="nav-text">Galeri</span></a>
-                        <a href="{{ route('siswa.pengumuman.index') }}"
-                            class="nav-link {{ request()->routeIs('siswa.pengumuman*') ? 'active' : '' }}"
-                            data-tooltip="Pengumuman"><i class="bi bi-megaphone"></i><span
-                                class="nav-text">Pengumuman</span></a>
-
-                        <div class="sidebar-section-header"><small>Lainnya</small></div>
-                        <a href="{{ route('siswa.pendaftaran') }}"
-                            class="nav-link {{ request()->routeIs('siswa.pendaftaran') ? 'active' : '' }}"
-                            data-tooltip="Status Pendaftaran">
-                            <i class="bi bi-clipboard-check"></i>
-                            <span class="nav-text">Status Pendaftaran</span>
+                    @if (auth()->user()->role === 'siswa')
+                        <div class="sidebar-section-header"><small>Navigasi Utama</small></div>
+                        <a href="{{ route('siswa.dashboard') }}"
+                            class="nav-link {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}"
+                            data-tooltip="Dashboard">
+                            <i class="bi bi-speedometer2"></i>
+                            <span class="nav-text">Dashboard</span>
                         </a>
-                        <a href="{{ route('siswa.ekstrakurikuler.index') }}"
-                            class="nav-link {{ request()->routeIs('siswa.ekstrakurikuler.*') ? 'active' : '' }}"
-                            data-tooltip="Lihat Ekstrakurikuler">
-                            <i class="bi bi-eye"></i>
-                            <span class="nav-text">Lihat Ekstrakurikuler</span>
+
+                        <a href="{{ route('siswa.profil') }}"
+                            class="nav-link {{ request()->routeIs('siswa.profil') ? 'active' : '' }}"
+                            data-tooltip="Profil Saya">
+                            <i class="bi bi-person-circle"></i>
+                            <span class="nav-text">Profil Saya</span>
                         </a>
+
+                        {{-- Cek apakah user sudah pernah mendaftar ekstrakurikuler --}}
+                        @if (auth()->user()->pendaftarans->count() > 0)
+                            {{-- Status Pendaftaran - Tampil jika ada pendaftaran --}}
+                            <a href="{{ route('siswa.pendaftaran') }}"
+                                class="nav-link {{ request()->routeIs('siswa.pendaftaran') ? 'active' : '' }}"
+                                data-tooltip="Status Pendaftaran">
+                                <i class="bi bi-clipboard-check"></i>
+                                <span class="nav-text">Status Pendaftaran</span>
+                                @php
+                                    $pendingCount = auth()->user()->pendaftarans()->where('status', 'pending')->count();
+                                    $approvedCount = auth()
+                                        ->user()
+                                        ->pendaftarans()
+                                        ->where('status', 'disetujui')
+                                        ->count();
+                                @endphp
+                            </a>
+                        @endif
+
+                        {{-- Menu berdasarkan status ekstrakurikuler --}}
+                        @if (!auth()->user()->sudahTerdaftarEkstrakurikuler())
+                            <div class="sidebar-section-header"><small>Pendaftaran</small></div>
+                            <a href="{{ route('siswa.rekomendasi') }}"
+                                class="nav-link {{ request()->routeIs('siswa.rekomendasi*') ? 'active' : '' }}"
+                                data-tooltip="Rekomendasi AI">
+                                <i class="bi bi-stars"></i>
+                                <span class="nav-text">Rekomendasi</span>
+                                <span class="badge bg-primary ms-auto">AI</span>
+                            </a>
+
+                            <a href="{{ route('siswa.ekstrakurikuler.index') }}"
+                                class="nav-link {{ request()->routeIs('siswa.ekstrakurikuler.*') ? 'active' : '' }}"
+                                data-tooltip="Lihat Ekstrakurikuler">
+                                <i class="bi bi-collection"></i>
+                                <span class="nav-text">Jelajahi Ekstrakurikuler</span>
+                            </a>
+                        @else
+                            <div class="sidebar-section-header"><small>Kegiatan Saya</small></div>
+                            <a href="{{ route('siswa.jadwal') }}"
+                                class="nav-link {{ request()->routeIs('siswa.jadwal*') ? 'active' : '' }}"
+                                data-tooltip="Jadwal">
+                                <i class="bi bi-calendar3"></i>
+                                <span class="nav-text">Jadwal</span>
+                            </a>
+
+                            <a href="{{ route('siswa.galeri.index') }}"
+                                class="nav-link {{ request()->routeIs('siswa.galeri*') ? 'active' : '' }}"
+                                data-tooltip="Galeri">
+                                <i class="bi bi-images"></i>
+                                <span class="nav-text">Galeri</span>
+                            </a>
+
+                            <a href="{{ route('siswa.pengumuman.index') }}"
+                                class="nav-link {{ request()->routeIs('siswa.pengumuman*') ? 'active' : '' }}"
+                                data-tooltip="Pengumuman">
+                                <i class="bi bi-megaphone"></i>
+                                <span class="nav-text">Pengumuman</span>
+                            </a>
+
+                            <div class="sidebar-section-header"><small>Lainnya</small></div>
+                            <a href="{{ route('siswa.ekstrakurikuler.index') }}"
+                                class="nav-link {{ request()->routeIs('siswa.ekstrakurikuler.*') && !request()->routeIs('siswa.ekstrakurikuler.show') ? 'active' : '' }}"
+                                data-tooltip="Lihat Ekstrakurikuler">
+                                <i class="bi bi-eye"></i>
+                                <span class="nav-text">Lihat Ekstrakurikuler</span>
+                            </a>
+                        @endif
                     @endif
                 @endif
             </div>
@@ -899,6 +936,81 @@
                 confirmLogout(e);
             }
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update badge status setiap 30 detik jika ada pendaftaran pending
+            @if (auth()->user()->pendaftarans()->where('status', 'pending')->count() > 0)
+                setInterval(function() {
+                    // Check for status updates via AJAX
+                    fetch('{{ route('siswa.pendaftaran.status') }}', {
+                            method: 'GET',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .getAttribute('content')
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Update badge berdasarkan status terbaru
+                                const statusLink = document.querySelector('a[href*="pendaftaran"]');
+                                if (statusLink) {
+                                    const currentBadge = statusLink.querySelector('.badge');
+
+                                    if (data.stats.pending > 0) {
+                                        if (currentBadge) {
+                                            currentBadge.textContent = data.stats.pending;
+                                            currentBadge.className = 'badge bg-warning ms-auto';
+                                        }
+                                    } else if (data.stats.approved > 0) {
+                                        if (currentBadge) {
+                                            currentBadge.innerHTML = '<i class="bi bi-check"></i>';
+                                            currentBadge.className = 'badge bg-success ms-auto';
+                                        }
+                                    }
+
+                                    // Show notification jika ada perubahan status
+                                    if (data.stats.has_changes) {
+                                        showStatusChangeNotification();
+                                    }
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.log('Status check failed:', error);
+                        });
+                }, 30000); // Check setiap 30 detik
+            @endif
+        });
+
+        function showStatusChangeNotification() {
+            // Create toast notification for status changes
+            const toastHTML = `
+        <div class="toast align-items-center text-white bg-info border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Status pendaftaran Anda telah diperbarui!
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+
+            // Add to toast container or create one
+            let toastContainer = document.querySelector('.toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+                toastContainer.style.zIndex = '1060';
+                document.body.appendChild(toastContainer);
+            }
+
+            toastContainer.innerHTML = toastHTML;
+            const toast = new bootstrap.Toast(toastContainer.querySelector('.toast'));
+            toast.show();
+        }
     </script>
 
     @stack('scripts')
