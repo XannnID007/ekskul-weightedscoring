@@ -28,6 +28,15 @@ class DatabaseSeeder extends Seeder
 
             $this->command->info('🏫 Seeding ekstrakurikuler...');
             $this->call(EkstrakurikulerSeeder::class);
+
+            $this->command->info('📢 Seeding pengumuman...');
+            $this->call(PengumumanSeeder::class);
+
+            $this->command->info('📸 Seeding galeri...');
+            $this->call(GaleriSeeder::class);
+
+            $this->command->info('📝 Seeding pendaftaran...');
+            $this->call(PendaftaranSeeder::class);
         } catch (\Exception $e) {
             $this->command->error('❌ Error during seeding: ' . $e->getMessage());
             throw $e;
@@ -38,9 +47,9 @@ class DatabaseSeeder extends Seeder
 
         $this->command->info('🎉 Database seeded successfully!');
         $this->command->info('📧 Login credentials:');
-        $this->command->info('   Admin: admin@miftah.com / admin123');
-        $this->command->info('   Pembina: budisantoso@miftah.com / pembina123');
-        $this->command->info('   Siswa: muhammadiqbal@student.com / siswa123');
+        $this->command->info('   Admin: admin@gmail.com / admin123');
+        $this->command->info('   Pembina: budisantoso@gmail.com / pembina123');
+        $this->command->info('   Siswa: ahmadrizkipratama@gmail.com / siswa123');
     }
 
     /**

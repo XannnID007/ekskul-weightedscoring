@@ -5,7 +5,7 @@
 @section('page-description', 'Detail informasi ekstrakurikuler dan pendaftaran')
 
 @section('page-actions')
-    <a href="{{ route('siswa.ekstrakurikuler.index') }}" class="btn btn-outline-light">
+    <a href="{{ route('siswa.ekstrakurikuler.index') }}" class="btn btn-light">
         <i class="bi bi-arrow-left me-1"></i>Kembali
     </a>
 @endsection

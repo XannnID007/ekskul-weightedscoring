@@ -687,5 +687,51 @@
             background: var(--bs-primary);
             border-radius: 3px;
         }
+
+        #registrationModal .modal-content {
+            background: var(--bs-white);
+            color: var(--bs-gray-800);
+            border: 1px solid var(--bs-gray-200);
+            border-radius: 1rem;
+        }
+
+        #registrationModal .modal-header {
+            background: linear-gradient(135deg, var(--bs-primary), var(--bs-info));
+            color: white;
+            border-bottom: none;
+        }
+
+        #registrationModal .btn-close-white {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+
+        #registrationModal .ekstrakurikuler-info {
+            background: var(--bs-primary-bg-subtle);
+            border: 1px solid var(--bs-primary-border-subtle);
+            border-radius: 0.75rem;
+            padding: 1rem;
+        }
+
+        #registrationModal .form-label,
+        #registrationModal .form-check-label {
+            color: var(--bs-gray-700);
+        }
+
+        #registrationModal .form-text {
+            color: var(--bs-gray-500);
+        }
+
+        #registrationModal .char-counter {
+            font-size: 0.75rem;
+            color: var(--bs-gray-500);
+        }
+
+        #registrationModal .char-counter.warning {
+            color: var(--bs-warning);
+        }
+
+        #registrationModal .char-counter.success {
+            color: var(--bs-success);
+        }
     </style>
 @endpush

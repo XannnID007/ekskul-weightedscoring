@@ -14,7 +14,7 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $role = $request->get('role', 'siswa');
-        $users = User::where('role', $role)->paginate(15);
+        $users = User::where('role', $role)->paginate(10);
 
         return view('admin.user.index', compact('users', 'role'));
     }

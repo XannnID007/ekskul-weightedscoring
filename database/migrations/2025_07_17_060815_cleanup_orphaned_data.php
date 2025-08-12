@@ -18,8 +18,6 @@ return new class extends Migration
         // Hapus data orphan di tabel pendaftarans
         DB::statement('DELETE FROM pendaftarans WHERE ekstrakurikuler_id NOT IN (SELECT id FROM ekstrakurikulers)');
 
-        // Hapus data orphan di tabel absensis
-        DB::statement('DELETE FROM absensis WHERE pendaftaran_id NOT IN (SELECT id FROM pendaftarans)');
 
         // Hapus data orphan di tabel pengumumans (jika ada)
         if (Schema::hasTable('pengumumans')) {
