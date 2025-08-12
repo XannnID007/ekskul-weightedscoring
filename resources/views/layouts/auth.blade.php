@@ -718,8 +718,7 @@
         <div class="auth-card fade-in">
             <!-- Auth Header -->
             <div class="auth-header">
-                <h3>
-                    <i class="bi bi-mortarboard-fill"></i>
+                <h3 style="color: var(--bs-primary)">
                     MiftahXKull
                 </h3>
                 <p>Sistem Ekstrakurikuler Modern</p>
@@ -734,7 +733,7 @@
             <div class="school-info">
                 <small>
                     <i class="bi bi-shield-check me-2"></i>
-                    MA Modern Miftahussa'adah - Platform Pembelajaran Digital
+                    MA Modern Miftahussa'adah Cimahi
                 </small>
             </div>
         </div>

@@ -4,12 +4,92 @@
 @section('page-title', $ekstrakurikuler->nama)
 @section('page-description', 'Detail informasi ekstrakurikuler')
 
+@push('styles')
+    <style>
+        /* Info di atas gambar header */
+        .header-overlay {
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%);
+        }
+
+        /* Kartu statistik mini untuk pendaftaran */
+        .mini-stats-card {
+            background-color: var(--bs-gray-50);
+            border: 1px solid var(--bs-gray-200);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .mini-stats-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+        }
+
+        .mini-stats-card .icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+        }
+
+        .mini-stats-card .icon.bg-success {
+            background-color: var(--bs-success-bg-subtle) !important;
+            color: var(--bs-success);
+        }
+
+        .mini-stats-card .icon.bg-warning {
+            background-color: var(--bs-warning-bg-subtle) !important;
+            color: var(--bs-warning);
+        }
+
+        .mini-stats-card .icon.bg-danger {
+            background-color: var(--bs-danger-bg-subtle) !important;
+            color: var(--bs-danger);
+        }
+
+        .mini-stats-card .icon.bg-info {
+            background-color: var(--bs-info-bg-subtle) !important;
+            color: var(--bs-info);
+        }
+
+        /* Info di sidebar kanan */
+        .quick-info-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--bs-gray-200);
+        }
+
+        .quick-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .quick-info-item .icon-wrapper {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            background-color: var(--bs-gray-100);
+            color: var(--bs-gray-600);
+        }
+    </style>
+@endpush
+
 @section('page-actions')
     <div class="d-flex gap-2">
         <a href="{{ route('admin.ekstrakurikuler.edit', $ekstrakurikuler) }}" class="btn btn-warning">
             <i class="bi bi-pencil me-1"></i>Edit
         </a>
-        <a href="{{ route('admin.ekstrakurikuler.index') }}" class="btn btn-outline-light">
+        <a href="{{ route('admin.ekstrakurikuler.index') }}" class="btn btn-light">
             <i class="bi bi-arrow-left me-1"></i>Kembali
         </a>
     </div>
@@ -17,319 +97,199 @@
 
 @section('content')
     <div class="row g-4">
-        <!-- Main Info -->
         <div class="col-xl-8">
-            <!-- Header Card -->
-            <div class="card mb-4">
+            <div class="card mb-4 overflow-hidden">
                 <div class="position-relative">
                     @if ($ekstrakurikuler->gambar)
                         <img src="{{ Storage::url($ekstrakurikuler->gambar) }}" class="card-img-top"
                             alt="{{ $ekstrakurikuler->nama }}" style="height: 300px; object-fit: cover;">
                     @else
-                        <div class="card-img-top d-flex align-items-center justify-content-center bg-gradient text-white"
-                            style="height: 300px; background: linear-gradient(135deg, var(--bs-primary) 0%, #8b5cf6 100%);">
+                        <div class="card-img-top d-flex align-items-center justify-content-center text-white"
+                            style="height: 300px; background: linear-gradient(135deg, var(--bs-primary), var(--bs-info));">
                             <i class="bi bi-collection" style="font-size: 5rem;"></i>
                         </div>
                     @endif
-
-                    <!-- Overlay Info -->
-                    <div class="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white p-4">
+                    <div class="position-absolute bottom-0 start-0 end-0 text-white p-4 header-overlay">
                         <div class="d-flex justify-content-between align-items-end">
                             <div>
-                                <h3 class="mb-1">{{ $ekstrakurikuler->nama }}</h3>
                                 <div class="mb-2">
                                     @if ($ekstrakurikuler->kategori && is_array($ekstrakurikuler->kategori))
                                         @foreach ($ekstrakurikuler->kategori as $kategori)
-                                            <span class="badge bg-light text-dark me-1">{{ ucfirst($kategori) }}</span>
+                                            <span class="badge bg-white text-dark me-1">{{ ucfirst($kategori) }}</span>
                                         @endforeach
                                     @endif
                                 </div>
-                                <p class="mb-0 opacity-75">Pembina:
-                                    {{ $ekstrakurikuler->pembina->name ?? 'Belum ditentukan' }}</p>
-                            </div>
-                            <div class="text-end">
-                                <span
-                                    class="badge bg-{{ $ekstrakurikuler->is_active ? 'success' : 'secondary' }} fs-6 px-3 py-2">
-                                    {{ $ekstrakurikuler->is_active ? 'Aktif' : 'Nonaktif' }}
-                                </span>
+                                <h2 class="mb-1 text-shadow">{{ $ekstrakurikuler->nama }}</h2>
+                                <p class="mb-0 opacity-75">
+                                    <i class="bi bi-person-check-fill me-1"></i>
+                                    {{ $ekstrakurikuler->pembina->name ?? 'Belum ditentukan' }}
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Description -->
             <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="bi bi-info-circle me-2"></i>Deskripsi
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <p class="mb-0">{{ $ekstrakurikuler->deskripsi }}</p>
+                <div class="card-body p-4">
+                    <h5 class="mb-3"><i class="bi bi-info-circle me-2 text-primary"></i>Deskripsi</h5>
+                    <p class="text-muted mb-0">{{ $ekstrakurikuler->deskripsi }}</p>
                 </div>
             </div>
 
-            <!-- Pendaftaran -->
             <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="bi bi-people me-2"></i>Data Pendaftaran
-                    </h5>
-                    <span class="badge bg-primary">{{ $ekstrakurikuler->pendaftarans->count() }} Total</span>
+                <div class="card-header bg-white border-0 pt-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-people me-2 text-primary"></i>Data Pendaftaran</h5>
+                    <span
+                        class="badge bg-primary-subtle text-primary-emphasis rounded-pill">{{ $ekstrakurikuler->pendaftarans->count() }}
+                        Total Pendaftar</span>
                 </div>
                 <div class="card-body">
                     <div class="row g-3 mb-4">
                         <div class="col-md-3">
-                            <div class="text-center">
-                                <div class="bg-success rounded-circle p-3 d-inline-flex mb-2">
-                                    <i class="bi bi-check-circle text-white"></i>
-                                </div>
-                                <div>
-                                    <strong
-                                        class="d-block fs-4">{{ $ekstrakurikuler->pendaftarans->where('status', 'disetujui')->count() }}</strong>
-                                    <small class="text-muted">Disetujui</small>
-                                </div>
+                            <div class="mini-stats-card">
+                                <div class="icon bg-success"><i class="bi bi-check-lg"></i></div>
+                                <strong
+                                    class="d-block fs-4">{{ $ekstrakurikuler->pendaftarans->where('status', 'disetujui')->count() }}</strong>
+                                <small class="text-muted">Disetujui</small>
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="text-center">
-                                <div class="bg-warning rounded-circle p-3 d-inline-flex mb-2">
-                                    <i class="bi bi-clock text-white"></i>
-                                </div>
-                                <div>
-                                    <strong
-                                        class="d-block fs-4">{{ $ekstrakurikuler->pendaftarans->where('status', 'pending')->count() }}</strong>
-                                    <small class="text-muted">Pending</small>
-                                </div>
+                            <div class="mini-stats-card">
+                                <div class="icon bg-warning"><i class="bi bi-clock"></i></div>
+                                <strong
+                                    class="d-block fs-4">{{ $ekstrakurikuler->pendaftarans->where('status', 'pending')->count() }}</strong>
+                                <small class="text-muted">Pending</small>
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="text-center">
-                                <div class="bg-danger rounded-circle p-3 d-inline-flex mb-2">
-                                    <i class="bi bi-x-circle text-white"></i>
-                                </div>
-                                <div>
-                                    <strong
-                                        class="d-block fs-4">{{ $ekstrakurikuler->pendaftarans->where('status', 'ditolak')->count() }}</strong>
-                                    <small class="text-muted">Ditolak</small>
-                                </div>
+                            <div class="mini-stats-card">
+                                <div class="icon bg-danger"><i class="bi bi-x-lg"></i></div>
+                                <strong
+                                    class="d-block fs-4">{{ $ekstrakurikuler->pendaftarans->where('status', 'ditolak')->count() }}</strong>
+                                <small class="text-muted">Ditolak</small>
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="text-center">
-                                <div class="bg-info rounded-circle p-3 d-inline-flex mb-2">
-                                    <i class="bi bi-percent text-white"></i>
-                                </div>
-                                <div>
-                                    <strong
-                                        class="d-block fs-4">{{ $ekstrakurikuler->kapasitas_maksimal > 0 ? round(($ekstrakurikuler->peserta_saat_ini / $ekstrakurikuler->kapasitas_maksimal) * 100) : 0 }}%</strong>
-                                    <small class="text-muted">Terisi</small>
-                                </div>
+                            <div class="mini-stats-card">
+                                <div class="icon bg-info"><i class="bi bi-pie-chart"></i></div>
+                                <strong
+                                    class="d-block fs-4">{{ $ekstrakurikuler->kapasitas_maksimal > 0 ? round(($ekstrakurikuler->peserta_saat_ini / $ekstrakurikuler->kapasitas_maksimal) * 100) : 0 }}%</strong>
+                                <small class="text-muted">Terisi</small>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Siswa List -->
                     @if ($ekstrakurikuler->pendaftarans->count() > 0)
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table class="table table-hover align-middle">
                                 <thead>
                                     <tr>
                                         <th>Nama Siswa</th>
-                                        <th>NIS</th>
                                         <th>Status</th>
                                         <th>Tanggal Daftar</th>
-                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($ekstrakurikuler->pendaftarans->take(10) as $pendaftaran)
+                                    @foreach ($ekstrakurikuler->pendaftarans->take(5) as $pendaftaran)
                                         <tr>
                                             <td>
                                                 <div class="d-flex align-items-center">
-                                                    <div class="bg-primary rounded-circle p-2 me-2">
-                                                        <i class="bi bi-person text-white"></i>
+                                                    <div class="user-avatar-sm me-3">
+                                                        <span>{{ strtoupper(substr($pendaftaran->user->name, 0, 2)) }}</span>
                                                     </div>
                                                     <div>
-                                                        <strong>{{ $pendaftaran->user->name }}</strong>
-                                                        <br><small
-                                                            class="text-muted">{{ $pendaftaran->user->email }}</small>
+                                                        <strong>{{ $pendaftaran->user->name }}</strong><br>
+                                                        <small
+                                                            class="text-muted">{{ $pendaftaran->user->nis ?? '-' }}</small>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>{{ $pendaftaran->user->nis ?? '-' }}</td>
                                             <td>
                                                 @if ($pendaftaran->status == 'pending')
-                                                    <span class="badge bg-warning">Pending</span>
+                                                    <span
+                                                        class="badge bg-warning-subtle text-warning-emphasis rounded-pill">Pending</span>
                                                 @elseif($pendaftaran->status == 'disetujui')
-                                                    <span class="badge bg-success">Disetujui</span>
+                                                    <span
+                                                        class="badge bg-success-subtle text-success-emphasis rounded-pill">Disetujui</span>
                                                 @else
-                                                    <span class="badge bg-danger">Ditolak</span>
+                                                    <span
+                                                        class="badge bg-danger-subtle text-danger-emphasis rounded-pill">Ditolak</span>
                                                 @endif
                                             </td>
-                                            <td>{{ $pendaftaran->created_at->format('d M Y') }}</td>
-                                            <td>
-                                                <a href="#" class="btn btn-outline-primary btn-sm"
-                                                    onclick="showPendaftaranDetail({{ $pendaftaran->id }})">
-                                                    <i class="bi bi-eye"></i>
-                                                </a>
+                                            <td><small
+                                                    class="text-muted">{{ $pendaftaran->created_at->format('d M Y') }}</small>
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         </div>
-                        @if ($ekstrakurikuler->pendaftarans->count() > 10)
-                            <div class="text-center mt-3">
-                                <small class="text-muted">Dan {{ $ekstrakurikuler->pendaftarans->count() - 10 }}
-                                    pendaftaran lainnya</small>
-                            </div>
-                        @endif
                     @else
-                        <div class="text-center py-4">
-                            <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
-                            <p class="text-muted mt-2">Belum ada pendaftaran</p>
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-people fs-1"></i>
+                            <p class="mt-2">Belum ada pendaftaran</p>
                         </div>
                     @endif
                 </div>
             </div>
-
-            <!-- Galeri -->
-            @if (isset($ekstrakurikuler->galeris) && $ekstrakurikuler->galeris->count() > 0)
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="bi bi-images me-2"></i>Galeri Kegiatan
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            @foreach ($ekstrakurikuler->galeris->take(6) as $galeri)
-                                <div class="col-md-4">
-                                    @if ($galeri->tipe == 'gambar')
-                                        <img src="{{ Storage::url($galeri->path_file) }}"
-                                            class="img-fluid rounded gallery-item" alt="{{ $galeri->judul }}"
-                                            style="height: 150px; width: 100%; object-fit: cover; cursor: pointer;"
-                                            onclick="showImage('{{ Storage::url($galeri->path_file) }}', '{{ $galeri->judul }}')">
-                                    @else
-                                        <div class="position-relative">
-                                            <video class="img-fluid rounded"
-                                                style="height: 150px; width: 100%; object-fit: cover;">
-                                                <source src="{{ Storage::url($galeri->path_file) }}" type="video/mp4">
-                                            </video>
-                                            <div class="position-absolute top-50 start-50 translate-middle">
-                                                <i class="bi bi-play-circle text-white" style="font-size: 2rem;"></i>
-                                            </div>
-                                        </div>
-                                    @endif
-                                    <small class="text-muted d-block mt-1">{{ $galeri->judul }}</small>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-            @endif
-
-            <!-- Pengumuman -->
-            @if (isset($ekstrakurikuler->pengumumans) && $ekstrakurikuler->pengumumans->count() > 0)
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="bi bi-megaphone me-2"></i>Pengumuman
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        @foreach ($ekstrakurikuler->pengumumans->take(3) as $pengumuman)
-                            <div class="d-flex align-items-start {{ !$loop->last ? 'border-bottom pb-3 mb-3' : '' }}">
-                                <div class="bg-primary rounded-circle p-2 me-3">
-                                    <i
-                                        class="bi bi-{{ $pengumuman->is_penting ? 'exclamation-triangle' : 'info-circle' }} text-white"></i>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-1">
-                                        {{ $pengumuman->judul }}
-                                        @if ($pengumuman->is_penting)
-                                            <span class="badge bg-warning ms-2">Penting</span>
-                                        @endif
-                                    </h6>
-                                    <p class="mb-1 text-muted">{{ Str::limit($pengumuman->konten, 150) }}</p>
-                                    <small class="text-muted">{{ $pengumuman->created_at->diffForHumans() }}</small>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
+            {{-- Galeri & Pengumuman bisa ditambahkan kembali di sini jika perlu --}}
         </div>
 
-        <!-- Sidebar -->
         <div class="col-xl-4">
-            <!-- Quick Info -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h6 class="mb-0">Informasi Cepat</h6>
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2 text-primary"></i>Informasi Cepat</h5>
                 </div>
                 <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label small text-muted">PEMBINA</label>
-                        <div class="d-flex align-items-center">
-                            <div class="bg-secondary rounded-circle p-2 me-2">
-                                <i class="bi bi-person text-white"></i>
-                            </div>
-                            <div>
-                                <strong>{{ $ekstrakurikuler->pembina->name ?? 'Belum ditentukan' }}</strong>
-                                @if ($ekstrakurikuler->pembina && $ekstrakurikuler->pembina->telepon)
-                                    <br><small class="text-muted">{{ $ekstrakurikuler->pembina->telepon }}</small>
-                                @endif
-                            </div>
+                    <div class="quick-info-item">
+                        <div class="icon-wrapper"><i class="bi bi-person-check-fill fs-5"></i></div>
+                        <div>
+                            <small class="text-muted">PEMBINA</small><br>
+                            <strong>{{ $ekstrakurikuler->pembina->name ?? 'Belum ditentukan' }}</strong>
                         </div>
                     </div>
-
-                    <div class="mb-3">
-                        <label class="form-label small text-muted">JADWAL</label>
-                        <div class="d-flex align-items-center">
-                            <div class="bg-info rounded-circle p-2 me-2">
-                                <i class="bi bi-calendar text-white"></i>
-                            </div>
+                    <div class="quick-info-item">
+                        <div class="icon-wrapper"><i class="bi bi-calendar3 fs-5"></i></div>
+                        <div>
+                            <small class="text-muted">JADWAL</small><br>
                             <strong>{{ $ekstrakurikuler->jadwal_string }}</strong>
                         </div>
                     </div>
-
-                    <div class="mb-3">
-                        <label class="form-label small text-muted">KAPASITAS</label>
-                        <div class="d-flex justify-content-between mb-1">
-                            <span>{{ $ekstrakurikuler->peserta_saat_ini }}/{{ $ekstrakurikuler->kapasitas_maksimal }}</span>
-                            <span>{{ $ekstrakurikuler->kapasitas_maksimal > 0 ? round(($ekstrakurikuler->peserta_saat_ini / $ekstrakurikuler->kapasitas_maksimal) * 100) : 0 }}%</span>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar {{ $ekstrakurikuler->masihBisaDaftar() ? 'bg-success' : 'bg-danger' }}"
-                                style="width: {{ $ekstrakurikuler->kapasitas_maksimal > 0 ? ($ekstrakurikuler->peserta_saat_ini / $ekstrakurikuler->kapasitas_maksimal) * 100 : 0 }}%">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label small text-muted">NILAI MINIMAL</label>
-                        <div class="d-flex align-items-center">
-                            <div class="bg-warning rounded-circle p-2 me-2">
-                                <i class="bi bi-trophy text-white"></i>
-                            </div>
+                    <div class="quick-info-item">
+                        <div class="icon-wrapper"><i class="bi bi-trophy fs-5"></i></div>
+                        <div>
+                            <small class="text-muted">NILAI MINIMAL</small><br>
                             <strong>{{ $ekstrakurikuler->nilai_minimal }}</strong>
                         </div>
                     </div>
-
-                    <div>
-                        <label class="form-label small text-muted">STATUS</label>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox"
-                                {{ $ekstrakurikuler->is_active ? 'checked' : '' }}
-                                onchange="toggleStatus({{ $ekstrakurikuler->id }}, this.checked)">
-                            <label class="form-check-label">
-                                <span class="badge bg-{{ $ekstrakurikuler->is_active ? 'success' : 'secondary' }}">
+                    <div class="quick-info-item">
+                        <div class="icon-wrapper"><i class="bi bi-pie-chart-fill fs-5"></i></div>
+                        <div class="w-100">
+                            <small class="text-muted">KAPASITAS</small>
+                            <div class="d-flex justify-content-between">
+                                <span>{{ $ekstrakurikuler->peserta_saat_ini }}/{{ $ekstrakurikuler->kapasitas_maksimal }}</span>
+                                <span>{{ $ekstrakurikuler->kapasitas_maksimal > 0 ? round(($ekstrakurikuler->peserta_saat_ini / $ekstrakurikuler->kapasitas_maksimal) * 100) : 0 }}%</span>
+                            </div>
+                            <div class="progress mt-1" style="height: 8px;">
+                                <div class="progress-bar {{ $ekstrakurikuler->masihBisaDaftar() ? 'bg-success' : 'bg-danger' }}"
+                                    style="width: {{ $ekstrakurikuler->kapasitas_maksimal > 0 ? ($ekstrakurikuler->peserta_saat_ini / $ekstrakurikuler->kapasitas_maksimal) * 100 : 0 }}%">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="quick-info-item">
+                        <div class="icon-wrapper"><i class="bi bi-toggles fs-5"></i></div>
+                        <div class="w-100">
+                            <small class="text-muted">STATUS</small><br>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox"
+                                    {{ $ekstrakurikuler->is_active ? 'checked' : '' }}
+                                    onchange="toggleStatus({{ $ekstrakurikuler->id }}, this.checked)">
+                                <label class="form-check-label fw-bold">
                                     {{ $ekstrakurikuler->is_active ? 'Aktif' : 'Nonaktif' }}
-                                </span>
-                            </label>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>

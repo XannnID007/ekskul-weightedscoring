@@ -6,10 +6,7 @@
 
 @section('page-actions')
     <div class="d-flex gap-2">
-        <button class="btn btn-success" onclick="exportAllData()">
-            <i class="bi bi-download me-1"></i>Export Semua
-        </button>
-        <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#filterModal">
+        <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#filterModal">
             <i class="bi bi-funnel me-1"></i>Filter Periode
         </button>
     </div>
@@ -17,6 +14,60 @@
 
 @push('styles')
     <style>
+        .stats-card {
+            border: 1px solid var(--bs-gray-200);
+            border-left: 5px solid var(--bs-primary);
+            transition: all 0.3s ease;
+        }
+
+        .stats-card .stats-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            background-color: rgba(60, 154, 231, 0.1);
+            color: var(--bs-primary);
+        }
+
+        .stats-card h2 {
+            font-weight: 700;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .stats-card.success {
+            border-left-color: var(--bs-success);
+        }
+
+        .stats-card.success .stats-icon {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--bs-success);
+        }
+
+        .stats-card.warning {
+            border-left-color: var(--bs-warning);
+        }
+
+        .stats-card.warning .stats-icon {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--bs-warning);
+        }
+
+        .stats-card.danger {
+            border-left-color: var(--bs-danger);
+        }
+
+        .stats-card.danger .stats-icon {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--bs-danger);
+        }
+
         .report-card {
             background: linear-gradient(135deg, var(--bs-gray-800) 0%, var(--bs-dark) 100%);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -205,7 +256,7 @@
 
     <div class="row g-4">
         <!-- Chart Pendaftaran per Bulan -->
-        <div class="col-xl-8">
+        <div class="col-xl-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Tren Pendaftaran</h5>
@@ -219,37 +270,6 @@
                 <div class="card-body">
                     <canvas id="chartPendaftaran" height="300"></canvas>
                 </div>
-            </div>
-        </div>
-
-        <!-- Quick Export -->
-        <div class="col-xl-4">
-            <div class="quick-export-section">
-
-                <div class="row g-3">
-                    <div class="col-6">
-                        <div class="export-format-card format-excel" onclick="exportData('all', 'excel')">
-                            <div class="export-format-icon">
-                                <i class="bi bi-file-earmark-excel"></i>
-                            </div>
-                            <h6 class="mb-1">Excel</h6>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="export-format-card format-pdf" onclick="exportData('all', 'pdf')">
-                            <div class="export-format-icon">
-                                <i class="bi bi-file-earmark-pdf"></i>
-                            </div>
-                            <h6 class="mb-1">PDF</h6>
-                        </div>
-                    </div>
-                </div>
-
-                <hr class="my-3">
-
-                <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#filterModal">
-                    <i class="bi bi-funnel me-2"></i>Export dengan Filter
-                </button>
             </div>
         </div>
     </div>
@@ -269,8 +289,7 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Tanggal Mulai</label>
-                                <input type="date" class="form-control" name="start_date"
-                                    value="{{ date('Y-m-01') }}">
+                                <input type="date" class="form-control" name="start_date" value="{{ date('Y-m-01') }}">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Tanggal Akhir</label>

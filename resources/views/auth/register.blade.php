@@ -104,7 +104,6 @@
         <div class="text-center mt-3">
             <span class="text-muted">Sudah punya akun? </span>
             <a href="{{ route('login') }}" class="text-decoration-none">
-                <i class="bi bi-box-arrow-in-right me-1"></i>
                 Masuk di sini
             </a>
         </div>

@@ -63,8 +63,8 @@
             </button>
         </div>
 
-        <div class="text-center mt-3">
-            <hr>
+        <div class="text-center mt-2">
+            <hr style="background-color: var(--bs-primary); height: 2px;">
             <span class="text-muted">Belum punya akun? </span>
             <a href="{{ route('register') }}" class="text-decoration-none">
                 Daftar sebagai siswa

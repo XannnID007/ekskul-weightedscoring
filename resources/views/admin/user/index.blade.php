@@ -12,6 +12,49 @@
     </div>
 @endsection
 
+@push('styles')
+    <style>
+        .btn-action {
+            background-color: transparent;
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bs-gray-500);
+            transition: all 0.2s ease;
+        }
+
+        /* Menghilangkan panah default dropdown */
+        .btn-action::after {
+            display: none;
+        }
+
+        .btn-action:hover,
+        .btn-action:focus {
+            background-color: var(--bs-gray-100);
+            color: var(--bs-primary);
+        }
+
+        /* Saat dropdown terbuka */
+        .btn-action.show {
+            background-color: var(--bs-primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(var(--bs-primary-rgb), 0.4);
+        }
+
+        /* Style untuk ikon di dalam menu */
+        .dropdown-menu .dropdown-item i {
+            width: 1.25rem;
+            display: inline-block;
+            text-align: center;
+            margin-right: 0.5rem;
+        }
+    </style>
+@endpush
+
 @section('content')
     <!-- Role Tabs -->
     <div class="card mb-4">
@@ -38,14 +81,6 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Daftar {{ ucfirst($role) }}</h5>
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#filterModal">
-                    <i class="bi bi-funnel me-1"></i>Filter
-                </button>
-                <button class="btn btn-outline-success btn-sm" onclick="exportData()">
-                    <i class="bi bi-download me-1"></i>Export
-                </button>
-            </div>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -57,7 +92,7 @@
                             <th width="20%">Email</th>
                             @if ($role == 'siswa')
                                 <th width="10%">NIS</th>
-                                <th width="10%">Jenis Kelamin</th>
+                                <th width="10%">Gender</th>
                                 <th width="10%">Nilai AVG</th>
                             @endif
                             <th width="10%">Status</th>
@@ -120,20 +155,20 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="dropdown">
-                                        <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button"
+                                    <div class="dropdown" style="position: static;">
+                                        <button class="btn btn-action dropdown-toggle" type="button"
                                             data-bs-toggle="dropdown">
                                             <i class="bi bi-three-dots-vertical"></i>
                                         </button>
-                                        <ul class="dropdown-menu">
+                                        <ul class="dropdown-menu dropdown-menu-end">
                                             <li>
                                                 <a class="dropdown-item" href="{{ route('admin.user.show', $user) }}">
-                                                    <i class="bi bi-eye me-2"></i>Detail
+                                                    <i class="bi bi-eye"></i>Detail
                                                 </a>
                                             </li>
                                             <li>
                                                 <a class="dropdown-item" href="{{ route('admin.user.edit', $user) }}">
-                                                    <i class="bi bi-pencil me-2"></i>Edit
+                                                    <i class="bi bi-pencil"></i>Edit
                                                 </a>
                                             </li>
                                             @if ($user->id !== auth()->id())
@@ -143,7 +178,7 @@
                                                 <li>
                                                     <a class="dropdown-item text-danger" href="#"
                                                         onclick="confirmDelete('{{ route('admin.user.destroy', $user) }}')">
-                                                        <i class="bi bi-trash me-2"></i>Hapus
+                                                        <i class="bi bi-trash"></i>Hapus
                                                     </a>
                                                 </li>
                                             @endif

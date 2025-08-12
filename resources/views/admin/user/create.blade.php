@@ -5,7 +5,7 @@
 @section('page-description', 'Buat akun ' . $role . ' baru')
 
 @section('page-actions')
-    <a href="{{ route('admin.user.index', ['role' => $role]) }}" class="btn btn-outline-light">
+    <a href="{{ route('admin.user.index', ['role' => $role]) }}" class="btn btn-light">
         <i class="bi bi-arrow-left me-1"></i>Kembali
     </a>
 @endsection
