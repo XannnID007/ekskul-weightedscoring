@@ -21,16 +21,21 @@
         .galeri-thumbnail-wrapper {
             position: relative;
             overflow: hidden;
-            cursor: pointer;
+            height: 200px;
+            /* Memberi tinggi yang konsisten */
         }
 
         .galeri-thumbnail-wrapper img,
         .galeri-thumbnail-wrapper video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Memastikan media memenuhi area tanpa distorsi */
             transition: transform 0.4s ease;
         }
 
-        .galeri-thumbnail-wrapper:hover img,
-        .galeri-thumbnail-wrapper:hover video {
+        .galeri-card:hover .galeri-thumbnail-wrapper img,
+        .galeri-card:hover .galeri-thumbnail-wrapper video {
             transform: scale(1.05);
         }
 
@@ -47,25 +52,25 @@
             transition: background 0.3s ease;
         }
 
-        .galeri-thumbnail-wrapper:hover .galeri-overlay {
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 70%);
-        }
-
         .play-icon-overlay {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             font-size: 3rem;
-            color: white;
-            opacity: 0.8;
+            color: rgba(255, 255, 255, 0.8);
             pointer-events: none;
-            /* Agar tidak menghalangi klik */
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
 
-        .galeri-thumbnail-wrapper:hover .play-icon-overlay {
+        .galeri-card:hover .play-icon-overlay {
             opacity: 1;
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .btn-check:checked+.btn-outline-primary {
+            background-color: var(--bs-primary);
+            color: white;
         }
     </style>
 @endpush
@@ -110,13 +115,13 @@
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
             <div class="btn-group" role="group">
                 <input type="radio" class="btn-check" name="filter" id="semua" value="semua" checked>
-                <label class="btn btn-outline-primary" for="semua"><i class="bi bi-grid-3x3-gap"></i> Semua</label>
+                <label class="btn btn-outline-primary" for="semua"><i class="bi bi-grid-3x3-gap me-1"></i> Semua</label>
 
                 <input type="radio" class="btn-check" name="filter" id="gambar" value="gambar">
-                <label class="btn btn-outline-primary" for="gambar"><i class="bi bi-image"></i> Foto</label>
+                <label class="btn btn-outline-primary" for="gambar"><i class="bi bi-image me-1"></i> Foto</label>
 
                 <input type="radio" class="btn-check" name="filter" id="video" value="video">
-                <label class="btn btn-outline-primary" for="video"><i class="bi bi-play-btn"></i> Video</label>
+                <label class="btn btn-outline-primary" for="video"><i class="bi bi-play-btn me-1"></i> Video</label>
             </div>
             <div class="mt-3 mt-md-0">
                 <input type="text" class="form-control" id="searchInput" placeholder="Cari berdasarkan judul...">
@@ -127,34 +132,34 @@
             @foreach ($galeris as $galeri)
                 <div class="col-lg-3 col-md-4 col-sm-6 galeri-item" data-type="{{ $galeri->tipe }}"
                     data-title="{{ strtolower($galeri->judul) }}">
-                    <div class="card galeri-card h-100" data-bs-toggle="modal" data-bs-target="#galeriModal"
-                        data-src="{{ Storage::url($galeri->path_file) }}" data-title="{{ $galeri->judul }}"
-                        data-description="{{ $galeri->deskripsi }}" data-type="{{ $galeri->tipe }}">
-                        <div class="galeri-thumbnail-wrapper">
-                            @if ($galeri->tipe == 'gambar')
-                                <img src="{{ Storage::url($galeri->path_file) }}" class="card-img-top"
-                                    alt="{{ $galeri->judul }}" style="height: 200px; object-fit: cover;">
-                            @else
-                                <div class="card-img-top bg-dark d-flex align-items-center justify-content-center"
-                                    style="height: 200px;">
-                                    <video class="w-100 h-100" style="object-fit: cover;" muted>
-                                        <source src="{{ Storage::url($galeri->path_file) }}" type="video/mp4">
+
+                    {{-- DIBUNGKUS DENGAN TAG <a> AGAR BISA DIKLIK --}}
+                    <a href="{{ route('siswa.galeri.show', ['ekstrakurikuler' => $ekstrakurikuler->id, 'galeri' => $galeri->id]) }}"
+                        class="text-decoration-none text-dark">
+                        <div class="card galeri-card h-100">
+                            <div class="galeri-thumbnail-wrapper">
+                                @if ($galeri->tipe == 'gambar')
+                                    <img src="{{ Storage::url($galeri->path_file) }}" class="card-img-top"
+                                        alt="{{ $galeri->judul }}">
+                                @else
+                                    <video class="card-img-top" muted preload="metadata">
+                                        <source src="{{ Storage::url($galeri->path_file) }}#t=0.5" type="video/mp4">
                                     </video>
                                     <div class="play-icon-overlay"><i class="bi bi-play-circle-fill"></i></div>
+                                @endif
+                                <div class="galeri-overlay">
+                                    <span
+                                        class="badge bg-{{ $galeri->tipe == 'gambar' ? 'info' : 'warning' }}-subtle text-{{ $galeri->tipe == 'gambar' ? 'info' : 'warning' }}-emphasis rounded-pill">
+                                        {{ ucfirst($galeri->tipe) }}
+                                    </span>
                                 </div>
-                            @endif
-                            <div class="galeri-overlay">
-                                <span
-                                    class="badge bg-{{ $galeri->tipe == 'gambar' ? 'info' : 'warning' }}-subtle text-{{ $galeri->tipe == 'gambar' ? 'info' : 'warning' }}-emphasis rounded-pill">
-                                    {{ ucfirst($galeri->tipe) }}
-                                </span>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="card-title">{{ Str::limit($galeri->judul, 35) }}</h6>
+                                <small class="text-muted">{{ $galeri->created_at->diffForHumans() }}</small>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <h6 class="card-title">{{ Str::limit($galeri->judul, 35) }}</h6>
-                            <small class="text-muted">{{ $galeri->created_at->diffForHumans() }}</small>
-                        </div>
-                    </div>
+                    </a>
                 </div>
             @endforeach
         </div>
@@ -168,78 +173,12 @@
             <p class="text-muted">Galeri untuk ekstrakurikuler ini masih kosong.</p>
         </div>
     @endif
-
-    {{-- Modal Galeri tetap sama --}}
 @endsection
-
-@push('styles')
-    <style>
-        .galeri-card {
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .galeri-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .galeri-thumbnail {
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .galeri-thumbnail:hover {
-            transform: scale(1.05);
-        }
-
-        .btn-check:checked+.btn-outline-primary {
-            background-color: var(--bs-primary);
-            color: white;
-        }
-
-        .modal-body img,
-        .modal-body video {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-        }
-    </style>
-@endpush
 
 @push('scripts')
     <script>
-        // Modal functionality
         document.addEventListener('DOMContentLoaded', function() {
-            const galeriModal = document.getElementById('galeriModal');
-            const modalTitle = document.getElementById('galeriModalTitle');
-            const modalContent = document.getElementById('galeriModalContent');
-            const modalDescription = document.getElementById('galeriModalDescription');
-
-            // Handle modal show
-            galeriModal.addEventListener('show.bs.modal', function(event) {
-                const button = event.relatedTarget;
-                const src = button.getAttribute('data-src');
-                const title = button.getAttribute('data-title');
-                const description = button.getAttribute('data-description');
-                const type = button.getAttribute('data-type');
-
-                modalTitle.textContent = title;
-                modalDescription.textContent = description || 'Tidak ada deskripsi';
-
-                if (type === 'image') {
-                    modalContent.innerHTML = `<img src="${src}" alt="${title}" class="img-fluid">`;
-                } else {
-                    modalContent.innerHTML = `
-                        <video controls class="w-100" style="max-height: 70vh;">
-                            <source src="${src}" type="video/mp4">
-                            Browser Anda tidak mendukung video.
-                        </video>
-                    `;
-                }
-            });
-
-            // Filter functionality
+            // Logika untuk filter dan search
             const filterButtons = document.querySelectorAll('input[name="filter"]');
             const galeriItems = document.querySelectorAll('.galeri-item');
             const searchInput = document.getElementById('searchInput');
@@ -257,7 +196,6 @@
 
                     if (typeMatch && searchMatch) {
                         item.style.display = 'block';
-                        item.style.animation = 'fadeIn 0.3s ease';
                     } else {
                         item.style.display = 'none';
                     }

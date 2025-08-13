@@ -24,72 +24,33 @@
                         @csrf
                         <input type="hidden" name="role" value="{{ $role }}">
 
-                        <!-- Data Dasar -->
-                        <h6 class="mb-3 text-primary">
-                            <i class="bi bi-person me-2"></i>Data Dasar
-                        </h6>
-
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <label for="name" class="form-label">Nama Lengkap *</label>
-                                <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                    id="name" name="name" value="{{ old('name') }}" required>
-                                @error('name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label for="email" class="form-label">Email *</label>
-                                <input type="email" class="form-control @error('email') is-invalid @enderror"
-                                    id="email" name="email" value="{{ old('email') }}" required>
-                                @error('email')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label for="password" class="form-label">Password *</label>
-                                <div class="input-group">
-                                    <input type="password" class="form-control @error('password') is-invalid @enderror"
-                                        id="password" name="password" required>
-                                    <button class="btn btn-outline-secondary" type="button"
-                                        onclick="togglePassword('password')">
-                                        <i class="bi bi-eye" id="password-icon"></i>
-                                    </button>
-                                </div>
-                                <div class="form-text">Minimal 6 karakter</div>
-                                @error('password')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label for="telepon" class="form-label">Nomor Telepon</label>
-                                <input type="text" class="form-control @error('telepon') is-invalid @enderror"
-                                    id="telepon" name="telepon" value="{{ old('telepon') }}">
-                                @error('telepon')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
                         @if ($role == 'siswa')
-                            <!-- Data Siswa -->
+                            {{-- FORMULIR KHUSUS JIKA ROLE ADALAH SISWA --}}
                             <h6 class="mb-3 text-primary">
-                                <i class="bi bi-person-badge me-2"></i>Data Siswa
+                                <i class="bi bi-person-badge me-2"></i>Data Pokok Siswa
                             </h6>
-
                             <div class="row g-3 mb-4">
+                                <div class="col-md-12">
+                                    <label for="name" class="form-label">Nama Lengkap *</label>
+                                    <input type="text" class="form-control @error('name') is-invalid @enderror"
+                                        id="name" name="name" value="{{ old('name') }}" required>
+                                    @error('name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
                                 <div class="col-md-6">
-                                    <label for="nis" class="form-label">NIS</label>
+                                    <label for="nis" class="form-label">NISN *</label>
                                     <input type="text" class="form-control @error('nis') is-invalid @enderror"
-                                        id="nis" name="nis" value="{{ old('nis') }}">
+                                        id="nis" name="nis" value="{{ old('nis') }}" required>
+                                    <div class="form-text">NISN akan digunakan siswa untuk registrasi.</div>
                                     @error('nis')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
+                                    <label for="jenis_kelamin" class="form-label">Jenis Kelamin *</label>
                                     <select class="form-select @error('jenis_kelamin') is-invalid @enderror"
-                                        id="jenis_kelamin" name="jenis_kelamin">
+                                        id="jenis_kelamin" name="jenis_kelamin" required>
                                         <option value="">Pilih Jenis Kelamin</option>
                                         <option value="L" {{ old('jenis_kelamin') == 'L' ? 'selected' : '' }}>
                                             Laki-laki</option>
@@ -100,51 +61,48 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
+                            </div>
+                        @else
+                            {{-- FORMULIR LAMA UNTUK ADMIN DAN PEMBINA --}}
+                            <h6 class="mb-3 text-primary">
+                                <i class="bi bi-person me-2"></i>Data Dasar
+                            </h6>
+                            <div class="row g-3 mb-4">
                                 <div class="col-md-6">
-                                    <label for="tanggal_lahir" class="form-label">Tanggal Lahir</label>
-                                    <input type="date" class="form-control @error('tanggal_lahir') is-invalid @enderror"
-                                        id="tanggal_lahir" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}">
-                                    @error('tanggal_lahir')
+                                    <label for="name" class="form-label">Nama Lengkap *</label>
+                                    <input type="text" class="form-control @error('name') is-invalid @enderror"
+                                        id="name" name="name" value="{{ old('name') }}" required>
+                                    @error('name')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="nilai_rata_rata" class="form-label">Nilai Rata-rata</label>
-                                    <input type="number"
-                                        class="form-control @error('nilai_rata_rata') is-invalid @enderror"
-                                        id="nilai_rata_rata" name="nilai_rata_rata" value="{{ old('nilai_rata_rata') }}"
-                                        min="0" max="100" step="0.1">
-                                    @error('nilai_rata_rata')
+                                    <label for="email" class="form-label">Email *</label>
+                                    <input type="email" class="form-control @error('email') is-invalid @enderror"
+                                        id="email" name="email" value="{{ old('email') }}" required>
+                                    @error('email')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
-                                <div class="col-12">
-                                    <label for="alamat" class="form-label">Alamat</label>
-                                    <textarea class="form-control @error('alamat') is-invalid @enderror" id="alamat" name="alamat" rows="3">{{ old('alamat') }}</textarea>
-                                    @error('alamat')
+                                <div class="col-md-6">
+                                    <label for="password" class="form-label">Password *</label>
+                                    <input type="password" class="form-control @error('password') is-invalid @enderror"
+                                        id="password" name="password" required>
+                                    <div class="form-text">Minimal 6 karakter</div>
+                                    @error('password')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="telepon" class="form-label">Nomor Telepon</label>
+                                    <input type="text" class="form-control @error('telepon') is-invalid @enderror"
+                                        id="telepon" name="telepon" value="{{ old('telepon') }}">
+                                    @error('telepon')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
                         @endif
-
-                        <!-- Status -->
-                        <h6 class="mb-3 text-primary">
-                            <i class="bi bi-toggles me-2"></i>Status Akun
-                        </h6>
-
-                        <div class="mb-4">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active"
-                                    value="1" checked>
-                                <label class="form-check-label" for="is_active">
-                                    Akun Aktif
-                                </label>
-                            </div>
-                            <div class="form-text">Akun yang tidak aktif tidak dapat login ke sistem</div>
-                        </div>
-
-                        <!-- Submit Button -->
                         <div class="d-flex justify-content-end gap-2">
                             <a href="{{ route('admin.user.index', ['role' => $role]) }}" class="btn btn-secondary">
                                 <i class="bi bi-x-lg me-1"></i>Batal

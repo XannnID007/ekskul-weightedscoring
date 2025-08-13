@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
+use App\Rules\NisnIsRegistered; // <-- PENTING: Impor aturan validasi baru
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
@@ -13,9 +14,6 @@ class RegisterController extends Controller
 {
     use RegistersUsers;
 
-    /**
-     * Where to redirect users after registration.
-     */
     protected $redirectTo = '/siswa/dashboard';
 
     public function __construct()
@@ -25,53 +23,52 @@ class RegisterController extends Controller
 
     /**
      * Get a validator for an incoming registration request.
+     *
+     * Diubah untuk menggunakan aturan validasi kustom kita.
      */
     protected function validator(array $data)
     {
+        // Gunakan aturan NisnIsRegistered yang telah kita buat
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'nis' => ['required', 'string', 'unique:users', 'regex:/^[0-9]{6,10}$/'],
+            'nis' => ['required', 'string', new NisnIsRegistered()], // <-- PENTING: Terapkan aturan di sini
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ], [
-            'name.required' => 'Nama lengkap wajib diisi',
-            'email.required' => 'Email wajib diisi',
-            'email.unique' => 'Email sudah terdaftar',
-            'nis.required' => 'NIS wajib diisi',
-            'nis.unique' => 'NIS sudah terdaftar',
-            'nis.regex' => 'Format NIS tidak valid (harus 6-10 digit angka)',
-            'password.required' => 'Password wajib diisi',
-            'password.min' => 'Password minimal 8 karakter',
-            'password.confirmed' => 'Konfirmasi password tidak cocok',
         ]);
     }
 
     /**
-     * Create a new user instance after a valid registration.
+     * Mengubah proses dari "Create" menjadi "Update".
+     *
+     * Fungsi ini tidak lagi membuat user baru, tapi mencari "akun bayangan"
+     * yang cocok dengan NISN, lalu meng-update-nya dengan data baru.
      */
     protected function create(array $data)
     {
-        return User::create([
+        // 1. Cari user "akun bayangan" berdasarkan NISN.
+        // Kita bisa yakin user ini ada karena sudah lolos validasi.
+        $user = User::where('nis', $data['nis'])->first();
+
+        // 2. Update data user tersebut dengan email dan password asli.
+        $user->update([
             'name' => $data['name'],
             'email' => $data['email'],
-            'nis' => $data['nis'],
             'password' => Hash::make($data['password']),
-            'role' => 'siswa',
-            'is_active' => true,
-            'email_verified_at' => now(),
+            'email_verified_at' => now(), // Aktifkan akunnya!
         ]);
+
+        // 3. Kembalikan user yang sudah di-update
+        return $user;
     }
 
     /**
      * The user has been registered.
      */
-
     protected function registered($request, $user)
     {
-        // Optional: Log atau notifikasi untuk admin
-        Log::info('Siswa baru mendaftar: ' . $user->name . ' (' . $user->email . ')');
+        Log::info('Siswa mengaktifkan akun: ' . $user->name . ' (' . $user->email . ')');
 
         return redirect($this->redirectPath())
-            ->with('success', 'Akun berhasil dibuat! Silakan lengkapi profil Anda untuk mendapatkan rekomendasi ekstrakurikuler.');
+            ->with('success', 'Registrasi berhasil! Akun Anda kini telah aktif.');
     }
 }
