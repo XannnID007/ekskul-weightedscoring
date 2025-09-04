@@ -132,7 +132,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // Siswa Routes
-    // Siswa Routes
     Route::middleware(['role:siswa'])->prefix('siswa')->name('siswa.')->group(function () {
         Route::get('/dashboard', [SiswaDashboardController::class, 'index'])->name('dashboard');
 
@@ -179,6 +178,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
     });
 });
+
 // API Routes untuk AJAX calls
 Route::middleware(['auth'])->prefix('api')->name('api.')->group(function () {
 
@@ -191,7 +191,10 @@ Route::middleware(['auth'])->prefix('api')->name('api.')->group(function () {
 
     // Siswa API
     Route::middleware(['role:siswa'])->prefix('siswa')->name('siswa.')->group(function () {
-        Route::get('/jadwal/events', [SiswaJadwalController::class, 'getEvents']);
+        // Jadwal API - UPDATED
+        Route::get('/jadwal/events', [SiswaJadwalController::class, 'getCalendarEvents'])->name('jadwal.events');
+
+        // Dashboard API
         Route::get('/notifikasi', [SiswaDashboardController::class, 'getNotifikasi']);
         Route::post('/notifikasi/{id}/read', [SiswaDashboardController::class, 'markAsRead']);
     });

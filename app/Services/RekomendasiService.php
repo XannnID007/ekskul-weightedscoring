@@ -16,14 +16,10 @@ class RekomendasiService
 
      public function generateRekomendasi(User $siswa)
      {
-          // Hapus rekomendasi lama
           Rekomendasi::where('user_id', $siswa->id)->delete();
 
-          // Ambil semua ekstrakurikuler yang tersedia
           $ekstrakurikulers = Ekstrakurikuler::aktif()->tersedia()->get();
-
           $rekomendasis = [];
-
           foreach ($ekstrakurikulers as $ekstrakurikuler) {
                // Hitung skor untuk setiap kriteria
                $skorMinat = $this->hitungSkorMinat($siswa, $ekstrakurikuler);
@@ -35,10 +31,8 @@ class RekomendasiService
                     ($skorAkademik * self::BOBOT_AKADEMIK) +
                     ($skorJadwal * self::BOBOT_JADWAL);
 
-               // Generate alasan rekomendasi
                $alasan = $this->generateAlasan($siswa, $ekstrakurikuler, $skorMinat, $skorAkademik, $skorJadwal);
 
-               // Simpan rekomendasi
                $rekomendasi = Rekomendasi::create([
                     'user_id' => $siswa->id,
                     'ekstrakurikuler_id' => $ekstrakurikuler->id,
@@ -48,58 +42,39 @@ class RekomendasiService
                     'total_skor' => $totalSkor,
                     'alasan' => $alasan
                ]);
-
                $rekomendasis[] = $rekomendasi;
           }
-
-          // Urutkan berdasarkan total skor tertinggi
           return collect($rekomendasis)->sortByDesc('total_skor');
      }
 
      private function hitungSkorMinat(User $siswa, Ekstrakurikuler $ekstrakurikuler)
      {
-          // Ambil minat siswa dengan safety check
           $minatSiswa = $this->getArrayFromJsonField($siswa->minat);
           $kategoriEkskul = $this->getArrayFromJsonField($ekstrakurikuler->kategori);
 
-          // Jika salah satu data kosong, berikan skor netral
           if (empty($minatSiswa) || empty($kategoriEkskul)) {
-               return 50; // Skor netral jika data tidak lengkap
+               return 50;
           }
-
-          // Double check: pastikan keduanya adalah array
           if (!is_array($minatSiswa)) {
                $minatSiswa = [];
           }
-
           if (!is_array($kategoriEkskul)) {
                $kategoriEkskul = [];
           }
-
-          // Hitung kecocokan minat dengan safety check
           $kecocokan = [];
           if (!empty($minatSiswa) && !empty($kategoriEkskul)) {
                $kecocokan = array_intersect($minatSiswa, $kategoriEkskul);
           }
-
           $jumlahKecocokan = count($kecocokan);
           $jumlahKategori = count($kategoriEkskul);
-
-          // Avoid division by zero
           if ($jumlahKategori === 0) {
                return 50;
           }
-
           $persentaseKecocokan = $jumlahKecocokan / $jumlahKategori;
-
-          // Konversi ke skor 0-100
           $skor = $persentaseKecocokan * 100;
-
-          // Tambahan skor jika ada kecocokan sempurna
           if ($persentaseKecocokan >= 0.8) {
-               $skor += 10; // Bonus untuk kecocokan tinggi
+               $skor += 10;
           }
-
           return min(100, $skor);
      }
 
@@ -131,7 +106,6 @@ class RekomendasiService
      private function hitungSkorJadwal(User $siswa, Ekstrakurikuler $ekstrakurikuler)
      {
           // Untuk saat ini, berikan skor berdasarkan preferensi umum
-          // Bisa dikembangkan dengan input preferensi jadwal dari siswa
 
           $jadwal = $this->getArrayFromJsonField($ekstrakurikuler->jadwal);
           $hari = $jadwal['hari'] ?? '';

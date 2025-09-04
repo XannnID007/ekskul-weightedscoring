@@ -7,7 +7,6 @@
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
-        <!-- Email Field -->
         <div class="mb-3">
             <label for="email" class="form-label">
                 <i class="bi bi-envelope me-1"></i>
@@ -18,33 +17,32 @@
 
             @error('email')
                 <div class="invalid-feedback">
-                    {{ $message }}
+                    <strong>{{ $message }}</strong>
                 </div>
             @enderror
         </div>
 
-        <!-- Password Field -->
         <div class="mb-3">
             <label for="password" class="form-label">
                 <i class="bi bi-lock me-1"></i>
                 Password
             </label>
-            <div class="input-group">
+            {{-- Tambahkan class 'has-validation' di sini --}}
+            <div class="input-group has-validation">
                 <input id="password" type="password" class="form-control @error('password') is-invalid @enderror"
                     name="password" required autocomplete="current-password" placeholder="Masukkan password Anda">
                 <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password')">
                     <i class="bi bi-eye"></i>
                 </button>
-            </div>
 
-            @error('password')
-                <div class="invalid-feedback">
-                    {{ $message }}
-                </div>
-            @enderror
+                @error('password')
+                    <div class="invalid-feedback">
+                        <strong>{{ $message }}</strong>
+                    </div>
+                @enderror
+            </div>
         </div>
 
-        <!-- Remember Me -->
         <div class="mb-3">
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" name="remember" id="remember"
@@ -55,7 +53,6 @@
             </div>
         </div>
 
-        <!-- Submit Button -->
         <div class="d-grid">
             <button type="submit" class="btn btn-primary btn-md">
                 <i class="bi bi-box-arrow-in-right me-2"></i>

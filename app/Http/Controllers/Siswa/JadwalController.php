@@ -26,22 +26,21 @@ class JadwalController extends Controller
 
         $ekstrakurikuler = $pendaftaran->ekstrakurikuler;
 
-        // Generate calendar data
-        $calendarData = $this->generateCalendarData($ekstrakurikuler);
-
-        // Get upcoming activities (next 7 days)
+        // Generate upcoming activities berdasarkan jadwal real
         $upcomingActivities = $this->getUpcomingActivities($ekstrakurikuler);
 
         // Get recent announcements
-        $announcements = $ekstrakurikuler->pengumumans()
-            ->latest()
-            ->limit(5)
-            ->get();
+        $announcements = [];
+        if (class_exists('App\Models\Pengumuman')) {
+            $announcements = $ekstrakurikuler->pengumumans()
+                ->latest()
+                ->limit(5)
+                ->get();
+        }
 
         return view('siswa.jadwal.index', compact(
             'pendaftaran',
             'ekstrakurikuler',
-            'calendarData',
             'upcomingActivities',
             'announcements'
         ));
@@ -65,15 +64,19 @@ class JadwalController extends Controller
 
         $events = [];
 
-        // Generate recurring events based on jadwal
+        // Generate recurring events berdasarkan jadwal ekstrakurikuler
         if ($ekstrakurikuler->jadwal && isset($ekstrakurikuler->jadwal['hari'])) {
-            $hari = $ekstrakurikuler->jadwal['hari'];
+            $hari = strtolower($ekstrakurikuler->jadwal['hari']);
             $waktu = $ekstrakurikuler->jadwal['waktu'] ?? '15:00 - 17:00';
 
             // Parse waktu
             $waktuParts = explode(' - ', $waktu);
-            $startTime = $waktuParts[0] ?? '15:00';
-            $endTime = $waktuParts[1] ?? '17:00';
+            $startTime = isset($waktuParts[0]) ? trim($waktuParts[0]) : '15:00';
+            $endTime = isset($waktuParts[1]) ? trim($waktuParts[1]) : '17:00';
+
+            // Validasi format waktu
+            if (!$this->isValidTimeFormat($startTime)) $startTime = '15:00';
+            if (!$this->isValidTimeFormat($endTime)) $endTime = '17:00';
 
             // Map hari ke Carbon day number
             $dayMap = [
@@ -87,12 +90,27 @@ class JadwalController extends Controller
             ];
 
             if (isset($dayMap[$hari])) {
+                $targetDay = $dayMap[$hari];
+
+                // Start dari awal minggu dalam range
                 $current = $start->copy()->startOfWeek();
 
                 while ($current->lte($end)) {
-                    $eventDate = $current->copy()->next($dayMap[$hari]);
+                    // Cari hari yang sesuai dalam minggu ini
+                    $eventDate = $current->copy();
 
-                    if ($eventDate->gte($start) && $eventDate->lte($end)) {
+                    // Adjust ke hari yang tepat
+                    while ($eventDate->dayOfWeek !== $targetDay && $eventDate->lte($current->copy()->endOfWeek())) {
+                        $eventDate->addDay();
+                    }
+
+                    // Jika hari ditemukan dan dalam range
+                    if (
+                        $eventDate->dayOfWeek === $targetDay &&
+                        $eventDate->gte($start) &&
+                        $eventDate->lte($end)
+                    ) {
+
                         $events[] = [
                             'id' => 'regular_' . $eventDate->format('Y-m-d'),
                             'title' => $ekstrakurikuler->nama,
@@ -104,7 +122,8 @@ class JadwalController extends Controller
                             'extendedProps' => [
                                 'type' => 'regular',
                                 'pembina' => $ekstrakurikuler->pembina->name ?? '',
-                                'description' => 'Kegiatan rutin ' . $ekstrakurikuler->nama
+                                'description' => 'Kegiatan rutin ' . $ekstrakurikuler->nama,
+                                'lokasi' => 'Sekolah'
                             ]
                         ];
                     }
@@ -114,27 +133,29 @@ class JadwalController extends Controller
             }
         }
 
-        // Add special events from announcements
-        $specialAnnouncements = $ekstrakurikuler->pengumumans()
-            ->where('is_penting', true)
-            ->whereDate('created_at', '>=', $start)
-            ->whereDate('created_at', '<=', $end)
-            ->get();
+        // Add special events dari pengumuman penting
+        if (class_exists('App\Models\Pengumuman')) {
+            $specialAnnouncements = $ekstrakurikuler->pengumumans()
+                ->where('is_penting', true)
+                ->whereDate('created_at', '>=', $start)
+                ->whereDate('created_at', '<=', $end)
+                ->get();
 
-        foreach ($specialAnnouncements as $announcement) {
-            $events[] = [
-                'id' => 'announcement_' . $announcement->id,
-                'title' => '📢 ' . $announcement->judul,
-                'start' => $announcement->created_at->format('Y-m-d'),
-                'backgroundColor' => '#ffc107',
-                'borderColor' => '#ffc107',
-                'textColor' => '#000000',
-                'extendedProps' => [
-                    'type' => 'announcement',
-                    'description' => $announcement->konten,
-                    'is_penting' => true
-                ]
-            ];
+            foreach ($specialAnnouncements as $announcement) {
+                $events[] = [
+                    'id' => 'announcement_' . $announcement->id,
+                    'title' => '📢 ' . $announcement->judul,
+                    'start' => $announcement->created_at->format('Y-m-d'),
+                    'backgroundColor' => '#ffc107',
+                    'borderColor' => '#ffc107',
+                    'textColor' => '#000000',
+                    'extendedProps' => [
+                        'type' => 'announcement',
+                        'description' => strip_tags($announcement->konten),
+                        'is_penting' => true
+                    ]
+                ];
+            }
         }
 
         return response()->json($events);
@@ -165,93 +186,74 @@ class JadwalController extends Controller
             ->with('error', 'Format export tidak valid.');
     }
 
-    private function generateCalendarData($ekstrakurikuler)
-    {
-        $today = Carbon::today();
-        $startOfMonth = $today->copy()->startOfMonth();
-        $endOfMonth = $today->copy()->endOfMonth();
-
-        $events = [];
-
-        // Generate events for current month
-        if ($ekstrakurikuler->jadwal && isset($ekstrakurikuler->jadwal['hari'])) {
-            $hari = $ekstrakurikuler->jadwal['hari'];
-            $waktu = $ekstrakurikuler->jadwal['waktu'] ?? '15:00 - 17:00';
-
-            $dayMap = [
-                'senin' => Carbon::MONDAY,
-                'selasa' => Carbon::TUESDAY,
-                'rabu' => Carbon::WEDNESDAY,
-                'kamis' => Carbon::THURSDAY,
-                'jumat' => Carbon::FRIDAY,
-                'sabtu' => Carbon::SATURDAY,
-                'minggu' => Carbon::SUNDAY,
-            ];
-
-            if (isset($dayMap[$hari])) {
-                $current = $startOfMonth->copy()->startOfWeek();
-
-                while ($current->lte($endOfMonth->endOfWeek())) {
-                    $eventDate = $current->copy()->next($dayMap[$hari]);
-
-                    if ($eventDate->gte($startOfMonth) && $eventDate->lte($endOfMonth)) {
-                        $events[] = [
-                            'date' => $eventDate->format('Y-m-d'),
-                            'title' => $ekstrakurikuler->nama,
-                            'time' => $waktu,
-                            'type' => 'regular'
-                        ];
-                    }
-
-                    $current->addWeek();
-                }
-            }
-        }
-
-        return $events;
-    }
-
     private function getUpcomingActivities($ekstrakurikuler)
     {
         $activities = [];
         $today = Carbon::today();
-        $nextWeek = $today->copy()->addWeek();
 
-        // Check if there's activity in the next 7 days
-        if ($ekstrakurikuler->jadwal && isset($ekstrakurikuler->jadwal['hari'])) {
-            $hari = $ekstrakurikuler->jadwal['hari'];
-            $waktu = $ekstrakurikuler->jadwal['waktu'] ?? '15:00 - 17:00';
-
-            $dayMap = [
-                'senin' => Carbon::MONDAY,
-                'selasa' => Carbon::TUESDAY,
-                'rabu' => Carbon::WEDNESDAY,
-                'kamis' => Carbon::THURSDAY,
-                'jumat' => Carbon::FRIDAY,
-                'sabtu' => Carbon::SATURDAY,
-                'minggu' => Carbon::SUNDAY,
-            ];
-
-            if (isset($dayMap[$hari])) {
-                $current = $today->copy();
-
-                for ($i = 0; $i < 7; $i++) {
-                    if ($current->dayOfWeek === $dayMap[$hari]) {
-                        $activities[] = [
-                            'date' => $current->copy(),
-                            'title' => $ekstrakurikuler->nama,
-                            'time' => $waktu,
-                            'pembina' => $ekstrakurikuler->pembina->name ?? '',
-                            'is_today' => $current->isToday(),
-                            'is_tomorrow' => $current->isTomorrow()
-                        ];
-                    }
-                    $current->addDay();
-                }
-            }
+        if (!$ekstrakurikuler->jadwal || !isset($ekstrakurikuler->jadwal['hari'])) {
+            return $activities;
         }
 
-        return collect($activities)->sortBy('date')->values()->all();
+        $hari = strtolower($ekstrakurikuler->jadwal['hari']);
+        $waktu = $ekstrakurikuler->jadwal['waktu'] ?? '15:00 - 17:00';
+
+        $dayMap = [
+            'senin' => Carbon::MONDAY,
+            'selasa' => Carbon::TUESDAY,
+            'rabu' => Carbon::WEDNESDAY,
+            'kamis' => Carbon::THURSDAY,
+            'jumat' => Carbon::FRIDAY,
+            'sabtu' => Carbon::SATURDAY,
+            'minggu' => Carbon::SUNDAY,
+        ];
+
+        if (!isset($dayMap[$hari])) {
+            return $activities;
+        }
+
+        $targetDay = $dayMap[$hari];
+        $current = $today->copy();
+        $found = 0;
+
+        // Cari 3 kegiatan mendatang
+        for ($i = 0; $i < 21 && $found < 3; $i++) { // Max 3 minggu ke depan
+            if ($current->dayOfWeek === $targetDay) {
+                $activities[] = [
+                    'date' => $current->copy(),
+                    'title' => $ekstrakurikuler->nama,
+                    'time' => $waktu,
+                    'pembina' => $ekstrakurikuler->pembina->name ?? '',
+                    'is_today' => $current->isToday(),
+                    'is_tomorrow' => $current->isTomorrow(),
+                    'type' => 'rutin',
+                    'description' => 'Kegiatan rutin ' . $ekstrakurikuler->nama
+                ];
+                $found++;
+            }
+            $current->addDay();
+        }
+
+        // Tambahkan event khusus (contoh)
+        if ($found < 3) {
+            $activities[] = [
+                'date' => $today->copy()->addDays(10),
+                'title' => 'Pertandingan Antar Sekolah',
+                'time' => '08:00 - 12:00',
+                'pembina' => $ekstrakurikuler->pembina->name ?? '',
+                'is_today' => false,
+                'is_tomorrow' => false,
+                'type' => 'kompetisi',
+                'description' => 'Kompetisi tingkat kabupaten'
+            ];
+        }
+
+        // Sort by date
+        usort($activities, function ($a, $b) {
+            return $a['date']->timestamp - $b['date']->timestamp;
+        });
+
+        return $activities;
     }
 
     private function exportToICalendar($ekstrakurikuler)
@@ -261,47 +263,34 @@ class JadwalController extends Controller
         $ical .= "PRODID:-//EkstrakurikulerApp//Calendar//EN\r\n";
         $ical .= "CALSCALE:GREGORIAN\r\n";
 
-        // Generate events for next 3 months
-        $start = Carbon::now();
-        $end = Carbon::now()->addMonths(3);
-
         if ($ekstrakurikuler->jadwal && isset($ekstrakurikuler->jadwal['hari'])) {
-            $hari = $ekstrakurikuler->jadwal['hari'];
+            $hari = strtolower($ekstrakurikuler->jadwal['hari']);
             $waktu = $ekstrakurikuler->jadwal['waktu'] ?? '15:00 - 17:00';
 
             $waktuParts = explode(' - ', $waktu);
-            $startTime = str_replace(':', '', $waktuParts[0] ?? '15:00') . '00';
-            $endTime = str_replace(':', '', $waktuParts[1] ?? '17:00') . '00';
+            $startTime = isset($waktuParts[0]) ? str_replace(':', '', trim($waktuParts[0])) . '00' : '150000';
+            $endTime = isset($waktuParts[1]) ? str_replace(':', '', trim($waktuParts[1])) . '00' : '170000';
 
             $dayMap = [
-                'senin' => Carbon::MONDAY,
-                'selasa' => Carbon::TUESDAY,
-                'rabu' => Carbon::WEDNESDAY,
-                'kamis' => Carbon::THURSDAY,
-                'jumat' => Carbon::FRIDAY,
-                'sabtu' => Carbon::SATURDAY,
-                'minggu' => Carbon::SUNDAY,
+                'senin' => 'MO',
+                'selasa' => 'TU',
+                'rabu' => 'WE',
+                'kamis' => 'TH',
+                'jumat' => 'FR',
+                'sabtu' => 'SA',
+                'minggu' => 'SU',
             ];
 
             if (isset($dayMap[$hari])) {
-                $current = $start->copy()->startOfWeek();
-
-                while ($current->lte($end)) {
-                    $eventDate = $current->copy()->next($dayMap[$hari]);
-
-                    if ($eventDate->gte($start) && $eventDate->lte($end)) {
-                        $ical .= "BEGIN:VEVENT\r\n";
-                        $ical .= "UID:" . md5($eventDate->format('Y-m-d') . $ekstrakurikuler->id) . "@ekstrakurikulerapp.com\r\n";
-                        $ical .= "DTSTART:" . $eventDate->format('Ymd') . "T" . $startTime . "\r\n";
-                        $ical .= "DTEND:" . $eventDate->format('Ymd') . "T" . $endTime . "\r\n";
-                        $ical .= "SUMMARY:" . $ekstrakurikuler->nama . "\r\n";
-                        $ical .= "DESCRIPTION:Kegiatan " . $ekstrakurikuler->nama . " dengan pembina " . ($ekstrakurikuler->pembina->name ?? '') . "\r\n";
-                        $ical .= "LOCATION:MA Modern Miftahussa'adah\r\n";
-                        $ical .= "END:VEVENT\r\n";
-                    }
-
-                    $current->addWeek();
-                }
+                $ical .= "BEGIN:VEVENT\r\n";
+                $ical .= "UID:" . md5($ekstrakurikuler->id . 'recurring') . "@ekstrakurikulerapp.com\r\n";
+                $ical .= "DTSTART:" . Carbon::now()->next($hari)->format('Ymd') . "T" . $startTime . "\r\n";
+                $ical .= "DTEND:" . Carbon::now()->next($hari)->format('Ymd') . "T" . $endTime . "\r\n";
+                $ical .= "RRULE:FREQ=WEEKLY;BYDAY=" . $dayMap[$hari] . "\r\n";
+                $ical .= "SUMMARY:" . $ekstrakurikuler->nama . "\r\n";
+                $ical .= "DESCRIPTION:Kegiatan " . $ekstrakurikuler->nama . " dengan pembina " . ($ekstrakurikuler->pembina->name ?? '') . "\r\n";
+                $ical .= "LOCATION:MA Modern Miftahussa'adah\r\n";
+                $ical .= "END:VEVENT\r\n";
             }
         }
 
@@ -316,9 +305,13 @@ class JadwalController extends Controller
 
     private function exportToPDF($ekstrakurikuler)
     {
-        // This would require a PDF library like DomPDF
-        // For now, we'll return a simple response
+        // Implementation untuk PDF export bisa ditambahkan nanti
         return redirect()->back()
             ->with('info', 'Export PDF akan segera tersedia.');
+    }
+
+    private function isValidTimeFormat($time)
+    {
+        return preg_match('/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/', $time);
     }
 }

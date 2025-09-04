@@ -165,17 +165,6 @@ class EkstrakurikulerController extends Controller
                 ->where('ekstrakurikuler_id', $ekstrakurikuler->id)
                 ->delete();
 
-            // 2. Hapus absensi yang terkait dengan pendaftaran ekstrakurikuler ini
-            $pendaftaranIds = DB::table('pendaftarans')
-                ->where('ekstrakurikuler_id', $ekstrakurikuler->id)
-                ->pluck('id');
-
-            if ($pendaftaranIds->isNotEmpty()) {
-                DB::table('absensis')
-                    ->whereIn('pendaftaran_id', $pendaftaranIds)
-                    ->delete();
-            }
-
             // 3. Hapus pendaftaran yang terkait
             DB::table('pendaftarans')
                 ->where('ekstrakurikuler_id', $ekstrakurikuler->id)

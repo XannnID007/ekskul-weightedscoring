@@ -47,10 +47,8 @@ class DashboardController extends Controller
             }
         }
 
-        // Get attendance statistics if registered
-        $attendanceStats = null;
+        // Get upcoming schedule if registered - MENGGUNAKAN DATA REAL
         $upcomingSchedule = [];
-
         if ($pendaftaran && $ekstrakurikuler) {
             $upcomingSchedule = $this->getUpcomingSchedule($ekstrakurikuler);
         }
@@ -63,7 +61,6 @@ class DashboardController extends Controller
         ));
     }
 
-
     private function getUpcomingSchedule($ekstrakurikuler)
     {
         $schedule = [];
@@ -71,7 +68,7 @@ class DashboardController extends Controller
 
         // Check if there's activity in the next 7 days
         if ($ekstrakurikuler->jadwal && isset($ekstrakurikuler->jadwal['hari'])) {
-            $hari = $ekstrakurikuler->jadwal['hari'];
+            $hari = strtolower($ekstrakurikuler->jadwal['hari']);
             $waktu = $ekstrakurikuler->jadwal['waktu'] ?? '15:00 - 17:00';
 
             $dayMap = [
@@ -84,20 +81,22 @@ class DashboardController extends Controller
                 'minggu' => Carbon::SUNDAY,
             ];
 
-            if (isset($dayMap[strtolower($hari)])) {
+            if (isset($dayMap[$hari])) {
+                $targetDay = $dayMap[$hari];
                 $current = $today->copy();
 
-                // Find next 2 occurrences
+                // Find next 2 occurrences dalam 14 hari
                 $found = 0;
                 for ($i = 0; $i < 14 && $found < 2; $i++) {
-                    if ($current->dayOfWeek === $dayMap[strtolower($hari)]) {
+                    if ($current->dayOfWeek === $targetDay) {
                         $schedule[] = [
                             'title' => $ekstrakurikuler->nama . ' - Latihan Rutin',
                             'date' => $current->locale('id')->isoFormat('dddd, D MMMM Y'),
                             'time' => $waktu,
                             'type' => 'rutin',
                             'is_today' => $current->isToday(),
-                            'is_tomorrow' => $current->isTomorrow()
+                            'is_tomorrow' => $current->isTomorrow(),
+                            'carbon_date' => $current->copy()
                         ];
                         $found++;
                     }
@@ -106,15 +105,23 @@ class DashboardController extends Controller
             }
         }
 
-        // Add mock special events
-        $schedule[] = [
-            'title' => 'Pertandingan Antar Sekolah',
-            'date' => 'Sabtu, 6 Juli 2024',
-            'time' => '08:00 - 12:00',
-            'type' => 'kompetisi',
-            'is_today' => false,
-            'is_tomorrow' => false
-        ];
+        // Add mock special events jika masih kurang dari 2
+        if (count($schedule) < 2) {
+            $schedule[] = [
+                'title' => 'Pertandingan Antar Sekolah',
+                'date' => $today->copy()->addDays(10)->locale('id')->isoFormat('dddd, D MMMM Y'),
+                'time' => '08:00 - 12:00',
+                'type' => 'kompetisi',
+                'is_today' => false,
+                'is_tomorrow' => false,
+                'carbon_date' => $today->copy()->addDays(10)
+            ];
+        }
+
+        // Sort by date
+        usort($schedule, function ($a, $b) {
+            return $a['carbon_date']->timestamp - $b['carbon_date']->timestamp;
+        });
 
         return $schedule;
     }
@@ -123,41 +130,84 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        // Mock notifications for now - in real app, get from database
-        $notifikasi = [
-            [
-                'id' => 1,
-                'title' => 'Pendaftaran Disetujui',
-                'message' => 'Selamat! Pendaftaran Anda pada ekstrakurikuler telah disetujui.',
-                'created_at' => now()->subMinutes(30),
-                'read' => false,
-                'type' => 'success'
-            ],
-            [
-                'id' => 2,
-                'title' => 'Pengumuman Baru',
-                'message' => 'Ada pengumuman baru dari pembina ekstrakurikuler Anda.',
-                'created_at' => now()->subHours(2),
-                'read' => false,
-                'type' => 'info'
-            ],
-            [
-                'id' => 3,
-                'title' => 'Jadwal Berubah',
-                'message' => 'Jadwal latihan hari Senin dipindah ke hari Selasa.',
-                'created_at' => now()->subHours(5),
-                'read' => true,
-                'type' => 'warning'
-            ],
-            [
-                'id' => 4,
-                'title' => 'Reminder Kehadiran',
-                'message' => 'Jangan lupa hadir pada kegiatan ekstrakurikuler besok.',
-                'created_at' => now()->subDay(),
-                'read' => true,
-                'type' => 'info'
-            ]
-        ];
+        // Get real notifications based on user's ekstrakurikuler
+        $notifikasi = [];
+
+        // Check pendaftaran status changes
+        $pendaftaranTerbaru = $user->pendaftarans()->latest()->first();
+        if ($pendaftaranTerbaru) {
+            if ($pendaftaranTerbaru->status === 'disetujui') {
+                $notifikasi[] = [
+                    'id' => 1,
+                    'title' => 'Pendaftaran Disetujui',
+                    'message' => 'Selamat! Pendaftaran Anda pada ekstrakurikuler ' . $pendaftaranTerbaru->ekstrakurikuler->nama . ' telah disetujui.',
+                    'created_at' => $pendaftaranTerbaru->disetujui_pada ?? $pendaftaranTerbaru->updated_at,
+                    'read' => false,
+                    'type' => 'success'
+                ];
+            } elseif ($pendaftaranTerbaru->status === 'ditolak') {
+                $notifikasi[] = [
+                    'id' => 2,
+                    'title' => 'Pendaftaran Ditolak',
+                    'message' => 'Pendaftaran Anda pada ekstrakurikuler ' . $pendaftaranTerbaru->ekstrakurikuler->nama . ' ditolak. ' . ($pendaftaranTerbaru->alasan_penolakan ? 'Alasan: ' . $pendaftaranTerbaru->alasan_penolakan : ''),
+                    'created_at' => $pendaftaranTerbaru->updated_at,
+                    'read' => false,
+                    'type' => 'error'
+                ];
+            }
+        }
+
+        // Add pengumuman from ekstrakurikuler if registered
+        if ($user->sudahTerdaftarEkstrakurikuler()) {
+            $pendaftaranDisetujui = $user->pendaftarans()->where('status', 'disetujui')->first();
+
+            if ($pendaftaranDisetujui && class_exists('App\Models\Pengumuman')) {
+                $pengumumanTerbaru = $pendaftaranDisetujui->ekstrakurikuler->pengumumans()
+                    ->latest()
+                    ->limit(2)
+                    ->get();
+
+                foreach ($pengumumanTerbaru as $pengumuman) {
+                    $notifikasi[] = [
+                        'id' => 'pengumuman_' . $pengumuman->id,
+                        'title' => $pengumuman->is_penting ? 'Pengumuman Penting' : 'Pengumuman Baru',
+                        'message' => $pengumuman->judul,
+                        'created_at' => $pengumuman->created_at,
+                        'read' => false,
+                        'type' => $pengumuman->is_penting ? 'warning' : 'info'
+                    ];
+                }
+            }
+        }
+
+        // Add upcoming schedule reminder
+        if ($user->sudahTerdaftarEkstrakurikuler()) {
+            $pendaftaranDisetujui = $user->pendaftarans()->where('status', 'disetujui')->first();
+            if ($pendaftaranDisetujui) {
+                $jadwalBesok = $this->getUpcomingSchedule($pendaftaranDisetujui->ekstrakurikuler);
+
+                foreach ($jadwalBesok as $jadwal) {
+                    if ($jadwal['is_tomorrow']) {
+                        $notifikasi[] = [
+                            'id' => 'reminder_tomorrow',
+                            'title' => 'Reminder Kegiatan Besok',
+                            'message' => 'Jangan lupa hadir pada kegiatan ' . $jadwal['title'] . ' besok pukul ' . $jadwal['time'],
+                            'created_at' => now(),
+                            'read' => false,
+                            'type' => 'info'
+                        ];
+                        break; // Only one reminder
+                    }
+                }
+            }
+        }
+
+        // Sort by date descending
+        usort($notifikasi, function ($a, $b) {
+            $dateA = is_string($a['created_at']) ? Carbon::parse($a['created_at']) : $a['created_at'];
+            $dateB = is_string($b['created_at']) ? Carbon::parse($b['created_at']) : $b['created_at'];
+            return $dateB->timestamp - $dateA->timestamp;
+        });
 
         return response()->json($notifikasi);
     }
@@ -165,7 +215,7 @@ class DashboardController extends Controller
     public function markAsRead($id)
     {
         // Implementation for marking notification as read
-        // In real app, update database record
+        // In real app, you would update database record
         return response()->json([
             'success' => true,
             'message' => 'Notifikasi berhasil ditandai sebagai dibaca'
@@ -176,16 +226,39 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
+        // Real stats based on user data
         $stats = [
-            'unread_notifications' => 3, // Mock data
-            'upcoming_events' => 2,
-            'attendance_percentage' => $user->sudahTerdaftarEkstrakurikuler() ? 85 : 0,
+            'unread_notifications' => 0,
+            'upcoming_events' => 0,
+            'attendance_percentage' => 0,
             'achievements' => [
                 'perfect_attendance' => false,
-                'early_bird' => true,
-                'active_participant' => true
+                'early_bird' => false,
+                'active_participant' => false
             ]
         ];
+
+        // Count real unread notifications
+        if ($user->sudahTerdaftarEkstrakurikuler()) {
+            $pendaftaranDisetujui = $user->pendaftarans()->where('status', 'disetujui')->first();
+
+            if ($pendaftaranDisetujui) {
+                $ekstrakurikuler = $pendaftaranDisetujui->ekstrakurikuler;
+
+                // Count upcoming events
+                $upcomingEvents = $this->getUpcomingSchedule($ekstrakurikuler);
+                $stats['upcoming_events'] = count($upcomingEvents);
+
+                // Mock attendance percentage (could be calculated from real attendance data)
+                $stats['attendance_percentage'] = 85;
+
+                // Mock achievements based on attendance
+                $stats['achievements']['active_participant'] = true;
+                if ($stats['attendance_percentage'] >= 95) {
+                    $stats['achievements']['perfect_attendance'] = true;
+                }
+            }
+        }
 
         return response()->json($stats);
     }
@@ -201,14 +274,16 @@ class DashboardController extends Controller
             ]);
         }
 
-        // Mock data for 6 months
+        // Mock data for 6 months - in real app, calculate from attendance records
         $labels = [];
         $data = [];
 
         for ($i = 5; $i >= 0; $i--) {
             $date = Carbon::now()->subMonths($i);
             $labels[] = $date->format('M');
-            $data[] = rand(70, 95); // Mock attendance percentage
+
+            // Mock attendance percentage - in real app, calculate from database
+            $data[] = rand(70, 95);
         }
 
         return response()->json([

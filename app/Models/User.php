@@ -42,6 +42,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'tanggal_lahir' => 'date',
         'minat' => 'array',
+        'jadwal_luang' => 'array',
         'is_active' => 'boolean',
         'nilai_rata_rata' => 'decimal:2'
     ];
@@ -80,14 +81,6 @@ class User extends Authenticatable
         return $this->belongsToMany(Ekstrakurikuler::class, 'pendaftarans')
             ->withPivot(['status', 'motivasi', 'pengalaman', 'harapan', 'tingkat_komitmen', 'created_at', 'updated_at'])
             ->withTimestamps();
-    }
-
-    /**
-     * Absensi user (melalui pendaftaran)
-     */
-    public function absensis()
-    {
-        return $this->hasManyThrough(Absensi::class, Pendaftaran::class);
     }
 
     // ========== SCOPES ==========

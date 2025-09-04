@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use App\Models\User;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 class LoginController extends Controller
 {
@@ -21,13 +23,6 @@ class LoginController extends Controller
     */
 
     use AuthenticatesUsers;
-
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/redirect-by-role';
 
     /**
      * Create a new controller instance.
@@ -49,7 +44,7 @@ class LoginController extends Controller
      */
     protected function authenticated(Request $request, $user)
     {
-        // Redirect berdasarkan role
+        // Redirect berdasarkan role (Logika ini sudah benar, tidak perlu diubah)
         switch ($user->role) {
             case 'admin':
                 return redirect()->intended(route('admin.dashboard'));
@@ -61,5 +56,51 @@ class LoginController extends Controller
                 Auth::logout();
                 return redirect()->route('login')->with('error', 'Role tidak valid');
         }
+    }
+
+    /**
+     * Validate the user login request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function validateLogin(Request $request)
+    {
+        $request->validate([
+            'email'    => 'required|string|email',
+            'password' => 'required|string',
+        ], [
+            'email.required'    => 'Email wajib diisi.',
+            'email.email'       => 'Format email tidak valid.',
+            'password.required' => 'Password wajib diisi.',
+        ]);
+    }
+
+    /**
+     * Get the failed login response instance.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        // Pertama, kita cek apakah user dengan email tersebut ada di database.
+        $userExists = User::where('email', $request->email)->first();
+
+        // Jika user tidak ditemukan, maka kesalahan pasti ada di email.
+        if (!$userExists) {
+            throw ValidationException::withMessages([
+                'email' => ['Email yang Anda masukkan tidak terdaftar.'],
+            ]);
+        }
+
+        // Jika user ditemukan, berarti kesalahan pasti ada di password.
+        throw ValidationException::withMessages([
+            'password' => ['Password yang Anda masukkan salah.'],
+        ]);
     }
 }

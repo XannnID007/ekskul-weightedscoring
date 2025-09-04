@@ -128,8 +128,7 @@
 
                             <!-- Actions -->
                             <div class="d-grid gap-2">
-                                <a href="{{ route('siswa.ekstrakurikuler.show', $rekomendasi->ekstrakurikuler) }}"
-                                    class="btn btn-dark">
+                                <a href="{{ route('siswa.rekomendasi.detail', $rekomendasi) }}" class="btn btn-dark">
                                     <i class="bi bi-eye me-1"></i>Lihat Detail
                                 </a>
                                 @if ($rekomendasi->ekstrakurikuler->masihBisaDaftar())
@@ -206,7 +205,7 @@
                                         </div>
 
                                         <div class="d-flex gap-2">
-                                            <a href="{{ route('siswa.ekstrakurikuler.show', $rekomendasi->ekstrakurikuler) }}"
+                                            <a href="{{ route('siswa.rekomendasi.detail', $rekomendasi) }}"
                                                 class="btn btn-outline-primary btn-sm flex-grow-1">
                                                 <i class="bi bi-eye me-1"></i>Detail
                                             </a>

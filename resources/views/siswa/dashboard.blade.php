@@ -95,32 +95,29 @@
 @section('content')
     @php
         $user = auth()->user();
-        $pendaftaran = $user
-            ->pendaftarans()
-            ->where('status', 'disetujui')
-            ->with(['ekstrakurikuler.pembina'])
-            ->first();
-        $ekstrakurikuler = $pendaftaran ? $pendaftaran->ekstrakurikuler : null;
+        // Data dari controller
+        $todayScheduleCount = 0;
+        $unreadAnnouncementsCount = 3; // Default value
 
-        // Mock data untuk jadwal mendatang
-        $upcomingSchedule = [
-            [
-                'title' => $ekstrakurikuler ? $ekstrakurikuler->nama . ' - Latihan Rutin' : 'Kegiatan Ekstrakurikuler',
-                'date' => 'Senin, 1 Jul 2024',
-                'time' => '15:30 - 17:00',
-                'type' => 'rutin',
-                'is_today' => false,
-                'is_tomorrow' => true,
-            ],
-            [
-                'title' => 'Pertandingan Antar Sekolah',
-                'date' => 'Sabtu, 6 Jul 2024',
-                'time' => '08:00 - 12:00',
-                'type' => 'kompetisi',
-                'is_today' => false,
-                'is_tomorrow' => false,
-            ],
-        ];
+        // Hitung jadwal hari ini dari data real
+        if (isset($upcomingSchedule)) {
+            foreach ($upcomingSchedule as $schedule) {
+                if ($schedule['is_today']) {
+                    $todayScheduleCount++;
+                }
+            }
+        }
+
+        // Hitung pengumuman yang belum dibaca jika sudah terdaftar
+        if ($user->sudahTerdaftarEkstrakurikuler()) {
+            $pendaftaranDisetujui = $user->pendaftarans()->where('status', 'disetujui')->first();
+            if ($pendaftaranDisetujui && class_exists('App\Models\Pengumuman')) {
+                $unreadAnnouncementsCount = $pendaftaranDisetujui->ekstrakurikuler
+                    ->pengumumans()
+                    ->where('created_at', '>=', \Carbon\Carbon::now()->subDays(7))
+                    ->count();
+            }
+        }
     @endphp
 
     <div class="row g-4">
@@ -164,7 +161,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="card-title mb-1">Pengumuman Baru</h6>
-                            <h2 class="mb-0">3</h2>
+                            <h2 class="mb-0">{{ $unreadAnnouncementsCount }}</h2>
                             <small class="opacity-75">Belum dibaca</small>
                         </div>
                         <div class="stats-icon">
@@ -181,13 +178,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="card-title mb-1">Jadwal Hari Ini</h6>
-                            <h2 class="mb-0">
-                                @if ($ekstrakurikuler)
-                                    1
-                                @else
-                                    0
-                                @endif
-                            </h2>
+                            <h2 class="mb-0">{{ $todayScheduleCount }}</h2>
                             <small class="opacity-75">Kegiatan hari ini</small>
                         </div>
                         <div class="stats-icon">
@@ -238,6 +229,16 @@
                                     <a href="{{ route('siswa.jadwal') }}" class="btn btn-primary btn-sm me-2">
                                         <i class="bi bi-calendar3 me-1"></i>Lihat Jadwal
                                     </a>
+                                    @if ($user->sudahTerdaftarEkstrakurikuler())
+                                        <a href="{{ route('siswa.pengumuman.index') }}"
+                                            class="btn btn-outline-primary btn-sm me-2">
+                                            <i class="bi bi-megaphone me-1"></i>Pengumuman
+                                        </a>
+                                        <a href="{{ route('siswa.galeri.index') }}"
+                                            class="btn btn-outline-secondary btn-sm">
+                                            <i class="bi bi-images me-1"></i>Galeri
+                                        </a>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -275,7 +276,9 @@
                                             <span class="badge bg-info ms-1">Besok</span>
                                         @endif
                                     </p>
-                                    <small class="text-success">{{ $schedule['time'] }}</small>
+                                    <small class="text-success">
+                                        <i class="bi bi-clock me-1"></i>{{ $schedule['time'] }}
+                                    </small>
                                 </div>
                                 @if ($schedule['type'] == 'kompetisi')
                                     <span class="badge bg-warning">Kompetisi</span>
@@ -360,102 +363,23 @@
     </div>
 @endsection
 
-@push('styles')
-    <style>
-        .stats-card {
-            transition: transform 0.2s ease;
-        }
-
-        .stats-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .circular-progress {
-            transform: rotate(-90deg);
-        }
-
-        .progress-ring {
-            transition: stroke-dashoffset 1.5s ease-in-out;
-        }
-
-        .avatar-sm {
-            width: 40px;
-            height: 40px;
-        }
-
-        .card {
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .row>.col-md-6,
-        .row>.col-xl-3,
-        .row>.col-xl-8,
-        .row>.col-xl-4,
-        .row>.col-xl-12 {
-            animation: fadeInUp 0.6s ease-out;
-        }
-
-        .row>.col-xl-4 {
-            animation-delay: 0.2s;
-        }
-
-        .badge {
-            font-size: 0.75em;
-        }
-    </style>
-@endpush
-
 @push('scripts')
     <script>
-        // Animate progress ring on load
-        window.addEventListener('load', function() {
-            const progressRing = document.querySelector('.progress-ring');
-            if (progressRing) {
-                progressRing.style.transition = 'stroke-dashoffset 1.5s ease-in-out';
-            }
-        });
-
-        // Auto refresh notifications every 30 seconds
+        // Auto refresh stats every 5 minutes
         setInterval(function() {
-            // You can implement AJAX call to get latest notifications here
-            console.log('Checking for new notifications...');
-        }, 30000);
+            // Check for new notifications via API
+            fetch('/api/siswa/notifikasi')
+                .then(response => response.json())
+                .then(data => {
+                    // Update notification indicators if needed
+                    console.log('Dashboard stats updated');
+                })
+                .catch(error => {
+                    console.log('Failed to update stats:', error);
+                });
+        }, 300000); // 5 minutes
 
-        // Card hover animations
-        document.querySelectorAll('.card').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                if (!this.classList.contains('stats-card')) {
-                    this.style.transform = 'translateY(-2px)';
-                    this.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
-                }
-            });
-
-            card.addEventListener('mouseleave', function() {
-                if (!this.classList.contains('stats-card')) {
-                    this.style.transform = 'translateY(0)';
-                    this.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-                }
-            });
-        });
-
-        // Quick action shortcuts
+        // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
             // Ctrl + J for Jadwal
             if (e.ctrlKey && e.key === 'j') {
@@ -464,17 +388,40 @@
                     window.location.href = '{{ route('siswa.jadwal') }}';
                 @endif
             }
+
+            // Ctrl + P for Pengumuman
+            if (e.ctrlKey && e.key === 'p' && e.shiftKey) {
+                e.preventDefault();
+                @if ($ekstrakurikuler)
+                    window.location.href = '{{ route('siswa.pengumuman.index') }}';
+                @endif
+            }
         });
 
-        // Show tooltips for keyboard shortcuts
+        // Add tooltips for keyboard shortcuts
         document.addEventListener('DOMContentLoaded', function() {
             @if ($ekstrakurikuler)
-                // Add tooltip to jadwal button
                 const jadwalBtn = document.querySelector('a[href="{{ route('siswa.jadwal') }}"]');
                 if (jadwalBtn) {
                     jadwalBtn.setAttribute('title', 'Shortcut: Ctrl + J');
                 }
+
+                const pengumumanBtn = document.querySelector('a[href="{{ route('siswa.pengumuman.index') }}"]');
+                if (pengumumanBtn) {
+                    pengumumanBtn.setAttribute('title', 'Shortcut: Ctrl + Shift + P');
+                }
             @endif
+        });
+
+        // Animate stats cards on page load
+        window.addEventListener('load', function() {
+            const statsCards = document.querySelectorAll('.stats-card');
+            statsCards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.transform = 'translateY(0)';
+                    card.style.opacity = '1';
+                }, index * 100);
+            });
         });
     </script>
 @endpush

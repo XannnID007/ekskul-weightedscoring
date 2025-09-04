@@ -230,7 +230,7 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('siswa.profil.update') }}" method="POST">
+                    <form action="{{ route('siswa.profil.update') }}" method="POST" id="profilForm">
                         @csrf
                         @method('PUT')
 
@@ -349,8 +349,8 @@
                             <div class="interest-info">
                                 <div class="d-flex align-items-center">
                                     <i class="bi bi-info-circle me-2"></i>
-                                    <span class="small">Pilih minimal 1 minat yang sesuai dengan Anda untuk mendapatkan
-                                        rekomendasi ekstrakurikuler yang akurat</span>
+                                    <span class="small" id="minat-info-text">Pilih maksimal 3 minat yang paling sesuai
+                                        dengan Anda.</span>
                                 </div>
                             </div>
 
@@ -369,8 +369,6 @@
                                         'teater' => 'bi-mask',
                                         'jurnalistik' => 'bi-newspaper',
                                         'fotografi' => 'bi-camera',
-                                        'memasak' => 'bi-egg-fried',
-                                        'berkebun' => 'bi-flower1',
                                     ];
                                 @endphp
 
@@ -378,7 +376,7 @@
                                     <div class="interest-item">
                                         <input class="interest-checkbox" type="checkbox" id="minat_{{ $key }}"
                                             name="minat[]" value="{{ $key }}"
-                                            {{ in_array($key, old('minat', $user->minat_array)) ? 'checked' : '' }}>
+                                            {{ in_array($key, old('minat', $user->minat ?? [])) ? 'checked' : '' }}>
                                         <label class="interest-label" for="minat_{{ $key }}">
                                             <i class="bi {{ $icons[$key] ?? 'bi-heart' }} interest-icon"></i>
                                             <span class="interest-text">{{ $label }}</span>
@@ -388,6 +386,33 @@
                             </div>
                             @error('minat')
                                 <div class="text-danger small mt-2">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Pilih Jadwal Luang Anda:</label>
+                            @php
+                                $jadwal_tersimpan = Auth::user()->jadwal_luang ?? [];
+                                $semua_hari = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+                            @endphp
+
+                            <div class="row">
+                                @foreach ($semua_hari as $hari)
+                                    <div class="col-md-3 col-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="jadwal_luang[]"
+                                                value="{{ $hari }}" id="jadwal_{{ $hari }}"
+                                                {{-- Cek apakah hari ini ada di jadwal yang tersimpan --}}
+                                                {{ in_array($hari, $jadwal_tersimpan) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="jadwal_{{ $hari }}">
+                                                {{ $hari }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                            @error('jadwal_luang')
+                                <div class="text-danger mt-2">{{ $message }}</div>
                             @enderror
                         </div>
 
@@ -432,18 +457,44 @@
 
 @push('scripts')
     <script>
-        // Check at least one interest selected
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const checkboxes = document.querySelectorAll('input[name="minat[]"]:checked');
-            if (checkboxes.length === 0) {
-                e.preventDefault();
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Minat Belum Dipilih',
-                    text: 'Pilih minimal satu minat untuk mendapatkan rekomendasi yang akurat.'
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('profilForm');
+            const minatCheckboxes = document.querySelectorAll('.interest-checkbox');
+            const MAX_MINAT = 3;
+
+            // --- FUNGSI UNTUK MEMBATASI 3 MINAT ---
+            function limitMinatSelection() {
+                const checkedCount = document.querySelectorAll('.interest-checkbox:checked').length;
+
+                minatCheckboxes.forEach(checkbox => {
+                    if (checkedCount >= MAX_MINAT && !checkbox.checked) {
+                        checkbox.disabled = true;
+                    } else {
+                        checkbox.disabled = false;
+                    }
                 });
-                return false;
             }
+
+            minatCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', limitMinatSelection);
+            });
+
+            // --- FUNGSI UNTUK VALIDASI SUBMIT ---
+            form.addEventListener('submit', function(e) {
+                const checkedMinat = document.querySelectorAll('input[name="minat[]"]:checked');
+                if (checkedMinat.length === 0) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Minat Belum Dipilih',
+                        text: 'Anda harus memilih minimal satu minat untuk melanjutkan.'
+                    });
+                    return false;
+                }
+            });
+
+            // Panggil fungsi limit saat halaman pertama kali dimuat
+            limitMinatSelection();
         });
 
         // Real-time progress update
